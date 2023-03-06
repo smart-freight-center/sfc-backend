@@ -10,5 +10,5 @@ const server = ApiServer.create({
   },
 });
 
-await server.listen(apiPort);
+server.listen(apiPort as number);
 console.log(`Listening on http://localhost:${apiPort}`);

@@ -1,10 +1,10 @@
 {
   "name": "sfc-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.ts",
   "repository": "git@github.com:smart-freight-center/sfc-backend.git",
   "scripts": {
-    "start": "nodemon index.ts",
+    "start": "nodemon",
     "build": "tsc"
   },
   "dependencies": {
