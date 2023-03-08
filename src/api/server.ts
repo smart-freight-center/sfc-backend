@@ -1,7 +1,7 @@
-import * as http from "http";
-import cors from "@koa/cors";
-import Koa from "koa";
-import * as routes from "./routes";
+import * as http from 'http';
+import cors from '@koa/cors';
+import Koa from 'koa';
+import * as routes from './routes';
 
 export interface ServerConfig {
   cors?: {
@@ -14,7 +14,7 @@ export class ApiServer {
   server: http.Server;
 
   /** The native Node.js HTTP server reference. */
-  koa: Koa;
+  public readonly koa: Koa;
 
   /**
    * # Not supported initialization method
@@ -30,7 +30,7 @@ export class ApiServer {
    *
    * @param port the port for incoming HTTP requests.
    */
-  async listen(port?: number, hostname = "0.0.0.0"): Promise<void> {
+  listen(port?: number, hostname = '0.0.0.0'): Promise<void> {
     return new Promise<void>((resolve) => {
       this.server.listen(port, hostname, () => {
         resolve();
@@ -68,15 +68,15 @@ export class ApiServer {
       koa.use(
         cors({
           origin: (context) => {
-            if (allowedOrigins.includes("*")) {
-              return "*";
+            if (allowedOrigins.includes('*')) {
+              return '*';
             }
 
             const foundOrigin = allowedOrigins.find(
               (origin) => origin === context.origin
             );
 
-            return foundOrigin || "";
+            return foundOrigin || '';
           },
         })
       );
