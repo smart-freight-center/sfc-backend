@@ -1,0 +1,4 @@
+[submodule "vendors/think-it-labs/edc-connector-client"]
+	path = vendors/think-it-labs/edc-connector-client
+	url = git@github.com:think-it-labs/edc-connector-client.git
+	branch = build
