@@ -1,7 +1,6 @@
 import { ApiServer } from "./api";
 import { EdcManager } from "./core";
 
-const apiPort = process.env.API_PORT || 3000;
 const apiAllowedOrigins = process.env.API_ALLOWED_ORIGINS || "";
 const allowedOrigins = apiAllowedOrigins.split(",").filter(Boolean);
 const connectorRegistry = JSON.parse(
@@ -28,6 +27,8 @@ const server = ApiServer.create({
     allowedOrigins,
   },
 });
+
+const apiPort = process.env.API_PORT || 3000;
 
 server.listen(apiPort as number);
 console.log(`Listening on http://localhost:${apiPort}`);

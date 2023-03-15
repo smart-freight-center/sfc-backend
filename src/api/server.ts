@@ -1,9 +1,9 @@
-import * as http from "http";
-import cors from "@koa/cors";
-import Koa from "koa";
-import * as routes from "./routes";
-import { EdcManager, EdcManagerError, EdcManagerErrorType } from "../core";
-import { ApiRouterContext } from "./context";
+import * as http from 'http';
+import cors from '@koa/cors';
+import Koa from 'koa';
+import * as routes from './routes';
+import { EdcManager, EdcManagerError, EdcManagerErrorType } from '../core';
+import { ApiRouterContext } from './context';
 
 export interface ServerConfig {
   edcManager: EdcManager;
@@ -17,7 +17,7 @@ export class ApiServer {
   server: http.Server;
 
   /** The native Node.js HTTP server reference. */
-  koa: Koa;
+  public readonly koa: Koa;
 
   edcManager: EdcManager;
   /**
@@ -35,7 +35,7 @@ export class ApiServer {
    *
    * @param port the port for incoming HTTP requests.
    */
-  async listen(port?: number, hostname = "0.0.0.0"): Promise<void> {
+  listen(port?: number, hostname = '0.0.0.0'): Promise<void> {
     return new Promise<void>((resolve) => {
       this.server.listen(port, hostname, () => {
         resolve();
@@ -75,15 +75,15 @@ export class ApiServer {
       koa.use(
         cors({
           origin: (context) => {
-            if (allowedOrigins.includes("*")) {
-              return "*";
+            if (allowedOrigins.includes('*')) {
+              return '*';
             }
 
             const foundOrigin = allowedOrigins.find(
               (origin) => origin === context.origin
             );
 
-            return foundOrigin || "";
+            return foundOrigin || '';
           },
         })
       );
@@ -107,7 +107,7 @@ export class ApiServer {
           await next();
         } catch (error) {
           if (error instanceof EdcManagerError) {
-            context.set("Content-type", "application/json");
+            context.set('Content-type', 'application/json');
             switch (error.type) {
               case EdcManagerErrorType.NotFound: {
                 context.status = 404;
@@ -141,7 +141,7 @@ export class ApiServer {
 
           context.status = 500;
           context.body = {
-            code: "Unknown",
+            code: 'Unknown',
             error,
           };
         }
