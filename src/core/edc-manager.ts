@@ -1,9 +1,9 @@
-import { EdcManagerContext } from "./context";
-import { Management, Mapping } from "./controllers";
-import { Inner } from "./inner";
-import { Connector } from "./entities";
+import { EdcManagerContext } from './context';
+import { Management, Mapping } from './controllers';
+import { Inner } from './inner';
+import { Connector } from './entities';
 
-const DISPOSED = Symbol("[_disposed]");
+const DISPOSED = Symbol('[_disposed]');
 
 export interface Logger {
   trace(message: string): void;
@@ -32,19 +32,19 @@ export class EdcManager {
     const connector: Connector = JSON.parse(
       process.env.CONNECTOR_CONFIG as string
     ) ?? {
-      id: "urn:connector:consumer",
-      title: "consumer.edc.think-it.io",
-      catalogId: "default",
-      description: "The consumer connector for the EDC manager demo",
-      region: "eu-west-1",
+      id: 'urn:connector:consumer',
+      title: 'consumer.edc.think-it.io',
+      catalogId: 'default',
+      description: 'The consumer connector for the EDC manager demo',
+      region: 'eu-west-1',
       addresses: {
-        default: "http://localhost:19191/api",
-        validation: "http://localhost:19292",
-        management: "http://localhost:19193/api/v1/data",
-        protocol: "http://consumer-connector:9194/api/v1/ids",
-        dataplane: "http://localhost:19195",
-        public: "http://localhost:19291/public",
-        control: "http://localhost:19292/control",
+        default: 'http://localhost:19191/api',
+        validation: 'http://localhost:19292',
+        management: 'http://localhost:19193/api/v1/data',
+        protocol: 'http://consumer-connector:9194/api/v1/ids',
+        dataplane: 'http://localhost:19195',
+        public: 'http://localhost:19291/public',
+        control: 'http://localhost:19292/control',
       },
     };
 
