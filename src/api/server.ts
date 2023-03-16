@@ -1,7 +1,10 @@
 import * as http from 'http';
 import cors from '@koa/cors';
-import Koa from 'koa';
+import Koa, { Context } from 'koa';
+import { RouterContext } from '@koa/router';
 import * as routes from './routes';
+import { EdcManagerError, EdcManagerErrorType } from '../core';
+import koaBodyparser from 'koa-bodyparser';
 
 export interface ServerConfig {
   cors?: {
@@ -9,6 +12,7 @@ export interface ServerConfig {
   };
 }
 
+export type ApiRouterContext = RouterContext<{}>;
 export class ApiServer {
   /** The native Node.js HTTP server reference. */
   server: http.Server;
@@ -42,7 +46,7 @@ export class ApiServer {
    * Gracefully close all open connections and stop listening for HTTP requests
    * and dispose the `Lms` instance.
    */
-  async shutdown(): Promise<void> {
+  async shutdown(edcManager): Promise<void> {
     if (!this.server.listening) {
       return;
     }
@@ -80,9 +84,58 @@ export class ApiServer {
           },
         })
       );
+      koa.use(
+        koaBodyparser({
+          enableTypes: ['json'],
+        })
+      );
     }
 
     const server = http.createServer(koa.callback());
+    koa.use(async (context: Context, next: () => Promise<void>) => {
+      try {
+        await next();
+      } catch (error) {
+        if (error instanceof EdcManagerError) {
+          context.set('Content-type', 'application/json');
+          switch (error.type) {
+            case EdcManagerErrorType.NotFound: {
+              context.status = 404;
+              context.body = {
+                code: error.type,
+                message: error.message,
+              };
+              break;
+            }
+            case EdcManagerErrorType.Duplicate: {
+              context.status = 409;
+              context.body = {
+                code: error.type,
+                message: error.message,
+              };
+              break;
+            }
+            case EdcManagerErrorType.Unknown:
+            default: {
+              context.status = 500;
+              context.body = {
+                code: error.type,
+                message: error.message,
+              };
+              break;
+            }
+          }
+
+          return;
+        }
+
+        context.status = 500;
+        context.body = {
+          code: 'Unknown',
+          error,
+        };
+      }
+    });
 
     for (const router of Object.values(routes)) {
       koa.use(router.routes()).use(router.allowedMethods());

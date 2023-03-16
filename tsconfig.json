@@ -7,20 +7,24 @@
     "inlineSourceMap": true,
     "skipLibCheck": true,
     "outDir": "dist",
-    "jsx": "preserve",
     "declaration": false,
     "allowJs": true,
     "strict": true /* Enable all strict type-checking options. */,
     "noImplicitAny": false /* Raise error on expressions and declarations with an implied 'any' type. */,
     "strictNullChecks": true /* Enable strict null checks. */,
     "strictPropertyInitialization": false /* Enable strict checking of property initialization in classes. */,
-    "noUnusedLocals": true /* Report errors on unused locals. */,
+    "noUnusedLocals": false /* Report errors on unused locals. */,
     "noUnusedParameters": false /* Report errors on unused parameters. */,
     "baseUrl": "./src",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "noImplicitReturns": true
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "**/*.ts",
+    "**/*.js",
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
