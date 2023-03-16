@@ -1,17 +1,18 @@
 import * as http from 'http';
 import cors from '@koa/cors';
-import Koa from 'koa';
+import Koa, { Context } from 'koa';
+import { RouterContext } from '@koa/router';
 import * as routes from './routes';
-import { EdcManager, EdcManagerError, EdcManagerErrorType } from '../core';
-import { ApiRouterContext } from './context';
+import { EdcManagerError, EdcManagerErrorType } from '../core';
+import koaBodyparser from 'koa-bodyparser';
 
 export interface ServerConfig {
-  edcManager: EdcManager;
   cors?: {
     allowedOrigins: string[];
   };
 }
 
+export type ApiRouterContext = RouterContext<{}>;
 export class ApiServer {
   /** The native Node.js HTTP server reference. */
   server: http.Server;
@@ -19,13 +20,11 @@ export class ApiServer {
   /** The native Node.js HTTP server reference. */
   public readonly koa: Koa;
 
-  edcManager: EdcManager;
   /**
    * # Not supported initialization method
    * Use `Server.create` instead.
    */
-  private constructor(server: http.Server, edcManager: EdcManager, koa: Koa) {
-    this.edcManager = edcManager;
+  private constructor(server: http.Server, koa: Koa) {
     this.koa = koa;
     this.server = server;
   }
@@ -47,7 +46,7 @@ export class ApiServer {
    * Gracefully close all open connections and stop listening for HTTP requests
    * and dispose the `Lms` instance.
    */
-  async shutdown(): Promise<void> {
+  async shutdown(edcManager): Promise<void> {
     if (!this.server.listening) {
       return;
     }
@@ -66,8 +65,6 @@ export class ApiServer {
    * @returns a new `Server` instance
    */
   static create(config: ServerConfig): ApiServer {
-    const { edcManager } = config;
-
     const koa = new Koa();
 
     if (config.cors) {
@@ -87,70 +84,63 @@ export class ApiServer {
           },
         })
       );
+      koa.use(
+        koaBodyparser({
+          enableTypes: ['json'],
+        })
+      );
     }
 
     const server = http.createServer(koa.callback());
-    koa
-      .use(async (context: ApiRouterContext, next: () => Promise<void>) => {
-        const edcManagerContext = edcManager.createContext();
-
-        context.state = {
-          ...context.state,
-          edcManager,
-          edcManagerContext,
-        };
-
+    koa.use(async (context: Context, next: () => Promise<void>) => {
+      try {
         await next();
-      })
-      .use(async (context: ApiRouterContext, next: () => Promise<void>) => {
-        try {
-          await next();
-        } catch (error) {
-          if (error instanceof EdcManagerError) {
-            context.set('Content-type', 'application/json');
-            switch (error.type) {
-              case EdcManagerErrorType.NotFound: {
-                context.status = 404;
-                context.body = {
-                  code: error.type,
-                  message: error.message,
-                };
-                break;
-              }
-              case EdcManagerErrorType.Duplicate: {
-                context.status = 409;
-                context.body = {
-                  code: error.type,
-                  message: error.message,
-                };
-                break;
-              }
-              case EdcManagerErrorType.Unknown:
-              default: {
-                context.status = 500;
-                context.body = {
-                  code: error.type,
-                  message: error.message,
-                };
-                break;
-              }
+      } catch (error) {
+        if (error instanceof EdcManagerError) {
+          context.set('Content-type', 'application/json');
+          switch (error.type) {
+            case EdcManagerErrorType.NotFound: {
+              context.status = 404;
+              context.body = {
+                code: error.type,
+                message: error.message,
+              };
+              break;
             }
-
-            return;
+            case EdcManagerErrorType.Duplicate: {
+              context.status = 409;
+              context.body = {
+                code: error.type,
+                message: error.message,
+              };
+              break;
+            }
+            case EdcManagerErrorType.Unknown:
+            default: {
+              context.status = 500;
+              context.body = {
+                code: error.type,
+                message: error.message,
+              };
+              break;
+            }
           }
 
-          context.status = 500;
-          context.body = {
-            code: 'Unknown',
-            error,
-          };
+          return;
         }
-      });
+
+        context.status = 500;
+        context.body = {
+          code: 'Unknown',
+          error,
+        };
+      }
+    });
 
     for (const router of Object.values(routes)) {
       koa.use(router.routes()).use(router.allowedMethods());
     }
 
-    return new ApiServer(server, edcManager, koa);
+    return new ApiServer(server, koa);
   }
 }

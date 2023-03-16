@@ -1,2 +1,1 @@
-export * from './mapping';
-export * from './management';
+export * from './footprint';
