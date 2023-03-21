@@ -12,7 +12,7 @@ export interface ServerConfig {
   };
 }
 
-export type ApiRouterContext = RouterContext<{}>;
+export type ApiRouterContext = RouterContext;
 export class ApiServer {
   /** The native Node.js HTTP server reference. */
   server: http.Server;

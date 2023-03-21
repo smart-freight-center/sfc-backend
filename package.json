@@ -11,21 +11,31 @@
     "**/*.{md,mdx}": "prettier --write"
   },
   "scripts": {
-    "dev": "nodemon --exec ts-node src/server.ts",
+    "dev": "NODE_PATH=src nodemon --exec ts-node src/server.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "build": "tsc && rm -rf dist/__tests__ **/*.test.ts",
     "test:one-unit": "cross-env NODE_ENV=test NODE_PATH=src mocha --exit",
     "test:unit": "npm run test:one-unit --  'src/**/*.unit.test.ts'",
-    "test:one-integration": "cross-env NODE_ENV=test NODE_PATH=src mocha --timeout 20000 --exit",
-    "test:integration": "npm run test:one-integration -- 'src/**/*.integration.test.ts' "
+    "test:one-integration": "cross-env NODE_ENV=test NODE_PATH=src mocha  -r ts-node/register -r src/__tests__/hooks.ts --timeout 20000 --exit",
+    "test:integration": "npm run test:one-integration -- 'src/**/*.integration.test.ts' ",
+    "undo-migration": "sequelize db:migrate:undo:all",
+    "migrate": "sequelize db:migrate"
   },
   "dependencies": {
     "@koa/cors": "^4.0.0",
     "@koa/router": "^12.0.0",
     "@think-it-labs/edc-connector-client": "^0.0.1-milestone-8.beta-4",
     "@think-it-labs/typed-error": "^0.2.0",
+    "dotenv": "^16.0.3",
     "koa": "^2.14.1",
     "koa-bodyparser": "^4.3.0",
     "lodash": "^4.17.21",
+    "pg": "^8.10.0",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^6.29.3",
+    "sequelize-cli": "^6.6.0",
+    "sequelize-typescript": "^2.1.5",
     "tsc": "^2.0.4"
   },
   "devDependencies": {
@@ -40,6 +50,7 @@
     "@types/koa__router": "^12.0.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.13",
+    "@types/validator": "^13.7.14",
     "@typescript-eslint/eslint-plugin": "^5.55.0",
     "chai": "^4.3.7",
     "chai-http": "^4.3.0",
