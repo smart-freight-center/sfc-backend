@@ -1,2 +1,3 @@
-export * from "./connector";
-export * from "./edc-connector-client";
+export * from './connector';
+export * from './footprint';
+export * from './edc-connector-client';

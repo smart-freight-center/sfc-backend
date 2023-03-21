@@ -37,8 +37,3 @@ export type DataAddressInput =
   | HttpDataAddressInput
   | S3StorageDataAddressInput
   | AzureStorageDataAddressInput;
-
-export type ShareFootprintInput = {
-    shipmentId: string;
-    dataAddress?: DataAddress;
-  };

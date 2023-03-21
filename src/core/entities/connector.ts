@@ -1,4 +1,4 @@
-import { Addresses } from "./edc-connector-client";
+import { Addresses } from './edc-connector-client';
 
 export interface Connector {
   id: string;

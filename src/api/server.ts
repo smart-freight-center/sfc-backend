@@ -46,7 +46,7 @@ export class ApiServer {
    * Gracefully close all open connections and stop listening for HTTP requests
    * and dispose the `Lms` instance.
    */
-  async shutdown(edcManager): Promise<void> {
+  async shutdown(): Promise<void> {
     if (!this.server.listening) {
       return;
     }
