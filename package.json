@@ -25,6 +25,7 @@
     "@think-it-labs/typed-error": "^0.2.0",
     "koa": "^2.14.1",
     "koa-bodyparser": "^4.3.0",
+    "lodash": "^4.17.21",
     "tsc": "^2.0.4"
   },
   "devDependencies": {

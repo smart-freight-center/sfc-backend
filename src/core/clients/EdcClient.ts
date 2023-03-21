@@ -30,10 +30,11 @@ export class EdcAdapter {
     );
   }
   async createPolicy(input: PolicyDefinitionInput) {
-    await this.edcConnectorClient.management.createPolicy(
+    const policy = await this.edcConnectorClient.management.createPolicy(
       this.edcClientContext,
       input
     );
+    return policy;
   }
   async listPolicy() {
     return this.edcConnectorClient.management.queryAllPolicies(
@@ -41,11 +42,15 @@ export class EdcAdapter {
     );
   }
 
-  async createContractDefinitions(input : ContractDefinitionInput) {
-    return this.edcConnectorClient.management.createContractDefinition(this.edcClientContext, input)
-
+  async createContractDefinitions(input: ContractDefinitionInput) {
+    return this.edcConnectorClient.management.createContractDefinition(
+      this.edcClientContext,
+      input
+    );
   }
   async listContractDefinitions() {
-    return this.edcConnectorClient.management.queryAllContractDefinitions(this.edcClientContext)
+    return this.edcConnectorClient.management.queryAllContractDefinitions(
+      this.edcClientContext
+    );
   }
 }
