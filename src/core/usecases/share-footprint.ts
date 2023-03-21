@@ -16,7 +16,6 @@ export class ShareFootprintUsecase {
     await this.edcClient.createContractDefinitions(contractDefinitionInput);
 
     return {
-      status: 201,
       body: asset,
     };
   }
@@ -24,7 +23,6 @@ export class ShareFootprintUsecase {
   async list() {
     const assets = await this.edcClient.listAssets();
     return {
-      status: 200,
       body: assets,
     };
   }

@@ -10,7 +10,7 @@ export class FootPrintController {
         context.request.body as ShareFootprintInput
       );
       context.body = response.body;
-      context.status = response.status;
+      context.status = 200;
     } catch (error) {
       console.log(error);
       if (error instanceof InvalidInput) {
@@ -26,7 +26,7 @@ export class FootPrintController {
     try {
       const response = await shareFootprintUsecase.list();
       context.body = response.body;
-      context.status = response.status;
+      context.status = 200;
     } catch (error) {
       console.log(error);
       if (error instanceof InvalidInput) {
