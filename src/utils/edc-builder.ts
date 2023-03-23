@@ -28,16 +28,29 @@ export function assetInput(
 }
 
 export function policyInput(
+  assetId: string,
   props: Partial<PolicyDefinitionInput> = {}
 ): PolicyDefinitionInput {
+  const permissions = [
+    {
+      target: assetId,
+      action: {
+        type: 'USE',
+      },
+      edctype: 'dataspaceconnector:permission',
+    },
+  ];
+
   return defaults(props, {
     policy: {
+      permissions: permissions,
       '@type': {
-        '@policytype': 'offer',
+        '@policytype': 'set',
       },
     },
   });
 }
+
 export function contractDefinition(
   props: Partial<ContractDefinition> = {}
 ): ContractDefinition {
