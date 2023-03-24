@@ -10,6 +10,7 @@ export type {
   ContractDefinitionInput,
   ContractOffer,
   ContractNegotiationRequest,
+  CreateResult,
   Criterion,
   Duty,
   HealthCheckResult,

@@ -26,21 +26,34 @@ export class EdcAdapter {
     this.edcClientContext = clientContext;
   }
 
-  async listAssets() {
-    return this.edcConnectorClient.management.listAssets(this.edcClientContext);
-  }
   async createAsset(input: AssetInput) {
     return this.edcConnectorClient.management.createAsset(
       this.edcClientContext,
       input
     );
   }
+  async deleteAsset(assetId: string) {
+    return this.edcConnectorClient.management.deleteAsset(
+      this.edcClientContext,
+      assetId
+    );
+  }
+  async listAssets() {
+    return this.edcConnectorClient.management.listAssets(this.edcClientContext);
+  }
+
   async createPolicy(input: PolicyDefinitionInput) {
     const policy = await this.edcConnectorClient.management.createPolicy(
       this.edcClientContext,
       input
     );
     return policy;
+  }
+  async deletePolicy(policyId: string) {
+    return this.edcConnectorClient.management.deletePolicy(
+      this.edcClientContext,
+      policyId
+    );
   }
   async listPolicy() {
     return this.edcConnectorClient.management.queryAllPolicies(
@@ -52,6 +65,12 @@ export class EdcAdapter {
     return this.edcConnectorClient.management.createContractDefinition(
       this.edcClientContext,
       input
+    );
+  }
+  async deleteContractDefinition(contractDefinitionId: string) {
+    return this.edcConnectorClient.management.deleteContractDefinition(
+      this.edcClientContext,
+      contractDefinitionId
     );
   }
   async listContractDefinitions() {
