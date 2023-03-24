@@ -7,7 +7,7 @@ export class ShareFootprintUsecase {
   async share(data: ShareFootprintInput) {
     const assetInput = builder.assetInput(data);
     const asset = await this.edcClient.createAsset(assetInput);
-    const policyInput = builder.policyInput();
+    const policyInput = builder.policyInput(asset.id);
     const policy = await this.edcClient.createPolicy(policyInput);
     const contractDefinitionInput = builder.contractDefinition({
       accessPolicyId: policy.id,
