@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "declaration": false,
+    "experimentalDecorators": true,
     "allowJs": true,
     "strict": true /* Enable all strict type-checking options. */,
     "noImplicitAny": false /* Raise error on expressions and declarations with an implied 'any' type. */,
@@ -20,11 +21,6 @@
     "resolveJsonModule": true,
     "noImplicitReturns": true
   },
-  "include": [
-    "**/*.ts",
-    "**/*.js",
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["**/*.ts", "**/*.js"],
+  "exclude": ["node_modules"]
 }

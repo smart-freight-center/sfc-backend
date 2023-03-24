@@ -1,3 +1,6 @@
+import 'dotenv/config';
+import dbConfig from 'infrastructure/db/config';
+
 export const CLIENT_CONFIG = (process.env.CONNECTOR_CONFIG &&
   JSON.parse(process.env.CONNECTOR_CONFIG as string)) ?? {
   id: 'urn:connector:consumer',
@@ -15,3 +18,13 @@ export const CLIENT_CONFIG = (process.env.CONNECTOR_CONFIG &&
     control: 'http://localhost:19292/control',
   },
 };
+
+const DATABASE_CONFIG = {
+  ...dbConfig,
+};
+
+type DATABASE_ENVS = keyof typeof DATABASE_CONFIG;
+const APP_ENV = (process.env.NODE_ENV as DATABASE_ENVS) || 'development';
+
+// eslint-disable-next-line no-use-before-define
+export const SEQUELIZE_CONFIG = DATABASE_CONFIG[APP_ENV];

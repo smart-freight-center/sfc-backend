@@ -18,4 +18,4 @@ export type {
   PolicyType,
   Prohibition,
   QuerySpec,
-} from "@think-it-labs/edc-connector-client";
+} from '@think-it-labs/edc-connector-client';
