@@ -12,7 +12,6 @@ export class ProvideFootPrintController {
       context.body = response.body;
       context.status = 200;
     } catch (error) {
-      console.log(error);
       if (error instanceof InvalidInput) {
         context.status = 400;
         return;
@@ -28,7 +27,6 @@ export class ProvideFootPrintController {
       context.body = response.body;
       context.status = 200;
     } catch (error) {
-      console.log(error);
       if (error instanceof InvalidInput) {
         context.status = 400;
         return;
