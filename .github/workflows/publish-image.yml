@@ -3,7 +3,7 @@ name: Create and publish a Docker image
 on:
   push:
     branches: 
-    - test-github-action
+    - main
 
 env:
   AWS_DEFAULT_REGION : eu-west-1
