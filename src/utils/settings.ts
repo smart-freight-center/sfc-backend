@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import dbConfig from 'infrastructure/db/config';
+import dbConfig from '../infrastructure/db/config';
 
 export const CLIENT_CONFIG = (process.env.CONNECTOR_CONFIG &&
   JSON.parse(process.env.CONNECTOR_CONFIG as string)) ?? {
