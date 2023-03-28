@@ -4,6 +4,7 @@ export type {
   ApiErrorDetail,
   Asset,
   AssetInput,
+  CatalogRequest,
   Constraint,
   ContractDefinition,
   ContractDefinitionInput,

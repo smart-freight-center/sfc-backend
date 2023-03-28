@@ -1,1 +1,2 @@
-export * from './footprint';
+export * from './provideFootprint';
+export * from './consumeFootprint';

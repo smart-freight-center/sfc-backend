@@ -1,7 +1,7 @@
-import { EdcAdapter } from '../../core/clients/EdcClient';
-import { ShareFootprintInput } from '../../core/entities';
+import { EdcAdapter } from '../clients/EdcClient';
+import { ShareFootprintInput } from '../entities';
 import * as builder from '../../utils/edc-builder';
-export class ShareFootprintUsecase {
+export class ProvideFootprintUsecase {
   constructor(private edcClient: EdcAdapter) {}
 
   async share(data: ShareFootprintInput) {
