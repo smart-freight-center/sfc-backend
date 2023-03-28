@@ -1,10 +1,10 @@
 import { v4 } from 'uuid';
 import { Op } from 'sequelize';
-import { ParticipantConnection } from 'infrastructure/db/models/participant-connections';
+import { ParticipantConnection } from '../../infrastructure/db/models/participant-connections';
 import {
   Participant,
   ParticipantEntity,
-} from 'infrastructure/db/models/participants';
+} from '../../infrastructure/db/models/participants';
 
 export class ParticipantGateway {
   static async createParticipant(data: ParticipantEntity) {
