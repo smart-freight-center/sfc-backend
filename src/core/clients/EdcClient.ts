@@ -1,9 +1,14 @@
 import {
   EdcConnectorClient,
   EdcConnectorClientContext,
-  PolicyDefinitionInput,
 } from '@think-it-labs/edc-connector-client';
-import { Connector, AssetInput, ContractDefinitionInput } from '../entities';
+import {
+  Connector,
+  AssetInput,
+  ContractDefinitionInput,
+  CatalogRequest,
+  PolicyDefinitionInput,
+} from '../entities';
 
 export class EdcAdapter {
   readonly edcConnectorClient: EdcConnectorClient;
@@ -51,6 +56,13 @@ export class EdcAdapter {
   async listContractDefinitions() {
     return this.edcConnectorClient.management.queryAllContractDefinitions(
       this.edcClientContext
+    );
+  }
+
+  async listCatalogs(input: CatalogRequest) {
+    return this.edcConnectorClient.management.requestCatalog(
+      this.edcClientContext,
+      input
     );
   }
 }

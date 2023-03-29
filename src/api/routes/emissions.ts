@@ -1,10 +1,18 @@
 import KoaRouter from '@koa/router';
-import { FootPrintController } from '../../core/controllers';
+import {
+  ConsumeFootPrintController,
+  ProvideFootPrintController,
+} from '../../core/controllers';
 
 export const edcRouter = new KoaRouter()
-  .post('Share a PCF', '/emissions', FootPrintController.shareFootprints)
+  .post('Share a PCF', '/emissions', ProvideFootPrintController.shareFootprints)
   .get(
     'Get shared PCFs',
     '/emissions/sent',
-    FootPrintController.getSharedFootprints
+    ProvideFootPrintController.getSharedFootprints
+  )
+  .post(
+    'Request a data catalog from a connector',
+    '/catalog',
+    ConsumeFootPrintController.requestFootprintsCatalogs
   );

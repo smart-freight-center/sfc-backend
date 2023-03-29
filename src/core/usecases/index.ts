@@ -1,4 +1,6 @@
 import { edcAdapter } from '../../core/clients';
-import { ShareFootprintUsecase } from './share-footprint';
+import { ProvideFootprintUsecase } from './provide-footprint';
+import { ConsumeFootprintUsecase } from './consume-footprint';
 
-export const shareFootprintUsecase = new ShareFootprintUsecase(edcAdapter);
+export const provideFootprintUsecase = new ProvideFootprintUsecase(edcAdapter);
+export const consumeFootprintUsecase = new ConsumeFootprintUsecase(edcAdapter);
