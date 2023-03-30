@@ -3,6 +3,8 @@ import { InvalidInput, KeyCloakCouldNotGenerateToken } from 'core/error';
 import { TokenInput } from 'core/types';
 import { generateTokenUsecase } from 'core/usecases';
 import { KeyCloackClient } from 'core/clients/KeyCloackClient';
+import { ParticipantGateway } from 'core/dataGateways';
+import { KEYCLOAK_PUBLIC_KEY } from 'utils/settings';
 
 export class AuthController {
   static async generateToken(context: RouterContext) {
@@ -27,12 +29,42 @@ export class AuthController {
   }
 
   static async authMiddleware(context: RouterContext, next) {
-    const authorization = context.request.headers.authorization;
+    const authorization = context.request.headers.authorization || '';
 
     try {
-      const decoded = await KeyCloackClient.verifyToken(authorization || '');
+      const decoded = await KeyCloackClient.verifyToken(
+        KEYCLOAK_PUBLIC_KEY,
+        authorization
+      );
 
       context.decoded = decoded;
+      next();
+    } catch (error) {
+      context.body = {
+        error: 'invalid token',
+      };
+
+      context.status = 401;
+    }
+  }
+
+  static async sfcUnitAuthMiddleware(context: RouterContext, next) {
+    const authorization = context.request.headers.authorization || '';
+
+    try {
+      const decoded = await KeyCloackClient.decodeToken(authorization);
+
+      const participant = await ParticipantGateway.getParticipant(
+        decoded.clientId
+      );
+
+      const verifiedData = await KeyCloackClient.verifyToken(
+        participant.public_key,
+        authorization
+      );
+
+      context.decoded = verifiedData;
+
       next();
     } catch (error) {
       context.body = {

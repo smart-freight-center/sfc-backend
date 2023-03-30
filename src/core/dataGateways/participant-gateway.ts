@@ -1,55 +1,58 @@
-import { v4 } from 'uuid';
-import { Op } from 'sequelize';
-import { ParticipantConnection } from 'infrastructure/db/models/participant-connections';
-import {
-  Participant,
-  ParticipantEntity,
-} from 'infrastructure/db/models/participants';
+import fs from 'fs';
+import path from 'path';
+import { ParticipantNotFound } from 'core/error';
+
+type ParticipantType = {
+  company_name: string;
+  client_id: string;
+  role: 'shipper' | 'lsp';
+  connection: string[];
+  public_key: string;
+};
 
 export class ParticipantGateway {
-  static async createParticipant(data: ParticipantEntity) {
-    return Participant.create({ ...data, email: data.email.toLowerCase() });
-  }
+  private static _participants: Record<string, ParticipantType>;
 
-  static async createParticipants(data: ParticipantEntity[]) {
-    const newParticipants = data.map((item) => ({
-      ...item,
-      id: item.id || v4(),
-      email: item.email.toLowerCase(),
-    }));
-    await Participant.bulkCreate(newParticipants);
+  private static getParticipants() {
+    if (ParticipantGateway._participants) return this._participants;
+    const appRoot = process.cwd();
 
-    return newParticipants;
-  }
-  static async createConnection(
-    participantId1: string,
-    participantId2: string
-  ) {
-    return ParticipantConnection.create({
-      participantId1,
-      participantId2,
-    });
+    const url = path.join(appRoot, 'participants.json');
+    const { participants } = JSON.parse(fs.readFileSync(url, 'utf-8'));
+
+    const participantsMapper: Record<string, ParticipantType> = {};
+
+    for (const participant of participants) {
+      participantsMapper[participant.client_id] = participant;
+    }
+
+    ParticipantGateway._participants = participantsMapper;
+
+    return participantsMapper;
   }
 
   static async fetchParticipantConnections(participantId: string) {
-    const participantConnections = await ParticipantConnection.findAll({
-      where: {
-        [Op.or]: [
-          { participantId1: participantId },
-          { participantId2: participantId },
-        ],
-      },
+    const participants = await ParticipantGateway.getParticipants();
+    const participant = participants[participantId];
+    if (!participant) throw new ParticipantNotFound();
+
+    const connections = participant.connection.map((partnerClientId) => {
+      const participant = participants[partnerClientId];
+
+      return {
+        client_id: participant.client_id,
+        company_name: participant.company_name,
+      };
     });
 
-    const userConnectionIds = new Set<string>();
+    return connections;
+  }
 
-    for (const participantConnection of participantConnections) {
-      userConnectionIds.add(participantConnection.participantId1);
-      userConnectionIds.add(participantConnection.participantId2);
-    }
+  static async getParticipant(clientId: string) {
+    const participants = await ParticipantGateway.getParticipants();
+    const participant = participants[clientId];
 
-    userConnectionIds.delete(participantId);
-
-    return Participant.findAll({ where: { id: [...userConnectionIds] } });
+    if (!participant) throw new ParticipantNotFound();
+    return participant;
   }
 }
