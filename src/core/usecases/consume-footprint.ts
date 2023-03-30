@@ -1,5 +1,5 @@
 import { EdcAdapter } from '../clients/EdcClient';
-import { CatalogRequest } from '../entities';
+import { CatalogRequest, ContractOffer } from '../entities';
 import * as builder from '../../utils/edc-builder';
 
 export class ConsumeFootprintUsecase {
@@ -20,6 +20,21 @@ export class ConsumeFootprintUsecase {
     });
     return {
       body: assets,
+    };
+  }
+
+  async startContractNegotiation(
+    contractOffer: ContractOffer,
+    connectorIdsAddress: string
+  ) {
+    const contractNegotitionInput = builder.contractNegotiationInput(
+      contractOffer,
+      connectorIdsAddress
+    );
+    const contractNegotiationCreationResult =
+      await this.edcClient.starContracttNegotiation(contractNegotitionInput);
+    return {
+      body: contractNegotiationCreationResult,
     };
   }
 }

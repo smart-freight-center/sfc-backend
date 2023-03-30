@@ -6,6 +6,7 @@ import {
   Connector,
   AssetInput,
   ContractDefinitionInput,
+  ContractNegotiationRequest,
   CatalogRequest,
   PolicyDefinitionInput,
 } from '../entities';
@@ -67,6 +68,12 @@ export class EdcAdapter {
   }
   async queryAllPolicies(input) {
     return this.edcConnectorClient.management.queryAllPolicies(
+      this.edcClientContext,
+      input
+    );
+  }
+  async starContracttNegotiation(input: ContractNegotiationRequest) {
+    return this.edcConnectorClient.management.initiateContractNegotiation(
       this.edcClientContext,
       input
     );

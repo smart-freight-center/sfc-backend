@@ -20,4 +20,9 @@ export const edcRouter = new KoaRouter()
     'Request a data catalog from a connector with shipment filter',
     '/catalog/:shipmentId',
     ConsumeFootPrintController.requestFilteredFootprintsCatalog
+  )
+  .post(
+    'start contract negotitation for a shipemnt',
+    '/emissions/:shipmentId/negotiate',
+    ConsumeFootPrintController.startContractNegotiation
   );
