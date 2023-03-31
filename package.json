@@ -12,6 +12,8 @@
   },
   "scripts": {
     "dev": "NODE_PATH=src nodemon --exec ts-node src/server.ts",
+    "dev:provider": "cross-env KEYCLOAK_REALM=provider API_PORT=3001  NODE_PATH=src nodemon --exec ts-node src/server.ts",
+    "dev:consumer": "cross-env KEYCLOAK_REALM=consumer API_PORT=3002 NODE_PATH=src nodemon --exec ts-node src/server.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "start": "NODE_PATH=dist node dist/server.js",

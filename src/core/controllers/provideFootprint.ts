@@ -2,6 +2,8 @@ import { RouterContext } from '@koa/router';
 import { ShareFootprintInput } from '../entities';
 import { InvalidInput } from '../error';
 import { provideFootprintUsecase } from '../usecases';
+import { ParticipantNotFound } from '../error';
+import { retrieveCompaniesConnectionUsecase } from '../usecases';
 
 export class ProvideFootPrintController {
   static async shareFootprints(context: RouterContext) {
@@ -21,6 +23,22 @@ export class ProvideFootPrintController {
     }
   }
 
+  static async companies(context: RouterContext) {
+    try {
+      context.status = 200;
+      context.body = await retrieveCompaniesConnectionUsecase.execute(
+        context.decoded.clientId
+      );
+    } catch (error) {
+      if (error instanceof ParticipantNotFound) {
+        context.status = 403;
+        context.body = { error: 'invalid token' };
+        return;
+      }
+      console.log(error);
+      context.status = 503;
+    }
+  }
   static async getSharedFootprints(context: RouterContext) {
     try {
       const response = await provideFootprintUsecase.list();

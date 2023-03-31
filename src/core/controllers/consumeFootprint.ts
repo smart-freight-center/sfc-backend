@@ -1,6 +1,6 @@
 import { RouterContext } from '@koa/router';
-import { ShareFootprintInput, CatalogRequest } from '../entities';
-import { InvalidInput } from '../error';
+import { CatalogRequest } from 'core/entities';
+import { InvalidInput } from 'core/error';
 import { consumeFootprintUsecase } from '../usecases';
 
 export class ConsumeFootPrintController {
