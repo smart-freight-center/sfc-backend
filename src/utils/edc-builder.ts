@@ -2,6 +2,7 @@ import {
   AssetInput,
   ContractDefinition,
   PolicyDefinitionInput,
+  QuerySpec,
   ShareFootprintInput,
 } from '../core/entities';
 import { defaults } from 'lodash';
@@ -58,4 +59,16 @@ export function contractDefinition(
     id: randomUid(),
     criteria: [],
   });
+}
+
+export function catalogAssetFilter(assetId: string): QuerySpec {
+  return {
+    filterExpression: [
+      {
+        operandLeft: 'asset:prop:id',
+        operandRight: assetId,
+        operator: '=',
+      },
+    ],
+  };
 }

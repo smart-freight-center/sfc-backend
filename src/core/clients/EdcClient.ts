@@ -59,8 +59,14 @@ export class EdcAdapter {
     );
   }
 
-  async listCatalogs(input: CatalogRequest) {
+  async listCatalog(input: CatalogRequest) {
     return this.edcConnectorClient.management.requestCatalog(
+      this.edcClientContext,
+      input
+    );
+  }
+  async queryAllPolicies(input) {
+    return this.edcConnectorClient.management.queryAllPolicies(
       this.edcClientContext,
       input
     );

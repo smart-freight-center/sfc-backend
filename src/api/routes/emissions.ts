@@ -14,5 +14,10 @@ export const edcRouter = new KoaRouter()
   .post(
     'Request a data catalog from a connector',
     '/catalog',
-    ConsumeFootPrintController.requestFootprintsCatalogs
+    ConsumeFootPrintController.requestFootprintsCatalog
+  )
+  .post(
+    'Request a data catalog from a connector with shipment filter',
+    '/catalog/:shipmentId',
+    ConsumeFootPrintController.requestFilteredFootprintsCatalog
   );
