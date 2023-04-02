@@ -5,53 +5,49 @@ export class ProvideFootprintUsecase {
   constructor(private edcClient: EdcAdapter) {}
 
   async share(data: ShareFootprintInput) {
-    const results: Array<{
-      step: string;
-      result: CreateResult;
-      rollBackFuncName: string;
-    }> = [];
+    const results = {
+      newAssetId: '',
+      newPolicyId: '',
+      newContractId: '',
+    };
+
     try {
       const assetInput = builder.assetInput(data);
-      const assetCreationResult = await this.edcClient.createAsset(assetInput);
-      results.push({
-        step: 'assetCreation',
-        result: assetCreationResult,
-        rollBackFuncName: 'deleteAsset',
-      });
+      const newAsset = await this.edcClient.createAsset(assetInput);
+      results.newAssetId = newAsset.id;
 
-      const policyInput = builder.policyInput(assetCreationResult.id);
-      const policyCreationResult = await this.edcClient.createPolicy(
-        policyInput
-      );
-      results.push({
-        step: 'policyCreation',
-        result: policyCreationResult,
-        rollBackFuncName: 'deletePolicy',
-      });
+      const policyInput = builder.policyInput(newAsset.id);
+      const newPolicy = await this.edcClient.createPolicy(policyInput);
+      results.newPolicyId = newPolicy.id;
 
       const contractDefinitionInput = builder.contractDefinition({
-        accessPolicyId: policyCreationResult.id,
-        contractPolicyId: policyCreationResult.id,
+        accessPolicyId: newPolicy.id,
+        contractPolicyId: newPolicy.id,
       });
-      const contractCreationResult =
-        await this.edcClient.createContractDefinitions(contractDefinitionInput);
-      results.push({
-        step: 'contractCreation',
-        result: contractCreationResult,
-        rollBackFuncName: 'deleteContractDefinition',
-      });
+      const newContract = await this.edcClient.createContractDefinitions(
+        contractDefinitionInput
+      );
+      results.newContractId = newContract.id;
 
       return {
-        body: assetCreationResult,
+        body: newAsset,
       };
     } catch (error) {
-      results.forEach(async (step) => {
-        if (step.result.id) {
-          await this.edcClient[step.rollBackFuncName](step.result.id);
-          results.splice(results.indexOf(step), 1);
-        }
-      });
+      await this.rollback(results);
       return;
+    }
+  }
+
+  private async rollback(results) {
+    if (results.newId) {
+      this.edcClient.deleteAsset(results.newAssetId);
+    }
+    if (results.newPolicyId) {
+      this.edcClient.deletePolicy(results.newAssetId);
+    }
+
+    if (results.newContractId) {
+      this.edcClient.deleteContractDefinition(results.newAssetId);
     }
   }
 
