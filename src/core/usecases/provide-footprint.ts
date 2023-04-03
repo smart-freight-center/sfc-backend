@@ -6,17 +6,17 @@ export class ProvideFootprintUsecase {
 
   async share(data: ShareFootprintInput) {
     const assetInput = builder.assetInput(data);
-    const asset = await this.edcClient.createAsset(assetInput);
-    const policyInput = builder.policyInput(asset.id);
-    const policy = await this.edcClient.createPolicy(policyInput);
+    const assetCreationResult = await this.edcClient.createAsset(assetInput);
+    const policyInput = builder.policyInput(assetCreationResult.id);
+    const policyCreationResult = await this.edcClient.createPolicy(policyInput);
     const contractDefinitionInput = builder.contractDefinition({
-      accessPolicyId: policy.id,
-      contractPolicyId: policy.id,
+      accessPolicyId: policyCreationResult.id,
+      contractPolicyId: policyCreationResult.id,
     });
     await this.edcClient.createContractDefinitions(contractDefinitionInput);
 
     return {
-      body: asset,
+      body: assetCreationResult,
     };
   }
 

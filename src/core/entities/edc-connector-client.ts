@@ -8,6 +8,8 @@ export type {
   Constraint,
   ContractDefinition,
   ContractDefinitionInput,
+  ContractOffer,
+  ContractNegotiationRequest,
   Criterion,
   Duty,
   HealthCheckResult,
