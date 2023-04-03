@@ -28,3 +28,6 @@ const APP_ENV = (process.env.NODE_ENV as DATABASE_ENVS) || 'development';
 
 // eslint-disable-next-line no-use-before-define
 export const SEQUELIZE_CONFIG = DATABASE_CONFIG[APP_ENV];
+export const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM;
+export const KEYCLOAK_HOST = process.env.KEYCLOAK_HOST;
+export const KEYCLOAK_PUBLIC_KEY = process.env.KEYCLOAK_PUBLIC_KEY || '';

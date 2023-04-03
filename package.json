@@ -12,13 +12,16 @@
   },
   "scripts": {
     "dev": "NODE_PATH=src nodemon --exec ts-node src/server.ts",
+    "dev:provider": "cross-env KEYCLOAK_REALM=provider API_PORT=3001  NODE_PATH=src nodemon --exec ts-node src/server.ts",
+    "dev:consumer": "cross-env KEYCLOAK_REALM=consumer API_PORT=3002 NODE_PATH=src nodemon --exec ts-node src/server.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "start": "NODE_PATH=dist node dist/server.js",
     "build": "tsc && rm -rf dist/__tests__ **/*.test.ts",
     "test:one-unit": "cross-env NODE_ENV=test NODE_PATH=src mocha --exit",
-    "test:unit": "npm run test:one-unit --  'src/**/*.unit.test.ts'",
+    "test:unit": "yarn  test:one-unit --  'src/**/*.unit.test.ts'",
     "test:one-integration": "cross-env NODE_ENV=test NODE_PATH=src mocha  -r ts-node/register -r src/__tests__/hooks.ts --timeout 20000 --exit",
-    "test:integration": "npm run test:one-integration -- 'src/**/*.integration.test.ts' ",
+    "test:integration": "yarn test:one-integration -- 'src/**/*.integration.test.ts' ",
     "undo-migration": "sequelize db:migrate:undo:all",
     "migrate": "sequelize db:migrate"
   },
@@ -36,7 +39,10 @@
     "sequelize": "^6.29.3",
     "sequelize-cli": "^6.6.0",
     "sequelize-typescript": "^2.1.5",
-    "typescript": "^4.9.5"
+    "axios": "^1.3.4",
+    "jsonwebtoken": "^9.0.0",
+    "typescript": "^4.9.5",
+    "validatorjs": "^3.22.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",

@@ -11,4 +11,11 @@ export class EdcManagerError extends TypedError<EdcManagerErrorType> {}
 
 class SFCBaseError extends Error {}
 
-export class InvalidInput extends SFCBaseError {}
+export class InvalidInput extends SFCBaseError {
+  constructor(public readonly errors?: any) {
+    super();
+  }
+}
+
+export class KeyCloakCouldNotGenerateToken extends SFCBaseError {}
+export class ParticipantNotFound extends SFCBaseError {}

@@ -1,8 +1,13 @@
 import {
   AssetInput,
   ContractDefinition,
+  ContractOffer,
+  ContractNegotiationRequest,
   PolicyDefinitionInput,
+  QuerySpec,
   ShareFootprintInput,
+  IDS_PROTOCOL,
+  Policy,
 } from '../core/entities';
 import { defaults } from 'lodash';
 import * as crypto from 'node:crypto';
@@ -58,4 +63,39 @@ export function contractDefinition(
     id: randomUid(),
     criteria: [],
   });
+}
+
+export function catalogAssetFilter(assetId: string): QuerySpec {
+  return {
+    filterExpression: [
+      {
+        operandLeft: 'asset:prop:id',
+        operandRight: assetId,
+        operator: '=',
+      },
+    ],
+  };
+}
+
+export function contractNegotiationInput(
+  contractOffer: ContractOffer,
+  connectorIdsAddress: string
+): ContractNegotiationRequest {
+  const connectorId = extractConnectorId(connectorIdsAddress);
+  return {
+    connectorAddress: connectorIdsAddress,
+    connectorId: connectorId,
+    offer: {
+      offerId: contractOffer.id as string,
+      assetId: contractOffer.asset?.id as string,
+      policy: contractOffer.policy as Policy,
+    },
+    protocol: IDS_PROTOCOL,
+  };
+}
+//FIXME(@OlfaBensoussia): this is a temporary workaround until we implement the companies endpoint and logic units
+function extractConnectorId(connectorIdsAddress: string): string {
+  const startIndex = connectorIdsAddress.indexOf('//');
+  const endIndex = connectorIdsAddress.indexOf(':', startIndex + 2);
+  return connectorIdsAddress.substring(startIndex + 2, endIndex);
 }

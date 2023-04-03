@@ -17,10 +17,11 @@
     "noUnusedLocals": false /* Report errors on unused locals. */,
     "noUnusedParameters": false /* Report errors on unused parameters. */,
     "baseUrl": "./src",
+    "rootDir": "./src",
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "noImplicitReturns": true
   },
-  "include": ["**/*.ts", "**/*.js"],
-  "exclude": ["node_modules"]
+  "include": ["**/*.ts", "./src/**/*.js"],
+  "exclude": ["node_modules", "dist", "tsconfig.json"]
 }

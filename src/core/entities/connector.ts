@@ -20,3 +20,5 @@ export interface ConnectorInput {
   catalogId: string;
   region: string;
 }
+
+export const IDS_PROTOCOL: string = 'ids-multipart';
