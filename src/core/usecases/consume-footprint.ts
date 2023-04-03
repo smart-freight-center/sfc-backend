@@ -6,20 +6,20 @@ export class ConsumeFootprintUsecase {
   constructor(private edcClient: EdcAdapter) {}
 
   async listCatalogs(input: CatalogRequest) {
-    const assets = await this.edcClient.listCatalog(input);
+    const catalogs = await this.edcClient.listCatalog(input);
     return {
-      body: assets,
+      body: catalogs,
     };
   }
 
   async listFilteredCatalog(input: CatalogRequest, shipmentId: string) {
     const assetFilter = builder.catalogAssetFilter(shipmentId);
-    const assets = await this.edcClient.listCatalog({
+    const catalogs = await this.edcClient.listCatalog({
       ...input,
       querySpec: assetFilter,
     });
     return {
-      body: assets,
+      body: catalogs,
     };
   }
 

@@ -1,0 +1,46 @@
+{
+  "participants": [
+    {
+      "company_name": "Amazon",
+      "client_id": "amazon",
+      "role": "shipper",
+      "connection": ["intelcom"],
+      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo4ZEoO3/2wKe8I9y7t2Gl9/zu4rq/F8uVdQWEZ+7zNw2Uug6Db+7mnJfTQN0z9tYW5/E4+nQT4ktvmDacNJY7BaEjC6ZVpddweQJaJjeVycfylrApazEwCGCpoi//koze/Qoz7XXyXh8lRXi+oaXe+yCriS/tq5yNCdpXVtcTg4en82frce4Bd4u0srK/RC9h5OTNk8eBLoPoRZu0NX5Tq/qsUoXcplTgL+b6ca3m0983iD5jsTTMOkR3rcf9NcIL7MBGq/wFLJQ+JqhqJ00QVsb4kD7Ud1Z96pjHVJt7MVlZ6/A375X09ohSKACj4ai33Z0el7rgTHLmpTV8Q6lGwIDAQAB"
+    },
+    {
+      "company_name": "Intelcom",
+      "client_id": "intelcom",
+      "role": "lsp",
+      "connection": ["amazon"],
+      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA15nsCQVXuyiwPhkQfEtjpticIyt9fR10RUN/lExGUctzMaE71QjwrVD0d1ZbEiHBmyqnnHnBjJpLH9NF1jLk11OPoUXanexNtmpZ8y850ZlQy3oeszLeBQ1Tmhy8NuqG7HaZ0tBnbN3Jqwi2g27lb+Mx7wzXwQyEHGQ+4kzPi4n7xxg3Sy2cdJbW0BqoQrM/8vJFusXKYkvgBwYFtbUNSoQkrZKKbanfCawWhbDrR+5PVgaOl6czq4wSf4VUW8BmoD2ygLqvm8SK+BaaqN0FhslxXucYRBKmzFs4vWuJnRSxBzgr3lMNHRUq4PY3Pm5NUJUd9K4J4QHh5wukEszhpQIDAQAB"
+    },
+    {
+      "company_name": "Nestle",
+      "client_id": "nestle",
+      "role": "shipper",
+      "connection": ["ansorge"],
+      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo4ZEoO3/2wKe8I9y7t2Gl9/zu4rq/F8uVdQWEZ+7zNw2Uug6Db+7mnJfTQN0z9tYW5/E4+nQT4ktvmDacNJY7BaEjC6ZVpddweQJaJjeVycfylrApazEwCGCpoi//koze/Qoz7XXyXh8lRXi+oaXe+yCriS/tq5yNCdpXVtcTg4en82frce4Bd4u0srK/RC9h5OTNk8eBLoPoRZu0NX5Tq/qsUoXcplTgL+b6ca3m0983iD5jsTTMOkR3rcf9NcIL7MBGq/wFLJQ+JqhqJ00QVsb4kD7Ud1Z96pjHVJt7MVlZ6/A375X09ohSKACj4ai33Z0el7rgTHLmpTV8Q6lGwIDAQAB"
+    },
+    {
+      "company_name": "Ansorge",
+      "client_id": "ansorge",
+      "role": "lsp",
+      "connection": ["nestle"],
+      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA15nsCQVXuyiwPhkQfEtjpticIyt9fR10RUN/lExGUctzMaE71QjwrVD0d1ZbEiHBmyqnnHnBjJpLH9NF1jLk11OPoUXanexNtmpZ8y850ZlQy3oeszLeBQ1Tmhy8NuqG7HaZ0tBnbN3Jqwi2g27lb+Mx7wzXwQyEHGQ+4kzPi4n7xxg3Sy2cdJbW0BqoQrM/8vJFusXKYkvgBwYFtbUNSoQkrZKKbanfCawWhbDrR+5PVgaOl6czq4wSf4VUW8BmoD2ygLqvm8SK+BaaqN0FhslxXucYRBKmzFs4vWuJnRSxBzgr3lMNHRUq4PY3Pm5NUJUd9K4J4QHh5wukEszhpQIDAQAB"
+    },
+    {
+      "company_name": "DOW",
+      "client_id": "dow",
+      "role": "shipper",
+      "connection": ["bertschi"],
+      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo4ZEoO3/2wKe8I9y7t2Gl9/zu4rq/F8uVdQWEZ+7zNw2Uug6Db+7mnJfTQN0z9tYW5/E4+nQT4ktvmDacNJY7BaEjC6ZVpddweQJaJjeVycfylrApazEwCGCpoi//koze/Qoz7XXyXh8lRXi+oaXe+yCriS/tq5yNCdpXVtcTg4en82frce4Bd4u0srK/RC9h5OTNk8eBLoPoRZu0NX5Tq/qsUoXcplTgL+b6ca3m0983iD5jsTTMOkR3rcf9NcIL7MBGq/wFLJQ+JqhqJ00QVsb4kD7Ud1Z96pjHVJt7MVlZ6/A375X09ohSKACj4ai33Z0el7rgTHLmpTV8Q6lGwIDAQAB"
+    },
+    {
+      "company_name": "Bertschi",
+      "client_id": "bertschi",
+      "role": "lsp",
+      "connection": ["dow"],
+      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA15nsCQVXuyiwPhkQfEtjpticIyt9fR10RUN/lExGUctzMaE71QjwrVD0d1ZbEiHBmyqnnHnBjJpLH9NF1jLk11OPoUXanexNtmpZ8y850ZlQy3oeszLeBQ1Tmhy8NuqG7HaZ0tBnbN3Jqwi2g27lb+Mx7wzXwQyEHGQ+4kzPi4n7xxg3Sy2cdJbW0BqoQrM/8vJFusXKYkvgBwYFtbUNSoQkrZKKbanfCawWhbDrR+5PVgaOl6czq4wSf4VUW8BmoD2ygLqvm8SK+BaaqN0FhslxXucYRBKmzFs4vWuJnRSxBzgr3lMNHRUq4PY3Pm5NUJUd9K4J4QHh5wukEszhpQIDAQAB"
+    }
+  ]
+}

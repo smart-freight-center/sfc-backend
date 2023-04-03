@@ -86,7 +86,7 @@ export class ApiServer {
       );
       koa.use(
         koaBodyparser({
-          enableTypes: ['json'],
+          enableTypes: ['json', 'form'],
         })
       );
     }
