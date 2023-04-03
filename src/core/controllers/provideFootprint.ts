@@ -1,9 +1,11 @@
 import { RouterContext } from '@koa/router';
 import { ShareFootprintInput } from '../entities';
 import { InvalidInput } from '../error';
-import { provideFootprintUsecase } from '../usecases';
 import { ParticipantNotFound } from '../error';
-import { retrieveCompaniesConnectionUsecase } from '../usecases';
+import {
+  retrieveCompaniesConnectionUsecase,
+  provideFootprintUsecase,
+} from '../usecases';
 
 export class ProvideFootPrintController {
   static async shareFootprints(context: RouterContext) {
@@ -11,9 +13,15 @@ export class ProvideFootPrintController {
       const response = await provideFootprintUsecase.share(
         context.request.body as ShareFootprintInput
       );
-      context.body = response.body;
-      context.status = 200;
+      if (response) {
+        context.body = response.body;
+        context.status = 201;
+      } else {
+        context.body = 'an error occurred while processing your request';
+        context.status = 400;
+      }
     } catch (error) {
+      console.log(error);
       if (error instanceof InvalidInput) {
         context.status = 400;
         return;
