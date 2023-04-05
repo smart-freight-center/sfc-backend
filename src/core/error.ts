@@ -18,4 +18,5 @@ export class InvalidInput extends SFCBaseError {
 }
 
 export class KeyCloakCouldNotGenerateToken extends SFCBaseError {}
+export class InvalidCredentials extends SFCBaseError {}
 export class ParticipantNotFound extends SFCBaseError {}

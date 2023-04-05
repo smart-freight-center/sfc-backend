@@ -1,8 +1,8 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import url from 'url';
 import jwt from 'jsonwebtoken';
 import { KEYCLOAK_HOST, KEYCLOAK_REALM } from 'utils/settings';
-import { KeyCloakCouldNotGenerateToken } from 'core/error';
+import { InvalidCredentials, KeyCloakCouldNotGenerateToken } from 'core/error';
 
 const keyCloakClient = axios.create({
   baseURL: `${KEYCLOAK_HOST}/realms/${KEYCLOAK_REALM}`,
@@ -24,6 +24,11 @@ export class KeyCloackClient {
 
       return res.data;
     } catch (error) {
+      const axiosError = error as AxiosError;
+
+      if (axiosError.response?.status === 401) {
+        throw new InvalidCredentials();
+      }
       console.log(error);
       throw new KeyCloakCouldNotGenerateToken();
     }

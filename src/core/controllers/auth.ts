@@ -1,5 +1,9 @@
 import { RouterContext } from '@koa/router';
-import { InvalidInput, KeyCloakCouldNotGenerateToken } from 'core/error';
+import {
+  InvalidCredentials,
+  InvalidInput,
+  KeyCloakCouldNotGenerateToken,
+} from 'core/error';
 import { TokenInput } from 'core/types';
 import { generateTokenUsecase } from 'core/usecases';
 import { KeyCloackClient } from 'core/clients/KeyCloackClient';
@@ -18,6 +22,9 @@ export class AuthController {
       if (error instanceof InvalidInput) {
         context.body = { errors: error.errors };
         context.status = 400;
+      } else if (error instanceof InvalidCredentials) {
+        context.body = { error: 'invalid credentials' };
+        context.status = 401;
       } else if (error instanceof KeyCloakCouldNotGenerateToken) {
         context.body = { error: 'Service unavailable' };
         context.status = 503;
