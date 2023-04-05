@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { ParticipantNotFound } from 'core/error';
+import { Addresses } from '../entities';
 
 type ParticipantType = {
   company_name: string;
@@ -8,6 +9,10 @@ type ParticipantType = {
   role: 'shipper' | 'lsp';
   connection: string[];
   public_key: string;
+  connector_data: {
+    id: string;
+    addresses: Addresses;
+  };
 };
 
 export class ParticipantGateway {

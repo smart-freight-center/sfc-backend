@@ -9,6 +9,7 @@ export type {
   ContractDefinition,
   ContractDefinitionInput,
   ContractOffer,
+  ContractNegotiation,
   ContractNegotiationRequest,
   CreateResult,
   Criterion,
@@ -22,4 +23,5 @@ export type {
   PolicyType,
   Prohibition,
   QuerySpec,
+  TransferProcessInput,
 } from '@think-it-labs/edc-connector-client';

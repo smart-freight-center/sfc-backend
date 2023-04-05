@@ -5,17 +5,17 @@ import {
   ProvideFootPrintController,
 } from '../../core/controllers';
 
-export const edcRouter = new KoaRouter()
+export const edcRouter = new KoaRouter({ prefix: '/emissioms' })
   .post(
     'Share a PCF',
-    '/emissions',
+    '/',
 
     AuthController.authMiddleware,
     ProvideFootPrintController.shareFootprints
   )
   .get(
     'Get shared PCFs',
-    '/emissions/sent',
+    '/sent',
     AuthController.authMiddleware,
     ProvideFootPrintController.getSharedFootprints
   )
@@ -33,7 +33,13 @@ export const edcRouter = new KoaRouter()
   )
   .post(
     'start contract negotitation for a shipemnt',
-    '/emissions/:shipmentId/negotiate',
+    '/:shipmentId/negotiate',
     AuthController.authMiddleware,
     ConsumeFootPrintController.startContractNegotiation
+  )
+  .post(
+    'initiate file transfer on the connector',
+    '/:shipmentId/request',
+    AuthController.authMiddleware,
+    ConsumeFootPrintController.initiateFileTransfer
   );

@@ -3,11 +3,13 @@ import {
   ContractDefinition,
   ContractOffer,
   ContractNegotiationRequest,
+  DataAddressType,
+  IDS_PROTOCOL,
   PolicyDefinitionInput,
   QuerySpec,
   ShareFootprintInput,
-  IDS_PROTOCOL,
   Policy,
+  TransferProcessInput,
 } from '../core/entities';
 import { defaults } from 'lodash';
 import * as crypto from 'node:crypto';
@@ -98,4 +100,19 @@ function extractConnectorId(connectorIdsAddress: string): string {
   const startIndex = connectorIdsAddress.indexOf('//');
   const endIndex = connectorIdsAddress.indexOf(':', startIndex + 2);
   return connectorIdsAddress.substring(startIndex + 2, endIndex);
+}
+export function transferProcessInput(
+  shipmentId: string,
+  connectorId: string,
+  connectorAddress: string,
+  contractId: string
+): TransferProcessInput {
+  return {
+    assetId: shipmentId,
+    connectorAddress: connectorAddress,
+    connectorId: connectorId,
+    contractId: contractId,
+    dataDestination: { type: DataAddressType.HttpType },
+    managedResources: false,
+  };
 }
