@@ -9,6 +9,7 @@ import {
   ContractNegotiationRequest,
   CatalogRequest,
   PolicyDefinitionInput,
+  TransferProcessInput,
 } from '../entities';
 
 export class EdcAdapter {
@@ -93,6 +94,18 @@ export class EdcAdapter {
   }
   async starContracttNegotiation(input: ContractNegotiationRequest) {
     return this.edcConnectorClient.management.initiateContractNegotiation(
+      this.edcClientContext,
+      input
+    );
+  }
+  async getContractNegotiationResponse(contracNegotiationId: string) {
+    return this.edcConnectorClient.management.getNegotiation(
+      this.edcClientContext,
+      contracNegotiationId
+    );
+  }
+  async initiateTransfer(input: TransferProcessInput) {
+    return this.edcConnectorClient.management.initiateTransfer(
       this.edcClientContext,
       input
     );

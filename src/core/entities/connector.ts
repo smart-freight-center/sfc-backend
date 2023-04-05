@@ -22,3 +22,14 @@ export interface ConnectorInput {
 }
 
 export const IDS_PROTOCOL: string = 'ids-multipart';
+export enum DataAddressType {
+  HttpType = 'HttpProxy',
+}
+
+export enum ContractNegotiationState {
+  ERROR = 'ERROR',
+  DECLINED = 'DECLINED',
+  CONFIRMED = 'CONFIRMED',
+  INITIAL = 'INITIAL',
+  REQUESTED = 'REQUESTED',
+}

@@ -34,7 +34,7 @@ export class ProvideFootPrintController {
   static async companies(context: RouterContext) {
     try {
       context.status = 200;
-      context.body = await retrieveCompaniesConnectionUsecase.execute(
+      context.body = await retrieveCompaniesConnectionUsecase.listCompanies(
         context.decoded.clientId
       );
     } catch (error) {
