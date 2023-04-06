@@ -3,8 +3,8 @@ import cors from '@koa/cors';
 import Koa, { Context } from 'koa';
 import { RouterContext } from '@koa/router';
 import * as routes from './routes';
-import { EdcManagerError, EdcManagerErrorType } from '../core';
 import koaBodyparser from 'koa-bodyparser';
+import { EdcManagerError, EdcManagerErrorType } from 'utils/error';
 
 export interface ServerConfig {
   cors?: {

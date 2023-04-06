@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import dbConfig from '../infrastructure/db/config';
+import dbConfig from 'sfc-unit/infrastructure/db/config';
 
 export const CLIENT_CONFIG = (process.env.CONNECTOR_CONFIG &&
   JSON.parse(process.env.CONNECTOR_CONFIG as string)) ?? {
@@ -31,3 +31,4 @@ export const SEQUELIZE_CONFIG = DATABASE_CONFIG[APP_ENV];
 export const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM;
 export const KEYCLOAK_HOST = process.env.KEYCLOAK_HOST;
 export const KEYCLOAK_PUBLIC_KEY = process.env.KEYCLOAK_PUBLIC_KEY || '';
+export const SFCAPI_BASEURL = process.env.SFCAPI_BASEURL;

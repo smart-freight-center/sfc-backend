@@ -11,13 +11,14 @@
     "**/*.{md,mdx}": "prettier --write"
   },
   "scripts": {
-    "dev": "NODE_PATH=src nodemon --exec ts-node src/server.ts",
-    "dev:provider": "cross-env KEYCLOAK_REALM=provider API_PORT=3001  NODE_PATH=src nodemon --exec ts-node src/server.ts",
-    "dev:consumer": "cross-env KEYCLOAK_REALM=consumer API_PORT=3002 NODE_PATH=src nodemon --exec ts-node src/server.ts",
+    "sample": "echo $CONSUMER_KEYCLOAK_PUBLIC_KEY",
+    "dev": "NODE_PATH=src  API_PORT=3000 nodemon --exec ts-node src/server.ts",
+    "dev:provider": "cross-env KEYCLOAK_REALM=provider API_PORT=3001  NODE_PATH=src CONNECTOR_CONFIG=\"$PROVIDER_CONNECTOR_CONFIG\"  KEYCLOAK_PUBLIC_KEY=$PROVIDER_KEYCLOAK_PUBLIC_KEY nodemon --exec ts-node src/server.ts",
+    "dev:consumer": "cross-env KEYCLOAK_REALM=consumer CONNECTOR_CONFIG=\"$CONSUMER_CONNECTOR_CONFIG\" KEYCLOAK_PUBLIC_KEY=$CONSUMER_KEYCLOAK_PUBLIC_KEY API_PORT=3002 NODE_PATH=src nodemon --exec ts-node src/server.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "start": "NODE_PATH=dist node dist/server.js",
-    "build": "tsc && rm -rf dist/__tests__ **/*.test.ts",
+    "build": "cross-env NODE_PATH=src tsc && rm -rf dist/__tests__ **/*.test.ts",
     "test:one-unit": "cross-env NODE_ENV=test NODE_PATH=src mocha --exit",
     "test:unit": "yarn  test:one-unit --  'src/**/*.unit.test.ts'",
     "test:one-integration": "cross-env NODE_ENV=test NODE_PATH=src mocha  -r ts-node/register -r src/__tests__/hooks.ts --timeout 20000 --exit",
@@ -30,7 +31,9 @@
     "@koa/router": "^12.0.0",
     "@think-it-labs/edc-connector-client": "^0.0.1-milestone-8.beta-4",
     "@think-it-labs/typed-error": "^0.2.0",
+    "axios": "^1.3.4",
     "dotenv": "^16.0.3",
+    "jsonwebtoken": "^9.0.0",
     "koa": "^2.14.1",
     "koa-bodyparser": "^4.3.0",
     "lodash": "^4.17.21",
@@ -39,9 +42,6 @@
     "sequelize": "^6.29.3",
     "sequelize-cli": "^6.6.0",
     "sequelize-typescript": "^2.1.5",
-    "axios": "^1.3.4",
-    "jsonwebtoken": "^9.0.0",
-    "typescript": "^4.9.5",
     "validatorjs": "^3.22.1"
   },
   "devDependencies": {
@@ -75,6 +75,6 @@
     "nodemon": "^2.0.20",
     "prettier": "^2.8.4",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.5"
+    "typescript": "^5.0.3"
   }
 }
