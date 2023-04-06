@@ -1,5 +1,5 @@
 import { ApiServer } from './api';
-import './infrastructure/db';
+import 'sfc-unit/infrastructure/db';
 const apiAllowedOrigins = process.env.API_ALLOWED_ORIGINS || '';
 const allowedOrigins = apiAllowedOrigins.split(',').filter(Boolean);
 const server = ApiServer.create({

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { exec } from 'child_process';
-import 'infrastructure/db';
+import 'sfc-unit/infrastructure/db';
 export const runShellCommand = (command: string) => {
   return new Promise((resolve, reject) => {
     exec(command, (err, stdout, stderr) => {

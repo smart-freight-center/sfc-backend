@@ -1,6 +1,5 @@
 import Validator, { Rules } from 'validatorjs';
-
-import { InvalidInput } from 'core/error';
+import { InvalidInput } from './error';
 
 export const validateSchema = (data: object, schema: Rules): void => {
   const validation = new Validator(data, schema);

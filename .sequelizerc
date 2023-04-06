@@ -1,7 +1,13 @@
-require("dotenv/config");
-const path = require("path");
+require('dotenv/config');
+const path = require('path');
 
 module.exports = {
-  config: path.resolve("src", "infrastructure", "db", "config.js"),
-  "migrations-path": path.resolve("src", "infrastructure", "db", "migrations"),
+  config: path.resolve('src', 'sfc-unit', 'infrastructure', 'db', 'config.js'),
+  'migrations-path': path.resolve(
+    'src',
+    'sfc-unit',
+    'infrastructure',
+    'db',
+    'migrations'
+  ),
 };

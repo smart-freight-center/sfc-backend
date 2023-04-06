@@ -5,7 +5,7 @@
       "client_id": "intelcom",
       "role": "lsp",
       "connection": ["amazon"],
-      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxNU7NcGbLkRa96rtkVdbQFsncTcmNg3qTNFYRbf5yWwLPiqjFsUeOLU/5qZ2tIFIW2kgDyTLauS/zsMuV4LaxGHdLRo64S8/YFl1FG+CgcUpfG/if9IBeGbDMlHhPfW2p/PilHXUfuVCAPF0Jc9gysR4G8SDIjmA1YmVSDF50HsvDwZvZsUGTPXwpWneYvQWvF07wif5gHTJF3CUFyBkOBL/i/4pXFn8yWa91lizS8CJs5if7Z1OTFqFqefY3SeOQF+NDAYAtaVAibV81F9PJZSwRg3u85D5Ut8NJ0i8SzC2GNm6BNp7QC43BD1MyXl6rYxyRHayH/jL2TzDC1gJDQIDAQAB",
+      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsmQ72tZqdN+L+N4SjLhl9Qqg2dmtGGhJcqAI3Z/09kKr1rjCcKyAFnOaGnSuJ0XSaOoN1Z+sB/DU9sbIP24SD/m38tLcqDqIPUq5RGTHSPwJujECZ3THBJplTFpIvy4Yt6o4zEBFImmlApG9vhyEmX2rbZjhEedeqKFXKDW2R8EF/84u3k00jST8QRs0hRaeDL0l9pCjJ+1OtXgFvSUuHQpnZiJA4Fth9EVDvT12uO0oXJxbnLB8oRmW91p1mf66UutBn8wzUWJaUsf/P9BEC+o64k+zgxb1NQFHyF76haCvuZkB7peiPTw2nm2h9VZyOctyfcBWgXhPjYehZDABmwIDAQAB",
       "connector_data": {
         "id": "urn:connector:provider",
         "addresses": {
@@ -24,7 +24,7 @@
       "client_id": "amazon",
       "role": "shipper",
       "connection": ["intelcom"],
-      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8xBqThuR6U0pCZaILG4dC/BRezi9nhVFvk7Dh5ytT32GxO6Wq7W70Hz/metMRLbJCravTV/3mbMvbSPQvCQl1V9+zWjV2ZHS48hW4iXGOSw2UOG3+SuozpN84QBVHs30MAfT2bBMSnf3/zOxpMcsAAjfgci9PSicw252tV1YcXC6kFJLN+p2CTy8IkrEBouyxPSRiZy8PALZxjBest5Yiv1+ZVn6BQEnNNvJawTY1leGuWC1Dacr9qfQ9JPysdrvt6oLP0vdknmFf4TycMKUurqgWf1rSME0wiGoeigkpRF4anMlYrCe/1lyJxjzY3SXV72jC8nvpBG4gPTzix/AiwIDAQAB",
+      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzmm1snZky1DN/wLwlVN/48pL55cBmGxI9QBk9d5wKQxOk98jAJnZmfZXDKj1ltYU7zlECw6KRpz1R2SghKtOvTnxnuAQcBJ9DmlHtYcY+bm9vTDgBI0z51j2Rc0jJn4lTLSxwbtjwmLZFroseAnfQTp47g36dc3IAHxkwhZ/Ok3QxZ0zHR4qN1m8HEmrSnxS0cpdJs4TBoAIM/Xv7wb+cIFxJpTKurRZ/JkK0IP4ePXCCar0qcct3CIjjpmlZBBj5HLBqyqQSSeHk+D+1tO05MFFt7yKa4gJBn6LB3nVU8lAvxc5TvHLV7WNMwoTv62lOEVf1CtUOr0pK6mkxpeRnQIDAQAB",
       "connector_data": {
         "id": "urn:connector:consumer",
         "addresses": {
