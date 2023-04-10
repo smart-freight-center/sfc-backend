@@ -44,24 +44,4 @@ export class ConsumeFootprintUsecase {
       body: response,
     };
   }
-
-  async initiateTransferProcess(
-    shipmentId: string,
-    connectorId: string,
-    connectorAddress: string,
-    contractId: string
-  ) {
-    const transferProcessInput = builder.transferProcessInput(
-      shipmentId,
-      connectorId,
-      connectorAddress,
-      contractId
-    );
-    const response = await this.edcClient.initiateTransfer(
-      transferProcessInput
-    );
-    return {
-      body: response,
-    };
-  }
 }
