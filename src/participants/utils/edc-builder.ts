@@ -4,12 +4,14 @@ import {
   ContractOffer,
   ContractNegotiationRequest,
   DataAddressType,
+  DataplaneInput,
   IDS_PROTOCOL,
   PolicyDefinitionInput,
   QuerySpec,
   ShareFootprintInput,
   Policy,
   TransferProcessInput,
+  Addresses,
 } from 'entities';
 import { defaults } from 'lodash';
 import * as crypto from 'node:crypto';
@@ -114,5 +116,20 @@ export function transferProcessInput(
     contractId: contractId,
     dataDestination: { type: DataAddressType.HttpType },
     managedResources: false,
+  };
+}
+
+export function dataplaneInput(
+  clientId: string,
+  connectorAddresses: Addresses
+): DataplaneInput {
+  return {
+    id: `${clientId}-dataplane`,
+    url: `${connectorAddresses.control}/transfer`,
+    allowedSourceTypes: ['HttpData'],
+    allowedDestTypes: ['HttpProxy', 'HttpData'],
+    properties: {
+      publicApiUrl: connectorAddresses.public,
+    },
   };
 }

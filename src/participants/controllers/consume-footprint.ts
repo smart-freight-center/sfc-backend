@@ -6,6 +6,7 @@ import {
 } from 'utils/error';
 import {
   consumeFootprintUsecase,
+  getFileUsecase,
   initiateFileTransferUsecase,
 } from '../usecases';
 import { CatalogRequest } from 'entities';
@@ -103,6 +104,17 @@ export class ConsumeFootPrintController {
       } else {
         context.status = 500;
       }
+    }
+  }
+
+  static async getData(context: RouterContext) {
+    try {
+      const data = await getFileUsecase.execute();
+      context.body = data;
+      context.status = 200;
+    } catch (error) {
+      context.body = { errors: error };
+      context.status = 5000;
     }
   }
 }

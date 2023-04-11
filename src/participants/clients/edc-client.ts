@@ -3,19 +3,22 @@ import {
   CatalogRequest,
   ContractDefinitionInput,
   ContractNegotiationRequest,
+  DataplaneInput,
   EdcConnectorClient,
   EdcConnectorClientContext,
   PolicyDefinitionInput,
   TransferProcessInput,
+  TransferProcessResponse,
 } from '@think-it-labs/edc-connector-client';
 import { Connector } from 'entities';
 
 export class EdcAdapter {
   readonly edcConnectorClient: EdcConnectorClient;
   edcClientContext: EdcConnectorClientContext;
-
+  edcClientId: string;
   constructor(myConnector: Connector, token: string) {
     this.edcConnectorClient = new EdcConnectorClient();
+    this.edcClientId = myConnector.id;
 
     const clientContext = this.edcConnectorClient.createContext(
       token,
@@ -106,6 +109,18 @@ export class EdcAdapter {
     return this.edcConnectorClient.management.initiateTransfer(
       this.edcClientContext,
       input
+    );
+  }
+  async registerDataplane(input: DataplaneInput) {
+    return this.edcConnectorClient.management.registerDataplane(
+      this.edcClientContext,
+      input
+    );
+  }
+  async getTranferedData(input: TransferProcessResponse) {
+    return this.edcConnectorClient.public.getTranferedData(
+      this.edcClientContext,
+      { [input.authKey]: input.authCode }
     );
   }
 }
