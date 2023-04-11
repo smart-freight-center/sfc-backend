@@ -14,4 +14,4 @@ export const initiateFileTransferUsecase = new InitiateFileTransferUsecase(
   edcAdapter,
   SFCAPI
 );
-export const getFileUsecase = new GetFileUsecase(edcAdapter);
+export const getFileUsecase = new GetFileUsecase(edcAdapter, SFCAPI);
