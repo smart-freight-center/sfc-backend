@@ -1,15 +1,25 @@
-import { EdcAdapter } from 'participants/clients';
+import { EdcAdapter, SocketIO } from 'participants/clients';
 import { SFCAPIType } from 'participants/types';
 import { TransferProcessResponse } from 'entities';
+import { EMITTED_MESSAGE } from 'participants/utils/constants';
 export class GetFileUsecase {
-  constructor(private edcClient: EdcAdapter, private sfcAPI: SFCAPIType) {}
-  async pullData(transferProcessResponse: TransferProcessResponse) {
-    // FIXME(@OlfaBensoussia): This will be removed once we get an event system in place. The value of this object need to be retrieved from the receiver endpoint
-
-    const response = await this.edcClient.getTranferedData(
-      transferProcessResponse
+  constructor(
+    private edcClient: EdcAdapter,
+    private sfcAPI: SFCAPIType,
+    private socketIO: SocketIO
+  ) {}
+  async pullData() {
+    this.socketIO.receive(
+      EMITTED_MESSAGE,
+      async (transferProcessResponse: TransferProcessResponse) => {
+        console.log('socket io input', transferProcessResponse);
+        const response = await this.edcClient.getTranferedData(
+          transferProcessResponse
+        );
+        return response;
+      }
     );
-    return response;
+    return;
   }
 
   async getTransferProcessResponse(
@@ -24,12 +34,10 @@ export class GetFileUsecase {
         ...requestInput,
         endpoint: `${provider.connector_data.addresses.public}/public/`,
       };
-      console.log('transferProcessResponse');
-      // socketio.emit("received-callback", {
-      //   connectorId: context.params.connectorId,
-      //   body: transferProcessResponse,
-      // });
+      this.socketIO.emit(EMITTED_MESSAGE, transferProcessResponse);
     }
+    // for testing
+    this.socketIO.emit(EMITTED_MESSAGE, 'holla');
   }
 
   //FIXME(@OlfaBensoussia): this is redundant as we had to define the same method in 'initiate-file-transfer.ts'
