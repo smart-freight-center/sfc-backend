@@ -4,6 +4,7 @@ import { ContractNotFound } from 'utils/error';
 import { validateSchema } from 'utils/helpers';
 import * as builder from '../utils/edc-builder';
 import { ParticipantType } from 'entities/client-types';
+import { Addresses } from 'entities';
 
 const initiateTransferSchema = {
   companyId: ['required', { minLength: 2 }],
@@ -26,6 +27,16 @@ export class InitiateFileTransferUsecase {
     const { contractNegotiationId, companyId, shipmentId } = inputData;
 
     const provider = await this.getProvider(authorization, companyId);
+
+    await this.registerDataplane(
+      provider.client_id,
+      provider.connector_data.addresses
+    );
+
+    await this.registerDataplane(
+      this.edcClient.edcClientId,
+      this.edcClient.edcClientContext
+    );
 
     const contractAgreementId = await this.getContractAgreementId(
       contractNegotiationId
@@ -74,5 +85,10 @@ export class InitiateFileTransferUsecase {
     if (!response.contractAgreementId) throw new ContractNotFound();
 
     return response.contractAgreementId;
+  }
+
+  async registerDataplane(clientId: string, connectorAddresses: Addresses) {
+    const dataPlaneInput = builder.dataplaneInput(clientId, connectorAddresses);
+    await this.edcClient.registerDataplane(dataPlaneInput);
   }
 }
