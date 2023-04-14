@@ -29,10 +29,7 @@ export class ProvideFootprintUsecase {
         contractDefinitionInput
       );
       results.newContractId = newContract.id;
-
-      return {
-        body: newAsset,
-      };
+      return newAsset;
     } catch (error) {
       console.log(error);
       await this.rollback(results);
@@ -55,8 +52,11 @@ export class ProvideFootprintUsecase {
 
   async list() {
     const assets = await this.edcClient.listAssets();
-    return {
-      body: assets,
-    };
+
+    return assets.map((asset) => ({
+      createdAt: asset.createdAt,
+      id: asset.id,
+      name: asset.properties['asset:prop:name'],
+    }));
   }
 }

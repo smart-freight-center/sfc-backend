@@ -18,17 +18,11 @@ export const edcRouter = new KoaRouter({ prefix: '/emissions' })
     AuthController.authMiddleware,
     ProvideFootPrintController.getSharedFootprints
   )
-  .post(
+  .get(
     'Request a data catalog from a connector',
     '/catalog',
     AuthController.authMiddleware,
     ConsumeFootPrintController.requestFootprintsCatalog
-  )
-  .post(
-    'Request a data catalog from a connector with shipment filter',
-    '/catalog/:shipmentId',
-    AuthController.authMiddleware,
-    ConsumeFootPrintController.requestFilteredFootprintsCatalog
   )
   .post(
     'start contract negotitation for a shipemnt',
@@ -48,3 +42,10 @@ export const edcRouter = new KoaRouter({ prefix: '/emissions' })
     AuthController.authMiddleware,
     ConsumeFootPrintController.getData
   );
+
+export const pactCompliantRouter = new KoaRouter().get(
+  'Get Footprint data',
+  '/footprints/:shipmentId',
+  AuthController.authMiddleware,
+  ConsumeFootPrintController.getData
+);

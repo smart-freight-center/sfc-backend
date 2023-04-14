@@ -13,7 +13,7 @@ const initiateTransferSchema = {
 };
 
 type Input = {
-  companyId: string;
+  clientId: string;
   contractNegotiationId: string;
   shipmentId: string;
 };
@@ -24,8 +24,9 @@ export class InitiateFileTransferUsecase {
   async execute(inputData: Input, authorization: string) {
     validateSchema(inputData, initiateTransferSchema);
 
-    const { contractNegotiationId, companyId, shipmentId } = inputData;
-    const provider = await this.getProvider(authorization, companyId);
+    const { contractNegotiationId, clientId, shipmentId } = inputData;
+
+    const provider = await this.getProvider(authorization, clientId);
 
     await this.registerDataplane(
       provider.client_id,
@@ -50,11 +51,12 @@ export class InitiateFileTransferUsecase {
     return response;
   }
 
-  private async getProvider(authorization: string, companyId: string) {
+  private async getProvider(authorization: string, clientId: string) {
     const sfcConnection = await this.sfcAPI.createConnection(
       authorization || ''
     );
-    const provider = await sfcConnection.getCompany(companyId);
+
+    const provider = await sfcConnection.getCompany(clientId);
     return provider;
   }
 

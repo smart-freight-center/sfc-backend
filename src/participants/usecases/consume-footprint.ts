@@ -1,26 +1,41 @@
 import { EdcAdapter } from '../clients';
-import { CatalogRequest, ContractOffer } from 'entities';
+import { CatalogRequest, ContractOffer, ListCatalogInput } from 'entities';
 import * as builder from '../utils/edc-builder';
+import { SFCAPIType } from 'participants/types';
+import { validateSchema } from 'utils/helpers';
 
+const listCatalogSchema = {
+  clientId: 'min:1|required',
+};
 export class ConsumeFootprintUsecase {
-  constructor(private edcClient: EdcAdapter) {}
+  constructor(private edcClient: EdcAdapter, private sfcAPI: SFCAPIType) {}
 
-  async listCatalogs(input: CatalogRequest) {
-    const catalogs = await this.edcClient.listCatalog(input);
-    return {
-      body: catalogs,
-    };
+  async listCatalogs(authorization: string, input: ListCatalogInput) {
+    validateSchema(input, listCatalogSchema);
+    const sfcAPISession = await this.sfcAPI.createConnection(authorization);
+    const provider = await sfcAPISession.getCompany(input.clientId);
+
+    const querySpec = this.getQuerySpec(input.shipmentId);
+    const catalogs = await this.edcClient.listCatalog({
+      providerUrl: provider.connector_data.addresses.protocol + '/data',
+      querySpec: querySpec,
+    });
+    return catalogs;
+  }
+
+  getQuerySpec(shipmentId?: string) {
+    if (shipmentId) {
+      return builder.catalogAssetFilter(shipmentId);
+    }
+    return undefined;
   }
 
   async listFilteredCatalog(input: CatalogRequest, shipmentId: string) {
     const assetFilter = builder.catalogAssetFilter(shipmentId);
-    const catalogs = await this.edcClient.listCatalog({
+    return await this.edcClient.listCatalog({
       ...input,
       querySpec: assetFilter,
     });
-    return {
-      body: catalogs,
-    };
   }
 
   async startContractNegotiation(
@@ -31,17 +46,11 @@ export class ConsumeFootprintUsecase {
       contractOffer,
       connectorIdsAddress
     );
-    const contractNegotiationCreationResult =
-      await this.edcClient.starContracttNegotiation(contractNegotitionInput);
-    return {
-      body: contractNegotiationCreationResult,
-    };
+    return this.edcClient.starContracttNegotiation(contractNegotitionInput);
   }
 
   async getContractNegotiationResponse(input: string) {
     const response = await this.edcClient.getContractNegotiationResponse(input);
-    return {
-      body: response,
-    };
+    return response;
   }
 }
