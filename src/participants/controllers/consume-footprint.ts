@@ -108,8 +108,19 @@ export class ConsumeFootPrintController {
   }
 
   static async getData(context: RouterContext) {
+    // socketio.on("received-callback", handler);
+    //  const handler = (input) => {
+    //   const TransferProcessResponse =  input
+    //   };
+    const TransferProcessResponse = {
+      id: 'string',
+      endpoint: 'string',
+      contractId: 'string',
+      authKey: 'string',
+      authCode: 'string',
+    };
     try {
-      const data = await getFileUsecase.execute();
+      const data = await getFileUsecase.pullData(TransferProcessResponse);
       context.body = data;
       context.status = 200;
     } catch (error) {

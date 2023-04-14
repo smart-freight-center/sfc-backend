@@ -25,4 +25,5 @@ export type {
   Prohibition,
   QuerySpec,
   TransferProcessInput,
+  TransferProcessResponse,
 } from '@think-it-labs/edc-connector-client';
