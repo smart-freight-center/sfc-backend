@@ -19,11 +19,12 @@ export class ConsumeFootPrintController {
         clientId: context.query.clientId as string,
         shipmentId: context.query.shipmentId as string,
       };
+
       const catalogs = await consumeFootprintUsecase.listCatalogs(
         context.headers.authorization as string,
         args
       );
-      context.body = { data: catalogs };
+      context.body = catalogs;
       context.status = 200;
     } catch (error) {
       console.log(error);
@@ -41,24 +42,7 @@ export class ConsumeFootPrintController {
       context.status = 500;
     }
   }
-  static async requestFilteredFootprintsCatalog(context: RouterContext) {
-    try {
-      const { shipmentId } = context.params;
-      const data = await consumeFootprintUsecase.listFilteredCatalog(
-        context.request.body as CatalogRequest,
-        shipmentId
-      );
-      context.body = data;
-      context.status = 200;
-    } catch (error) {
-      console.log(error);
-      if (error instanceof InvalidInput) {
-        context.status = 400;
-        return;
-      }
-      context.status = 500;
-    }
-  }
+
   static async startContractNegotiation(context: RouterContext) {
     try {
       const data = {
@@ -111,7 +95,7 @@ export class ConsumeFootPrintController {
         context.body = { errors: error.errors };
         context.status = 400;
       } else if (error instanceof ParticipantNotFound) {
-        context.body = { error: 'invalid company id' };
+        context.body = { error: 'invalid client id' };
         context.status = 404;
       } else if (error instanceof ContractNotFound) {
         context.body = { error: 'invalid shipmentId' };

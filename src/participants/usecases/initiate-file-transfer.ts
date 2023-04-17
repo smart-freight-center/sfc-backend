@@ -7,7 +7,7 @@ import { ParticipantType } from 'entities/client-types';
 import { Addresses } from 'entities';
 
 const initiateTransferSchema = {
-  companyId: 'required|min:2',
+  clientId: 'required|min:2',
   contractNegotiationId: 'required|min:2',
   shipmentId: 'required|min:2',
 };

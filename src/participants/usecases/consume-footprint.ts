@@ -19,11 +19,13 @@ export class ConsumeFootprintUsecase {
     validateSchema(input, listCatalogSchema);
     const sfcAPISession = await this.sfcAPI.createConnection(authorization);
     const provider = await sfcAPISession.getCompany(input.clientId);
-
-    const querySpec = this.getQuerySpec(input.shipmentId);
+    let querySpec;
+    if (input.shipmentId) {
+      querySpec = this.getQuerySpec(input.shipmentId);
+    }
     const catalogs = await this.edcClient.listCatalog({
       providerUrl: provider.connector_data.addresses.protocol + '/data',
-      querySpec: querySpec,
+      querySpec: querySpec ?? undefined,
     });
     return catalogs;
   }
@@ -33,14 +35,6 @@ export class ConsumeFootprintUsecase {
       return builder.catalogAssetFilter(shipmentId);
     }
     return undefined;
-  }
-
-  async listFilteredCatalog(input: CatalogRequest, shipmentId: string) {
-    const assetFilter = builder.catalogAssetFilter(shipmentId);
-    return await this.edcClient.listCatalog({
-      ...input,
-      querySpec: assetFilter,
-    });
   }
 
   async startContractNegotiation(
