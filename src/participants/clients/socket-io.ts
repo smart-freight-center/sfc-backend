@@ -1,10 +1,9 @@
-import { ApiServer } from 'api';
 import { Server } from 'socket.io';
 
 export class SocketIO {
   readonly server: Server;
-  constructor(apiServer: ApiServer) {
-    this.server = apiServer.io;
+  constructor(apiServer) {
+    this.server = apiServer;
   }
 
   async emit(message: string, data: any) {

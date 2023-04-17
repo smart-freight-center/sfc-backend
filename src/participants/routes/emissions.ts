@@ -42,7 +42,7 @@ export const edcRouter = new KoaRouter({ prefix: '/emissions' })
     AuthController.authMiddleware,
     ConsumeFootPrintController.initiateFileTransfer
   )
-  .post(
+  .get(
     'get data',
     '/:shipmentId/data',
     AuthController.authMiddleware,

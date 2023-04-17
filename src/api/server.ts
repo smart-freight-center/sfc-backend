@@ -5,7 +5,6 @@ import { RouterContext } from '@koa/router';
 import * as routes from './routes';
 import koaBodyparser from 'koa-bodyparser';
 import { EdcManagerError, EdcManagerErrorType } from 'utils/error';
-import { Server as SocketIo } from 'socket.io';
 
 export interface ServerConfig {
   cors?: {
@@ -17,7 +16,6 @@ export type ApiRouterContext = RouterContext;
 export class ApiServer {
   /** The native Node.js HTTP server reference. */
   server: http.Server;
-  io: SocketIo;
 
   /** The native Node.js HTTP server reference. */
   public readonly koa: Koa;
@@ -26,8 +24,7 @@ export class ApiServer {
    * # Not supported initialization method
    * Use `Server.create` instead.
    */
-  private constructor(server: http.Server, koa: Koa, io: SocketIo) {
-    this.io = io;
+  private constructor(server: http.Server, koa: Koa) {
     this.koa = koa;
     this.server = server;
   }
@@ -95,12 +92,6 @@ export class ApiServer {
     }
 
     const server = http.createServer(koa.callback());
-    const io = new SocketIo(server, {
-      cors: {
-        origin: '*',
-        methods: ['GET', 'POST'],
-      },
-    });
 
     koa.use(async (context: Context, next: () => Promise<void>) => {
       try {
@@ -151,6 +142,6 @@ export class ApiServer {
       koa.use(router.routes()).use(router.allowedMethods());
     }
 
-    return new ApiServer(server, koa, io);
+    return new ApiServer(server, koa);
   }
 }
