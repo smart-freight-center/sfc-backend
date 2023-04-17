@@ -7,9 +7,9 @@ import { ParticipantType } from 'entities/client-types';
 import { Addresses } from 'entities';
 
 const initiateTransferSchema = {
-  companyId: ['required', { minLength: 2 }],
-  contractNegotiationId: ['required', { minLength: 2 }],
-  shipmentId: ['required', { minLength: 2 }],
+  companyId: 'required|min:2',
+  contractNegotiationId: 'required|min:2',
+  shipmentId: 'required|min:2',
 };
 
 type Input = {
@@ -25,7 +25,6 @@ export class InitiateFileTransferUsecase {
     validateSchema(inputData, initiateTransferSchema);
 
     const { contractNegotiationId, companyId, shipmentId } = inputData;
-
     const provider = await this.getProvider(authorization, companyId);
 
     await this.registerDataplane(
@@ -55,7 +54,6 @@ export class InitiateFileTransferUsecase {
     const sfcConnection = await this.sfcAPI.createConnection(
       authorization || ''
     );
-
     const provider = await sfcConnection.getCompany(companyId);
     return provider;
   }

@@ -123,4 +123,10 @@ export class EdcAdapter {
       { [input.authKey]: input.authCode }
     );
   }
+  async getContractAgreement(input: string) {
+    return this.edcConnectorClient.management.getAgreement(
+      this.edcClientContext,
+      input
+    );
+  }
 }

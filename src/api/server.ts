@@ -92,6 +92,7 @@ export class ApiServer {
     }
 
     const server = http.createServer(koa.callback());
+
     koa.use(async (context: Context, next: () => Promise<void>) => {
       try {
         await next();

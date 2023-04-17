@@ -42,6 +42,7 @@
     "sequelize": "^6.29.3",
     "sequelize-cli": "^6.6.0",
     "sequelize-typescript": "^2.1.5",
+    "socket.io": "^4.6.1",
     "validatorjs": "^3.22.1"
   },
   "devDependencies": {

@@ -111,7 +111,7 @@ export function transferProcessInput(
 ): TransferProcessInput {
   return {
     assetId: shipmentId,
-    connectorAddress: connectorAddress,
+    connectorAddress: `${connectorAddress}/data`,
     connectorId: connectorId,
     contractId: contractId,
     dataDestination: { type: DataAddressType.HttpType },
