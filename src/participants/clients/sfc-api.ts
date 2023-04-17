@@ -29,10 +29,10 @@ export class SFCAPI {
     }
   }
 
-  async getCompany(companyId: string) {
+  async getCompany(clientId: string) {
     const companies = await this.getCompanies();
 
-    const company = companies.find((company) => company.client_id == companyId);
+    const company = companies.find((company) => company.client_id == clientId);
 
     if (!company) {
       throw new ParticipantNotFound();

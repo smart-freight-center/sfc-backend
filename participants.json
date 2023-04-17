@@ -5,7 +5,11 @@
       "client_id": "intelcom",
       "role": "lsp",
       "connection": ["amazon"],
+<<<<<<< HEAD
       "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkNtOGgAptaD5G0oIijLOHZalCroImQRUDhgbdpJOy62MK6Ju85CGP6I/xDaWggE1n+ceRuwobVCVbPOaGDiBNzaR1SkJK1GVi8ZunMj4uLZ8L8cpIiwTM3AIqebYPMX/wZKeFvZo8k9c7RQ99mCQaukVdVevrIt+S+bu2wh2yxGh08cTuHC/KOvJdjjmaqXlGcQENr5jwOeBheeDzAObmLecsY1CSlm+WEyNviVd1YOhf3W8mpoMvzS9oYgO/eBfu7xezPyUi9938vseLUbzwplLLNtS+xLDz598Gt7VqexhlcsqGiubtFIzNV9UlaDnT0zEcpYNdWon/hanC6CJzQIDAQAB",
+=======
+      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwceF+8th+FMv7lAwws1y5Y7UyqxuiDHWkmVuvZrZYHB0/jcw6F9XgFF+GsKc/aOZCqKp3txD7/+9eGUkJ63PCKWQQgH3kEPyszHBG3c/Sz4ELv7ETvqZ+DSPT7PKGWMmpOAshVi2y8nuo3DtZv1UIrBIzzNYbRrhAsUwlA8CvcA1PyDuCXAWgUtCeEz1YJ1KBIaCB7SX1zEI8P8ysSzD7MKQ3NoBdCJntCuji0Y+fKMKljVbmrv4xOo9BPDyKwj6U19F/1u3zzvx4rB1PXnb6pdMJ2axOaDnf0KUzZEJbPCOyQJNmiT9uASbgvnmjQF76FZgoOUQput3frDu4v93ZQIDAQAB",
+>>>>>>> 080bc69... feat: modifies endpoints to use less connector language
       "connector_data": {
         "id": "urn:connector:provider",
         "addresses": {
@@ -24,7 +28,11 @@
       "client_id": "amazon",
       "role": "shipper",
       "connection": ["intelcom"],
+<<<<<<< HEAD
       "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmn98Ymj6UjaD1Lphuce80WcLbhzqc9gjf5DSn8L/ZqD3hvxmTEieGvqdT3dnGpMobuDHusldw8ANnzUFan8Y9i0ol1lGS0uNzEl71sCTAefjFZ6hOgDjy2Dv21s6wLmpCXDTJllBou6K6/iwLwcFdh/kjt3aTlqtfGNk6WP+tHmfXoTaAIYFrO6NTwUDMDNrugO/SqblO0pmzHchsKyEuAWf3bd5ECnWbPkUHOk8lDlGGwIArJCw4yxeAcibCJBs04x5laiZR9c2lQRSC4OaHpvovmx+SmD5X2L2Vd/tGMG4V6AY24cLfXVTI5Ozv8bmTdk2VQ132fJNo7ILdcE8HQIDAQAB",
+=======
+      "public_key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAo6HnKRbjRhIMijv97o6uW6+z1yxJPoIALfH9y1irL4HpeD+clUj+foYqg2WHpHXAprTk0yuyD/huRHDSA1MzIPObb+TPMd3NjM7QHS9sols1S0UmudbjUdahiMWbJfhgJIZhMqCMgOINO5RxS67wcTfyeADyz+AHeJzmsXY7yzwXf4FsN0aGfNxfJCMjSyVoc6FztgRX4uVN3M9XQIxZejG4dHpWEM3WkTT3prx7vaq6aTN9Qd/5jQQXAqbNBuUzCPDi+EPgq3m3SUBFCO0/kI7x1WdR9opx1WtE7X0xKjs8brYWGfGiTKL94WpjPWpt6dOY9zpprPER0NkBevghGQIDAQAB",
+>>>>>>> 080bc69... feat: modifies endpoints to use less connector language
       "connector_data": {
         "id": "urn:connector:consumer",
         "addresses": {

@@ -8,21 +8,33 @@ import {
   consumeFootprintUsecase,
   getFileUsecase,
   initiateFileTransferUsecase,
+  startContractNegotiationUsecase,
 } from '../usecases';
 import { CatalogRequest } from 'entities';
 
 export class ConsumeFootPrintController {
   static async requestFootprintsCatalog(context: RouterContext) {
     try {
-      const response = await consumeFootprintUsecase.listCatalogs(
-        context.request.body as CatalogRequest
+      const args = {
+        clientId: context.query.clientId as string,
+        shipmentId: context.query.shipmentId as string,
+      };
+      const catalogs = await consumeFootprintUsecase.listCatalogs(
+        context.headers.authorization as string,
+        args
       );
-      context.body = response.body;
+      context.body = { data: catalogs };
       context.status = 200;
     } catch (error) {
       console.log(error);
       if (error instanceof InvalidInput) {
         context.status = 400;
+        context.body = { errors: error.errors };
+        return;
+      }
+      if (error instanceof ParticipantNotFound) {
+        context.status = 404;
+        context.body = { error: 'Participant not found' };
         return;
       }
 
@@ -32,11 +44,11 @@ export class ConsumeFootPrintController {
   static async requestFilteredFootprintsCatalog(context: RouterContext) {
     try {
       const { shipmentId } = context.params;
-      const response = await consumeFootprintUsecase.listFilteredCatalog(
+      const data = await consumeFootprintUsecase.listFilteredCatalog(
         context.request.body as CatalogRequest,
         shipmentId
       );
-      context.body = response.body;
+      context.body = data;
       context.status = 200;
     } catch (error) {
       console.log(error);
@@ -49,25 +61,27 @@ export class ConsumeFootPrintController {
   }
   static async startContractNegotiation(context: RouterContext) {
     try {
-      const { shipmentId } = context.params;
-      const catalogRequest = context.request.body as CatalogRequest;
-      const contractOfferResponse =
-        await consumeFootprintUsecase.listFilteredCatalog(
-          catalogRequest,
-          shipmentId
-        );
-      if (contractOfferResponse) {
-        const response = await consumeFootprintUsecase.startContractNegotiation(
-          contractOfferResponse.body.contractOffers[0],
-          catalogRequest.providerUrl
-        );
-        context.body = response.body;
-        context.status = 200;
-      }
+      const data = {
+        shipmentId: context.params.shipmentId as string,
+        clientId: (context.request.body as any)?.clientId as string,
+      };
+      const resData = await startContractNegotiationUsecase.execute(
+        context.headers.authorization || '',
+        data
+      );
+
+      context.body = resData;
+      context.status = 200;
     } catch (error) {
       console.log(error);
       if (error instanceof InvalidInput) {
         context.status = 400;
+        context.body = { errors: error.errors };
+        return;
+      }
+      if (error instanceof ContractNotFound) {
+        context.status = 404;
+        context.body = { error: 'Invalid shipment Id' };
         return;
       }
 
@@ -78,11 +92,11 @@ export class ConsumeFootPrintController {
   static async initiateFileTransfer(context: RouterContext) {
     try {
       const { shipmentId } = context.params;
-      const { contractNegotiationId, companyId } = context.query;
+      const { contractNegotiationId, clientId } = context.query;
       const inputData = {
         shipmentId: shipmentId as string,
         contractNegotiationId: contractNegotiationId as string,
-        companyId: companyId as string,
+        clientId: clientId as string,
       };
       const data = await initiateFileTransferUsecase.execute(
         inputData,
@@ -100,7 +114,7 @@ export class ConsumeFootPrintController {
         context.body = { error: 'invalid company id' };
         context.status = 404;
       } else if (error instanceof ContractNotFound) {
-        context.body = { error: 'invalid contractNegotiationId' };
+        context.body = { error: 'invalid shipmentId' };
         context.status = 404;
       } else {
         context.status = 500;
