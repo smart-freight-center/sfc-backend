@@ -70,7 +70,11 @@ export class InitiateFileTransferUsecase {
               ) {
                 poll();
               } else {
-                reject(new Error('Negotiation failed'));
+                reject(
+                  new Error(
+                    'An error occured while retrieving the data. Please make sure that you have the right acces to it.'
+                  )
+                );
               }
             } catch (error) {
               reject(error);
@@ -79,12 +83,11 @@ export class InitiateFileTransferUsecase {
         };
         poll();
       }).then(async (contractAgreement) => {
-        const response = await this.initiateTransfer(
+        return await this.initiateTransfer(
           provider,
           shipmentId,
           contractAgreement.id
         );
-        return response;
       });
     }
   }
