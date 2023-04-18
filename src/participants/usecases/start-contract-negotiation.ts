@@ -65,7 +65,7 @@ export class StartContractNegotiationUsecase {
   ) {
     const contractNegotitionInput = builder.contractNegotiationInput(
       contractOffer,
-      provider.connector_data.addresses.protocol + '/data'
+      provider.connector_data
     );
     const contractNegotiationCreationResult =
       await this.edcClient.starContracttNegotiation(contractNegotitionInput);

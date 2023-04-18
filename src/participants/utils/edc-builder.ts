@@ -12,6 +12,7 @@ import {
   Policy,
   TransferProcessInput,
   Addresses,
+  Connector,
 } from 'entities';
 import { defaults } from 'lodash';
 import * as crypto from 'node:crypto';
@@ -97,12 +98,11 @@ export function catalogAssetFilter(assetId: string): QuerySpec {
 
 export function contractNegotiationInput(
   contractOffer: ContractOffer,
-  connectorIdsAddress: string
+  connector: Connector
 ): ContractNegotiationRequest {
-  const connectorId = extractConnectorId(connectorIdsAddress);
   return {
-    connectorAddress: connectorIdsAddress,
-    connectorId: connectorId,
+    connectorAddress: `${connector.addresses.protocol}/data`,
+    connectorId: connector.id,
     offer: {
       offerId: contractOffer.id as string,
       assetId: contractOffer.asset?.id as string,
@@ -111,22 +111,16 @@ export function contractNegotiationInput(
     protocol: IDS_PROTOCOL,
   };
 }
-//FIXME(@OlfaBensoussia): this is a temporary workaround until we implement the companies endpoint and logic units
-function extractConnectorId(connectorIdsAddress: string): string {
-  const startIndex = connectorIdsAddress.indexOf('//');
-  const endIndex = connectorIdsAddress.indexOf(':', startIndex + 2);
-  return connectorIdsAddress.substring(startIndex + 2, endIndex);
-}
+
 export function transferProcessInput(
   shipmentId: string,
-  connectorId: string,
-  connectorAddress: string,
+  connector: Connector,
   contractId: string
 ): TransferProcessInput {
   return {
     assetId: shipmentId,
-    connectorAddress: `${connectorAddress}/data`,
-    connectorId: connectorId,
+    connectorAddress: `${connector.addresses.protocol}/data`,
+    connectorId: connector.id,
     contractId: contractId,
     dataDestination: { type: DataAddressType.HttpType },
     managedResources: false,

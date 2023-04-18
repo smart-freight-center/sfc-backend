@@ -1,5 +1,10 @@
 import { EdcAdapter } from '../clients';
-import { CatalogRequest, ContractOffer, ListCatalogInput } from 'entities';
+import {
+  CatalogRequest,
+  Connector,
+  ContractOffer,
+  ListCatalogInput,
+} from 'entities';
 import * as builder from '../utils/edc-builder';
 import { SFCAPIType } from 'participants/types';
 import { validateSchema } from 'utils/helpers';
@@ -40,11 +45,11 @@ export class ConsumeFootprintUsecase {
 
   async startContractNegotiation(
     contractOffer: ContractOffer,
-    connectorIdsAddress: string
+    connector: Connector
   ) {
     const contractNegotitionInput = builder.contractNegotiationInput(
       contractOffer,
-      connectorIdsAddress
+      connector
     );
     return this.edcClient.starContracttNegotiation(contractNegotitionInput);
   }

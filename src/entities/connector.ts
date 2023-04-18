@@ -7,7 +7,7 @@ export interface Connector {
   maintainer?: string;
   curator?: string;
   catalogId?: string;
-  region: string;
+  region?: string;
   addresses: Addresses;
 }
 

@@ -67,8 +67,7 @@ export class InitiateFileTransferUsecase {
   ) {
     const transferProcessInput = builder.transferProcessInput(
       shipmentId,
-      provider.connector_data.id,
-      provider.connector_data.addresses.protocol,
+      provider.connector_data,
       contractAgreementId
     );
     const response = await this.edcClient.initiateTransfer(
