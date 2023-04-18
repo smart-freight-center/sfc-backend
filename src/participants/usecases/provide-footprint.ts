@@ -1,11 +1,17 @@
 import { ShareFootprintInput } from 'entities';
 import { EdcAdapter } from '../clients/edc-client';
 import * as builder from 'participants/utils/edc-builder';
+import { validateSchema } from 'utils/helpers';
+import {
+  customMessage,
+  shareFootprintSchema,
+} from 'participants/validators/share-footprint-schema';
 
 export class ProvideFootprintUsecase {
   constructor(private edcClient: EdcAdapter) {}
 
-  async share(data: ShareFootprintInput) {
+  public async share(data: ShareFootprintInput) {
+    this.validateData(data);
     const results = {
       newAssetId: '',
       newPolicyId: '',
@@ -31,9 +37,22 @@ export class ProvideFootprintUsecase {
       results.newContractId = newContract.id;
       return newAsset;
     } catch (error) {
-      console.log(error);
       await this.rollback(results);
-      return;
+
+      throw error;
+    }
+  }
+  private validateData(input: Partial<ShareFootprintInput>) {
+    input.type = input.type?.toLowerCase() as ShareFootprintInput['type'];
+    validateSchema(input, shareFootprintSchema.shared, customMessage.shared);
+    if (input.type === 'azure') {
+      validateSchema(input, shareFootprintSchema.azure);
+    }
+    if (input.type === 's3') {
+      validateSchema(input, shareFootprintSchema.s3);
+    }
+    if (input.type === 'http') {
+      validateSchema(input, shareFootprintSchema.http);
     }
   }
 

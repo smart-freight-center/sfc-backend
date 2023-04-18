@@ -2,6 +2,10 @@ import { ShareFootprintInput } from 'entities';
 import { InvalidInput } from 'utils/error';
 import { provideFootprintUsecase } from 'participants/usecases';
 import { RouterContext } from '@koa/router';
+import {
+  EdcConnectorClientError,
+  EdcConnectorClientErrorType,
+} from '@think-it-labs/edc-connector-client';
 
 export class ProvideFootPrintController {
   static async shareFootprints(context: RouterContext) {
@@ -9,22 +13,28 @@ export class ProvideFootPrintController {
       const data = await provideFootprintUsecase.share(
         context.request.body as ShareFootprintInput
       );
-      if (data) {
-        context.status = 201;
-        context.body = data;
-        return;
-      } else {
-        context.body = 'an error occurred while processing your request';
-        context.status = 400;
-      }
-      return;
+      context.status = 201;
+      context.body = data;
     } catch (error) {
-      console.log(error);
       if (error instanceof InvalidInput) {
         context.status = 400;
+        context.body = { errors: error.errors };
         return;
       }
-
+      if (error instanceof EdcConnectorClientError) {
+        if (error.type === EdcConnectorClientErrorType.Unknown) {
+          context.status = 503;
+        } else if (error.type === EdcConnectorClientErrorType.Duplicate) {
+          context.status = 409;
+          context.body = {
+            error: 'A shipment with that id has already been created',
+          };
+        } else {
+          context.status = 500;
+        }
+        return;
+      }
+      console.log(error);
       context.status = 500;
     }
   }

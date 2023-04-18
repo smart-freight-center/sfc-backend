@@ -1,28 +1,41 @@
 const shared = {
   shipmentId: 'required|min:2',
-  type: 'required|enum:azure,s3,http',
+  contentType: 'in:application/json,text/csv',
+  type: 'required|in:azure,s3,http',
+  dataLocation: 'required|present',
 };
+
+const sharedCustomMessage = {
+  'in.type':
+    "The only data types that are allowed are 'azure', 's3' and 'http'",
+  'in.contentType':
+    "The allowed content Types are 'application/json' and 'text/csv'",
+  'data.present': 'You need to specify the data object',
+};
+
 const s3Schema = {
-  data: {
-    name: 'min:1',
-    bucketName: 'min:1|string',
-    accessKeyId: 'min:1',
-    secretAccessKey: 'min:1|string',
+  dataLocation: {
+    name: 'required|min:1',
+    bucketName: 'required|min:1|string',
+    keyName: 'min:4|string',
+    filename: 'min:3',
+    region: 'required|min:1',
   },
 };
+
 const azureSchema = {
-  data: {
+  dataLocation: {
     container: 'min:1|string',
     account: 'min:1',
     blobname: 'min:1|string',
   },
 };
 const httpSchema = {
-  data: {
+  dataLocation: {
     name: 'min:1|required',
+    baseUrl: 'required|min:5|url',
     path: 'min:1',
     method: 'min:1',
-    baseUrl: 'min:1',
     authKey: 'min:1',
     authCode: 'min:1',
     secretName: 'min:1',
@@ -32,6 +45,10 @@ const httpSchema = {
     proxyMethod: 'min:1',
     contentType: 'min:1',
   },
+};
+
+export const customMessage = {
+  shared: sharedCustomMessage,
 };
 
 export const shareFootprintSchema = {
