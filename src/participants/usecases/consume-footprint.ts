@@ -19,20 +19,16 @@ export class ConsumeFootprintUsecase {
     validateSchema(input, listCatalogSchema);
     const sfcAPISession = await this.sfcAPI.createConnection(authorization);
     const provider = await sfcAPISession.getCompany(input.clientId);
-    let querySpec;
-    if (input.shipmentId) {
-      querySpec = this.getQuerySpec(input.shipmentId);
-    }
     const catalogs = await this.edcClient.listCatalog({
       providerUrl: provider.connector_data.addresses.protocol + '/data',
-      querySpec: querySpec ?? undefined,
+      querySpec: this.getQuerySpec(input.shipmentId),
     });
     return catalogs;
   }
 
   getQuerySpec(shipmentId?: string) {
     if (shipmentId) {
-      return builder.catalogAssetFilter(shipmentId);
+      return builder.filter('asset:prop:id', shipmentId);
     }
     return undefined;
   }

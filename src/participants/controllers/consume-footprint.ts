@@ -8,9 +8,7 @@ import {
   consumeFootprintUsecase,
   getFileUsecase,
   initiateFileTransferUsecase,
-  startContractNegotiationUsecase,
 } from '../usecases';
-import { CatalogRequest } from 'entities';
 
 export class ConsumeFootPrintController {
   static async requestFootprintsCatalog(context: RouterContext) {
@@ -36,36 +34,6 @@ export class ConsumeFootPrintController {
       if (error instanceof ParticipantNotFound) {
         context.status = 404;
         context.body = { error: 'Participant not found' };
-        return;
-      }
-
-      context.status = 500;
-    }
-  }
-
-  static async startContractNegotiation(context: RouterContext) {
-    try {
-      const data = {
-        shipmentId: context.params.shipmentId as string,
-        clientId: (context.request.body as any)?.clientId as string,
-      };
-      const resData = await startContractNegotiationUsecase.execute(
-        context.headers.authorization || '',
-        data
-      );
-
-      context.body = resData;
-      context.status = 200;
-    } catch (error) {
-      console.log(error);
-      if (error instanceof InvalidInput) {
-        context.status = 400;
-        context.body = { errors: error.errors };
-        return;
-      }
-      if (error instanceof ContractNotFound) {
-        context.status = 404;
-        context.body = { error: 'Invalid shipment Id' };
         return;
       }
 

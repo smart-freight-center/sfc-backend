@@ -84,13 +84,13 @@ export function contractDefinition(
   });
 }
 
-export function catalogAssetFilter(assetId: string): QuerySpec {
+export function filter(operandLeft, operandRight, operator = '='): QuerySpec {
   return {
     filterExpression: [
       {
-        operandLeft: 'asset:prop:id',
-        operandRight: assetId,
-        operator: '=',
+        operandLeft: operandLeft,
+        operandRight: operandRight,
+        operator: operator,
       },
     ],
   };
