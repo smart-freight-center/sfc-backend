@@ -100,14 +100,13 @@ export function contractNegotiationInput(
 
 export function transferProcessInput(
   shipmentId: string,
-  connectorId: string,
-  connectorAddress: string,
+  connector: Connector,
   contractId: string
 ): TransferProcessInput {
   return {
     assetId: shipmentId,
-    connectorAddress: `${connectorAddress}/data`,
-    connectorId: connectorId,
+    connectorAddress: `${connector.addresses.protocol}/data`,
+    connectorId: connector.id,
     contractId: contractId,
     dataDestination: { type: DataAddressType.HttpType },
     managedResources: false,
