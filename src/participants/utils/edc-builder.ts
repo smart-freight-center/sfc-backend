@@ -20,25 +20,39 @@ function randomUid() {
   return crypto.randomUUID();
 }
 
-export function assetInput(
-  props: Partial<ShareFootprintInput> = {}
-): AssetInput {
-  const { shipmentId = randomUid(), dataAddress } = props;
+export function assetInput(dataInput: ShareFootprintInput): AssetInput {
+  const {
+    shipmentId = randomUid(),
+    dataLocation,
+    type,
+    contentType,
+  } = dataInput;
 
+  const mapper = {
+    s3: 'AmazonS3',
+    http: 'HttpData',
+    azure: 'AzureStorage',
+  };
   return {
     asset: {
       properties: {
         'asset:prop:id': shipmentId,
-        'asset:prop:name': shipmentId,
+        'asset:prop:name': dataLocation.name || shipmentId,
+        'asset:prop:contenttype': contentType,
       },
     },
-    dataAddress: dataAddress,
+    dataAddress: {
+      properties: {
+        ...dataLocation,
+        type: mapper[type.toLowerCase()],
+      },
+    },
   } as AssetInput;
 }
 
 export function policyInput(
   assetId: string,
-  props: Partial<PolicyDefinitionInput> = {}
+  dataInput: Partial<PolicyDefinitionInput> = {}
 ): PolicyDefinitionInput {
   const permissions = [
     {
@@ -50,7 +64,7 @@ export function policyInput(
     },
   ];
 
-  return defaults(props, {
+  return defaults(dataInput, {
     policy: {
       permissions: permissions,
       '@type': {
@@ -61,9 +75,9 @@ export function policyInput(
 }
 
 export function contractDefinition(
-  props: Partial<ContractDefinition> = {}
+  dataInput: Partial<ContractDefinition> = {}
 ): ContractDefinition {
-  return defaults(props, {
+  return defaults(dataInput, {
     id: randomUid(),
     criteria: [],
   });
