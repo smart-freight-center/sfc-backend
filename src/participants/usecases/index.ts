@@ -5,6 +5,7 @@ import { GenerateTokenUsecase } from './generate-token';
 import { edcAdapter, SFCAPI } from 'participants/clients';
 import { InitiateFileTransferUsecase } from './initiate-file-transfer';
 import { GetFileUsecase } from './get-file';
+import { CacheService } from 'clients';
 
 export const provideFootprintUsecase = new ProvideFootprintUsecase(edcAdapter);
 export const consumeFootprintUsecase = new ConsumeFootprintUsecase(
@@ -16,4 +17,4 @@ export const initiateFileTransferUsecase = new InitiateFileTransferUsecase(
   edcAdapter,
   SFCAPI
 );
-export const getFileUsecase = new GetFileUsecase(edcAdapter);
+export const getFileUsecase = new GetFileUsecase(edcAdapter, CacheService);

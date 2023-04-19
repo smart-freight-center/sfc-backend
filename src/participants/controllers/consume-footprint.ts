@@ -81,6 +81,7 @@ export class ConsumeFootPrintController {
       context.body = data;
       context.status = 200;
     } catch (error) {
+      console.log(error);
       context.body = { errors: error };
       context.status = 5000;
     }
