@@ -7,6 +7,7 @@ import {
   EdcConnectorClient,
   EdcConnectorClientContext,
   PolicyDefinitionInput,
+  QuerySpec,
   TransferProcessInput,
   TransferProcessResponse,
 } from '@think-it-labs/edc-connector-client';
@@ -125,6 +126,24 @@ export class EdcAdapter {
   }
   async getContractAgreement(input: string) {
     return this.edcConnectorClient.management.getAgreement(
+      this.edcClientContext,
+      input
+    );
+  }
+  async getAgreementForNegotiation(input: string) {
+    return this.edcConnectorClient.management.getAgreementForNegotiation(
+      this.edcClientContext,
+      input
+    );
+  }
+  async queryAllAgreements(query?: QuerySpec) {
+    return this.edcConnectorClient.management.queryAllAgreements(
+      this.edcClientContext,
+      query
+    );
+  }
+  async getNegotiationState(input: string) {
+    return this.edcConnectorClient.management.getNegotiationState(
       this.edcClientContext,
       input
     );

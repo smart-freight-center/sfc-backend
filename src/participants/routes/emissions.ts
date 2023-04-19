@@ -25,22 +25,10 @@ export const edcRouter = new KoaRouter({ prefix: '/emissions' })
     ConsumeFootPrintController.requestFootprintsCatalog
   )
   .post(
-    'start contract negotitation for a shipemnt',
-    '/:shipmentId/negotiate',
-    AuthController.authMiddleware,
-    ConsumeFootPrintController.startContractNegotiation
-  )
-  .post(
     'initiate file transfer on the connector',
     '/:shipmentId/request',
     AuthController.authMiddleware,
     ConsumeFootPrintController.initiateFileTransfer
-  )
-  .get(
-    'get data',
-    '/:shipmentId/data',
-    AuthController.authMiddleware,
-    ConsumeFootPrintController.getData
   );
 
 export const pactCompliantRouter = new KoaRouter().get(

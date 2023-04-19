@@ -5,17 +5,12 @@ import { GenerateTokenUsecase } from './generate-token';
 import { edcAdapter, SFCAPI } from 'participants/clients';
 import { InitiateFileTransferUsecase } from './initiate-file-transfer';
 import { GetFileUsecase } from './get-file';
-import { StartContractNegotiationUsecase } from './start-contract-negotiation';
 
 export const provideFootprintUsecase = new ProvideFootprintUsecase(edcAdapter);
 export const consumeFootprintUsecase = new ConsumeFootprintUsecase(
   edcAdapter,
   SFCAPI
 );
-
-export const startContractNegotiationUsecase =
-  new StartContractNegotiationUsecase(edcAdapter, SFCAPI);
-
 export const generateTokenUsecase = new GenerateTokenUsecase(KeyCloackClient);
 export const initiateFileTransferUsecase = new InitiateFileTransferUsecase(
   edcAdapter,
