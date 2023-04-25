@@ -1,5 +1,7 @@
 import { ApiServer } from './api';
 import 'sfc-unit/infrastructure/db';
+import 'clients/redis-client';
+
 const apiAllowedOrigins = process.env.API_ALLOWED_ORIGINS || '';
 const allowedOrigins = apiAllowedOrigins.split(',').filter(Boolean);
 export const apiServer = ApiServer.create({

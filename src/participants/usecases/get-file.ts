@@ -1,21 +1,25 @@
 import { EdcAdapter } from 'participants/clients';
 import { TransferProcessResponse } from 'entities';
-import { globalContext } from 'context';
+import { CacheServiceType } from 'clients';
+import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
+
 export class GetFileUsecase {
   readonly dataQueue = [];
 
-  constructor(private edcClient: EdcAdapter) {}
+  constructor(
+    private edcClient: EdcAdapter,
+    private cacheService: CacheServiceType
+  ) {}
 
   async pullData(shipmentId: string) {
-    const contextKeys = globalContext.getData(shipmentId);
+    const contextKeys = await this.cacheService.retrieve(shipmentId);
 
     const response = await this.edcClient.getTranferedData(
-      contextKeys as unknown as TransferProcessResponse
+      contextKeys as TransferProcessResponse
     );
     if (response.body) {
       return response.json();
     }
-    throw Error();
   }
 
   async getTransferProcessResponse(requestInput) {
@@ -28,6 +32,10 @@ export class GetFileUsecase {
       transferProcessResponse.properties.cid
     );
 
-    globalContext.setData(agreement.assetId, transferProcessResponse);
+    await this.cacheService.storeItem(
+      agreement.assetId,
+      transferProcessResponse,
+      TRANSFER_EXP_PROCESS_IN_SECONDS
+    );
   }
 }
