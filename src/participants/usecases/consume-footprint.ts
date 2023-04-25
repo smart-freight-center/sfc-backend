@@ -1,10 +1,5 @@
 import { EdcAdapter } from '../clients';
-import {
-  CatalogRequest,
-  Connector,
-  ContractOffer,
-  ListCatalogInput,
-} from 'entities';
+import { Connector, ContractOffer, ListCatalogInput } from 'entities';
 import * as builder from '../utils/edc-builder';
 import { SFCAPIType } from 'participants/types';
 import { validateSchema } from 'utils/helpers';
@@ -28,7 +23,7 @@ export class ConsumeFootprintUsecase {
 
   getQuerySpec(shipmentId?: string) {
     if (shipmentId) {
-      return builder.filter('asset:prop:id', shipmentId);
+      return builder.filter('asset:prop:id', shipmentId, 'like');
     }
     return undefined;
   }

@@ -1,7 +1,7 @@
 import { ShareFootprintInput } from 'entities';
 import { EdcAdapter } from '../clients/edc-client';
 import * as builder from 'participants/utils/edc-builder';
-import { validateSchema } from 'utils/helpers';
+import { validateSchema, isValidDateFormat } from 'utils/helpers';
 import {
   customMessage,
   shareFootprintSchema,
@@ -19,7 +19,7 @@ export class ProvideFootprintUsecase {
     };
 
     try {
-      const assetInput = builder.assetInput(data);
+      const assetInput = builder.assetInput(data, this.edcClient.edcClientId);
       const newAsset = await this.edcClient.createAsset(assetInput);
       results.newAssetId = newAsset.id;
 
@@ -42,8 +42,8 @@ export class ProvideFootprintUsecase {
       throw error;
     }
   }
-  private validateData(input: Partial<ShareFootprintInput>) {
-    input.type = input.type?.toLowerCase() as ShareFootprintInput['type'];
+  private validateData(input: ShareFootprintInput) {
+    input.type = input.type.toLowerCase() as ShareFootprintInput['type'];
     validateSchema(input, shareFootprintSchema.shared, customMessage.shared);
     if (input.type === 'azure') {
       validateSchema(input, shareFootprintSchema.azure);
@@ -54,6 +54,11 @@ export class ProvideFootprintUsecase {
     if (input.type === 'http') {
       validateSchema(input, shareFootprintSchema.http);
     }
+    const startDate = input.trackingPeriod.split('-')[0];
+    const endDate = input.trackingPeriod.split('-')[1];
+
+    isValidDateFormat(startDate);
+    isValidDateFormat(endDate);
   }
 
   private async rollback(results) {

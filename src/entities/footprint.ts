@@ -3,6 +3,7 @@ import { DataAddress } from './data-address';
 export type ShareFootprintInput = {
   shipmentId: string;
   type: 'azure' | 'http' | 's3';
+  trackingPeriod: string;
   dataLocation: Omit<DataAddress, 'contentType'>;
   contentType?: string;
 };

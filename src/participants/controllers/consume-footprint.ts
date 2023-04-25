@@ -9,6 +9,7 @@ import {
   getFileUsecase,
   initiateFileTransferUsecase,
 } from '../usecases';
+import { randomUid } from 'utils/helpers';
 
 export class ConsumeFootPrintController {
   static async requestFootprintsCatalog(context: RouterContext) {
@@ -74,11 +75,24 @@ export class ConsumeFootPrintController {
     }
   }
 
-  static async getData(context: RouterContext) {
+  static async getShipmentData(context: RouterContext) {
     try {
       const shipmentId = context.params.shipmentId as string;
-      const data = await getFileUsecase.pullData(shipmentId);
+      const data = await getFileUsecase.pullShipmentData(shipmentId);
       context.body = data;
+      context.status = 200;
+    } catch (error) {
+      console.log('error', error);
+      context.body = { errors: error };
+      context.status = 5000;
+    }
+  }
+
+  static async getData(context: RouterContext) {
+    try {
+      const jobId = randomUid();
+      await getFileUsecase.pullData();
+      context.body = { jobId: jobId };
       context.status = 200;
     } catch (error) {
       context.body = { errors: error };

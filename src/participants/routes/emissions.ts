@@ -29,11 +29,16 @@ export const edcRouter = new KoaRouter({ prefix: '/emissions' })
     '/:shipmentId/request',
     AuthController.authMiddleware,
     ConsumeFootPrintController.initiateFileTransfer
+  )
+  .get(
+    'Get Footprint data by shipment',
+    '/:shipmentId',
+    AuthController.authMiddleware,
+    ConsumeFootPrintController.getShipmentData
+  )
+  .get(
+    'Get Footprint data',
+    '/',
+    AuthController.authMiddleware,
+    ConsumeFootPrintController.getData
   );
-
-export const pactCompliantRouter = new KoaRouter().get(
-  'Get Footprint data',
-  '/footprints/:shipmentId',
-  AuthController.authMiddleware,
-  ConsumeFootPrintController.getData
-);

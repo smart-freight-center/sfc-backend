@@ -6,7 +6,7 @@ export class GetFileUsecase {
 
   constructor(private edcClient: EdcAdapter) {}
 
-  async pullData(shipmentId: string) {
+  async pullShipmentData(shipmentId: string) {
     const contextKeys = globalContext.getData(shipmentId);
 
     const response = await this.edcClient.getTranferedData(
@@ -17,6 +17,8 @@ export class GetFileUsecase {
     }
     throw Error();
   }
+
+  async pullData() {}
 
   async getTransferProcessResponse(requestInput) {
     const transferProcessResponse = {
