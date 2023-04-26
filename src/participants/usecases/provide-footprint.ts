@@ -12,4 +12,12 @@ export class ProvideFootprintUsecase {
       name: asset.properties['asset:prop:name'],
     }));
   }
+
+  async delete(contractId: string) {
+    try {
+      await this.edcClient.deleteContractDefinition(contractId);
+    } catch (error) {
+      throw error;
+    }
+  }
 }

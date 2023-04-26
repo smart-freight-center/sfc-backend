@@ -1,10 +1,8 @@
 import { ShareFootprintInput } from 'entities';
+import { EmptyFootprintData, InvalidFootprintData } from 'utils/error';
+import { ContractNotFound, InvalidInput } from 'utils/error';
 import {
-  EmptyFootprintData,
-  InvalidFootprintData,
-  InvalidInput,
-} from 'utils/error';
-import {
+  initiateFileTransferUsecase,
   provideFootprintUsecase,
   shareFootprintUsecase,
 } from 'participants/usecases';
@@ -57,6 +55,33 @@ export class ProvideFootPrintController {
         return;
       }
       console.log(error);
+      context.status = 500;
+    }
+  }
+
+  static async unshareFootprint(context: RouterContext) {
+    const { shipmentId } = context.params;
+    try {
+      const contractToBecanceled =
+        await initiateFileTransferUsecase.getContractOffer(shipmentId);
+      if (contractToBecanceled.id) {
+        await provideFootprintUsecase.delete(
+          contractToBecanceled.id.split(':')[0]
+        );
+        context.status = 200;
+        context.body = 'access revoked successfully';
+      }
+    } catch (error) {
+      if (error instanceof ContractNotFound) {
+        context.status = 404;
+        context.body = {
+          error: `No shipment with id ${shipmentId} is currently shared`,
+        };
+      }
+      if (error instanceof InvalidInput) {
+        context.status = 400;
+        return;
+      }
       context.status = 500;
     }
   }
