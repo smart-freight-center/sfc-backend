@@ -20,7 +20,10 @@ function randomUid() {
   return crypto.randomUUID();
 }
 
-export function assetInput(dataInput: ShareFootprintInput): AssetInput {
+export function assetInput(
+  dataInput: ShareFootprintInput,
+  connectorId: string
+): AssetInput {
   const {
     shipmentId = randomUid(),
     dataLocation,
@@ -36,7 +39,7 @@ export function assetInput(dataInput: ShareFootprintInput): AssetInput {
   return {
     asset: {
       properties: {
-        'asset:prop:id': shipmentId,
+        'asset:prop:id': `${shipmentId}-${connectorId}`,
         'asset:prop:name': dataLocation.name || shipmentId,
         'asset:prop:contenttype': contentType,
       },
