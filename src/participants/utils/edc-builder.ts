@@ -22,8 +22,9 @@ function randomUid() {
 
 export function assetInput(
   dataInput: ShareFootprintInput,
+  connectorId: string,
   currentTimestamp: number,
-  sharedWith = ''
+  sharedWith: string
 ): AssetInput {
   const {
     shipmentId = randomUid(),
@@ -40,7 +41,7 @@ export function assetInput(
   return {
     asset: {
       properties: {
-        'asset:prop:id': `${shipmentId}:${currentTimestamp}`,
+        'asset:prop:id': `${shipmentId}-${connectorId}:${currentTimestamp}`,
         'asset:prop:name': dataLocation.name || shipmentId,
         'asset:prop:contenttype': contentType,
         'asset:prop:sharedWith': sharedWith,

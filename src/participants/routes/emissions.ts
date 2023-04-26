@@ -1,7 +1,7 @@
 import KoaRouter from '@koa/router';
 import { AuthController } from 'participants/controllers/auth';
 import {
-  ConsumeFootprintController,
+  ConsumeFootPrintController,
   ProvideFootPrintController,
 } from '../controllers';
 
@@ -28,17 +28,23 @@ export const edcRouter = new KoaRouter({ prefix: '/emissions' })
     'Request a data catalog from a connector',
     '/catalog',
     AuthController.authMiddleware,
-    ConsumeFootprintController.requestFootprintsCatalog
+    ConsumeFootPrintController.requestFootprintsCatalog
   )
   .post(
     'initiate file transfer on the connector',
     '/:shipmentId/request',
     AuthController.authMiddleware,
-    ConsumeFootprintController.initiateFileTransfer
+    ConsumeFootPrintController.initiateFileTransfer
+  )
+  .get(
+    'Get Footprint data by shipment',
+    '/:shipmentId',
+    AuthController.authMiddleware,
+    ConsumeFootPrintController.getData
   )
   .get(
     'Get Footprint data',
-    '/:shipmentId',
+    '/',
     AuthController.authMiddleware,
-    ConsumeFootprintController.getData
+    ConsumeFootPrintController.getData
   );

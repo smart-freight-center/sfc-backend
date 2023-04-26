@@ -12,7 +12,7 @@ import {
   initiateFileTransferUsecase,
 } from '../usecases';
 
-export class ConsumeFootprintController {
+export class ConsumeFootPrintController {
   static async requestFootprintsCatalog(context: RouterContext) {
     try {
       const args = {

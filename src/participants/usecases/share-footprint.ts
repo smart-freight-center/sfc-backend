@@ -90,6 +90,7 @@ export class ShareFootprintUsecase {
       const provider = await this.getProvider(authorization, data.companyId);
       const assetInput = builder.assetInput(
         data,
+        this.edcClient.edcClientId,
         currentTimestamp,
         provider.client_id
       );
