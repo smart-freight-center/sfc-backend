@@ -13,7 +13,6 @@ export type {
   ContractNegotiationRequest,
   CreateResult,
   Criterion,
-  DataplaneInput,
   Duty,
   HealthCheckResult,
   HealthStatus,

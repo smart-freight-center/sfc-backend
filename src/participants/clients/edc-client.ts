@@ -3,7 +3,6 @@ import {
   CatalogRequest,
   ContractDefinitionInput,
   ContractNegotiationRequest,
-  DataplaneInput,
   EdcConnectorClient,
   EdcConnectorClientContext,
   PolicyDefinitionInput,
@@ -108,12 +107,6 @@ export class EdcAdapter {
   }
   async initiateTransfer(input: TransferProcessInput) {
     return this.edcConnectorClient.management.initiateTransfer(
-      this.edcClientContext,
-      input
-    );
-  }
-  async registerDataplane(input: DataplaneInput) {
-    return this.edcConnectorClient.management.registerDataplane(
       this.edcClientContext,
       input
     );
