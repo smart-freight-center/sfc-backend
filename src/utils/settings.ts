@@ -59,3 +59,4 @@ export const AWS_ACCESS_ID = process.env.AWS_ACCESS_ID;
 export const AWS_SECRET = process.env.AWS_SECRET;
 
 export const PARTICIPANT_CONFIG_URL = process.env.PARTICIPANT_CONFIG_URL || '';
+export const CONNECTOR_TOKEN = process.env.CONNECTOR_TOKEN || 'test-token';

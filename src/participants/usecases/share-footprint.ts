@@ -63,8 +63,8 @@ export class ShareFootprintUsecase {
 
     try {
       const provider = await this.getProvider(authorization, data.companyId);
-      const assetInput = builder.assetInput(data);
 
+      const assetInput = builder.assetInput(data, this.edcClient.edcClientId);
       const newAsset = await this.edcClient.createAsset(assetInput);
       results.newAssetId = newAsset.id;
 
