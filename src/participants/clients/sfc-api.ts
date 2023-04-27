@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { ParticipantType } from 'entities/client-types';
-import { ParticipantNotFound } from 'utils/error';
+import { InvalidTokenInSFCAPI, ParticipantNotFound } from 'utils/error';
 import { SFCAPI_BASEURL } from 'utils/settings';
 
 const sfcAxios = axios.create({
@@ -21,9 +21,10 @@ export class SFCAPI {
 
       return response.data as Omit<ParticipantType, 'connection'>[];
     } catch (error) {
-      console.log('The error occured here...');
-
-      console.log(error);
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 401) {
+        throw new InvalidTokenInSFCAPI();
+      }
 
       throw error;
     }

@@ -2,7 +2,9 @@ import { RouterContext } from '@koa/router';
 import {
   ContractNotFound,
   InvalidInput,
+  InvalidTokenInSFCAPI,
   ParticipantNotFound,
+  TransferNotInitiated,
 } from 'utils/error';
 import {
   consumeFootprintUsecase,
@@ -10,7 +12,7 @@ import {
   initiateFileTransferUsecase,
 } from '../usecases';
 
-export class ConsumeFootPrintController {
+export class ConsumeFootprintController {
   static async requestFootprintsCatalog(context: RouterContext) {
     try {
       const args = {
@@ -18,7 +20,7 @@ export class ConsumeFootPrintController {
         shipmentId: context.query.shipmentId as string,
       };
 
-      const catalogs = await consumeFootprintUsecase.listCatalogs(
+      const catalogs = await consumeFootprintUsecase.execute(
         context.headers.authorization as string,
         args
       );
@@ -34,6 +36,14 @@ export class ConsumeFootPrintController {
       if (error instanceof ParticipantNotFound) {
         context.status = 404;
         context.body = { error: 'Participant not found' };
+        return;
+      }
+
+      if (error instanceof InvalidTokenInSFCAPI) {
+        context.status = 501;
+        context.body = {
+          error: 'Please share your public key with the SFC Admin.',
+        };
         return;
       }
 
@@ -68,6 +78,11 @@ export class ConsumeFootPrintController {
       } else if (error instanceof ContractNotFound) {
         context.body = { error: 'invalid shipmentId' };
         context.status = 404;
+      } else if (error instanceof InvalidTokenInSFCAPI) {
+        context.status = 501;
+        context.body = {
+          error: 'Please share your public key with the SFC Admin.',
+        };
       } else {
         context.status = 500;
       }
@@ -82,8 +97,14 @@ export class ConsumeFootPrintController {
       context.status = 200;
     } catch (error) {
       console.log(error);
-      context.body = { errors: error };
-      context.status = 5000;
+      if (error instanceof TransferNotInitiated) {
+        context.status = 409;
+        context.body = {
+          error: 'Transfer for this shipment is not yet initiated',
+        };
+        return;
+      }
+      context.status = 500;
     }
   }
 }

@@ -31,15 +31,11 @@ export class CacheService {
     }
   }
   public static async retrieve(key: string) {
-    try {
-      console.log('Retrieving data with key=', key, '.....');
-      const data = await redisClient.get(key);
-      if (!data) return null;
+    console.log('Retrieving data with key=', key, '.....');
+    const data = await redisClient.get(key);
+    if (!data) return null;
 
-      return JSON.parse(data);
-    } catch (error) {
-      console.log(error, '<---Errorr while retrieving keys');
-    }
+    return JSON.parse(data);
   }
 }
 
