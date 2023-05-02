@@ -23,6 +23,7 @@ export class InvalidTokenInSFCAPI extends SFCBaseError {}
 export class TransferNotInitiated extends SFCBaseError {}
 export class InvalidCredentials extends SFCBaseError {}
 export class ParticipantNotFound extends SFCBaseError {}
+export class CouldntFetchDataInSource extends SFCBaseError {}
 
 export class ContractNotFound extends SFCBaseError {}
 
@@ -40,6 +41,11 @@ export class InvalidFootprintData extends SFCBaseError {
     const finalObj = {};
     const setBasedMsgs = {};
     for (const errorItem of joiError.details) {
+      if (errorItem.path.length === 0) {
+        return {
+          msgs: ['The content of your data is not an array'],
+        };
+      }
       const { path, message } = errorItem;
       const key = errorItem.path[1];
       const currentKeyError = finalObj[key] || {

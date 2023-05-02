@@ -1,19 +1,43 @@
 import 'dotenv/config';
 
+const connectorJSONConfig = JSON.parse(process.env.CONNECTOR_CONFIG || '{}');
+
 export const CLIENT_CONFIG = {
-  id: process.env.EDC_ID || 'urn:connector:consumer',
-  title: process.env.EDC_TITLE || 'consumer.edc.think-it.io',
-  catalogId: process.env.EDC_CATALOG_ID || 'default',
-  description: process.env.EDC_DESCRIPTION || 'The consumer connector for the EDC manager demo',
-  region: process.env.EDC_REGION || 'eu-west-1',
+  id: process.env.EDC_ID || connectorJSONConfig.id || 'urn:connector:consumer',
+  title:
+    process.env.EDC_TITLE ||
+    connectorJSONConfig.title ||
+    'consumer.edc.think-it.io',
+  catalogId:
+    process.env.EDC_CATALOG_ID || connectorJSONConfig.catalogId || 'default',
+  description:
+    process.env.EDC_DESCRIPTION ||
+    connectorJSONConfig.description ||
+    'The consumer connector for the EDC manager demo',
+  region: process.env.EDC_REGION || connectorJSONConfig.region || 'eu-west-1',
   addresses: {
     default: process.env.EDC_DEFAULT || 'http://localhost:19191/api',
-    validation: process.env.EDC_VALIDATION || 'http://localhost:19292',
-    management: process.env.EDC_MANAGEMENT || 'http://localhost:19193/api/v1/data',
-    protocol: process.env.EDC_PROTOCOL || 'http://consumer-connector:9194/api/v1/ids',
+    validation:
+      process.env.EDC_VALIDATION ||
+      connectorJSONConfig?.addresses?.validation ||
+      'http://localhost:19292',
+    management:
+      process.env.EDC_MANAGEMENT ||
+      connectorJSONConfig?.addresses?.management ||
+      'http://localhost:19193/api/v1/data',
+    protocol:
+      process.env.EDC_PROTOCOL ||
+      connectorJSONConfig?.addresses?.protocol ||
+      'http://consumer-connector:9194/api/v1/ids',
     dataplane: process.env.EDC_DATAPLANE || 'http://localhost:19195',
-    public: process.env.EDC_PUBLIC || 'http://localhost:19291/public',
-    control: process.env.EDC_CONTROL || 'http://localhost:19292/control'
+    public:
+      process.env.EDC_PUBLIC ||
+      connectorJSONConfig?.addresses?.public ||
+      'http://localhost:19291/public',
+    control:
+      process.env.EDC_CONTROL ||
+      connectorJSONConfig?.addresses?.control ||
+      'http://localhost:19292/control',
   },
 };
 

@@ -1,5 +1,10 @@
 import { ShareFootprintInput } from 'entities';
-import { EmptyFootprintData, InvalidFootprintData } from 'utils/error';
+import {
+  CouldntFetchDataInSource,
+  EmptyFootprintData,
+  InvalidFootprintData,
+  ParticipantNotFound,
+} from 'utils/error';
 import { ContractNotFound, InvalidInput } from 'utils/error';
 import {
   initiateFileTransferUsecase,
@@ -41,6 +46,20 @@ export class ProvideFootPrintController {
           errors: error.errors,
         };
         return;
+      }
+      if (error instanceof ParticipantNotFound) {
+        context.status = 404;
+        context.body = {
+          error: 'Participant not found',
+        };
+        return;
+      }
+
+      if (error instanceof CouldntFetchDataInSource) {
+        context.status = 400;
+        context.body = {
+          error: "Couldn't validate data in the specified source",
+        };
       }
       if (error instanceof EdcConnectorClientError) {
         if (error.type === EdcConnectorClientErrorType.Unknown) {

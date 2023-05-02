@@ -14,10 +14,6 @@ export class ProvideFootprintUsecase {
   }
 
   async delete(contractId: string) {
-    try {
-      await this.edcClient.deleteContractDefinition(contractId);
-    } catch (error) {
-      throw error;
-    }
+    await this.edcClient.deleteContractDefinition(contractId);
   }
 }
