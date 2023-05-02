@@ -72,6 +72,12 @@ export class ProvideFootPrintController {
         return;
       }
 
+      if (error instanceof EdcConnectorClientError) {
+        context.status = 503;
+        context.body = { error: 'Your connector is not healthy' };
+        return;
+      }
+
       context.status = 500;
     }
   }

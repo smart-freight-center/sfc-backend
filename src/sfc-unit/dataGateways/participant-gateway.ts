@@ -2,16 +2,19 @@ import fs from 'fs';
 import path from 'path';
 import { ParticipantType } from 'entities/client-types';
 import { ParticipantNotFound } from 'utils/error';
+import { PARTICIPANT_CONFIG_URL } from 'utils/settings';
+import axios from 'axios';
+import { AppLogger } from 'utils/logger';
 
+const logger = AppLogger.createLogger('ParticipantGateway');
 export class ParticipantGateway {
   private static _participants: Record<string, ParticipantType>;
+  private static PARTICIPANTS_FILE = 'participants.json';
 
-  private static getParticipants() {
+  private static async getParticipants() {
     if (ParticipantGateway._participants) return this._participants;
-    const appRoot = process.cwd();
 
-    const url = path.join(appRoot, 'participants.json');
-    const { participants } = JSON.parse(fs.readFileSync(url, 'utf-8'));
+    const participants = await ParticipantGateway.fetchParticipantsData();
 
     const participantsMapper: Record<string, ParticipantType> = {};
 
@@ -22,6 +25,34 @@ export class ParticipantGateway {
     ParticipantGateway._participants = participantsMapper;
 
     return participantsMapper;
+  }
+  private static async fetchParticipantsData(): Promise<ParticipantType[]> {
+    if (PARTICIPANT_CONFIG_URL) {
+      return ParticipantGateway.fetchConfig(PARTICIPANT_CONFIG_URL);
+    }
+    return ParticipantGateway.readParticipantConfigFile();
+  }
+
+  private static async fetchConfig(url: string) {
+    logger.info('Retrieving participants config from upstream file...');
+
+    const response = await axios.get(url);
+    const participants = response.data.participants as ParticipantType[];
+
+    logger.info('Successfully retrieved participants data');
+    return participants;
+  }
+
+  private static readParticipantConfigFile() {
+    logger.info('Reading pariticipants config from local file...');
+
+    const appRoot = process.cwd();
+    const url = path.join(appRoot, this.PARTICIPANTS_FILE);
+    const { participants } = JSON.parse(fs.readFileSync(url, 'utf-8'));
+
+    logger.info('Successfully read participants config from local file.');
+
+    return participants;
   }
 
   static async fetchParticipantConnections(participantId: string) {
