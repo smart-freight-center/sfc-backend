@@ -59,8 +59,7 @@ const dataModelSchema = joi.array().items(
     load_factor: joi.number().required(),
     empty_distance: joi.number().required(),
     energy_carrier_N: joi.string().required(),
-    Feedstock_N: joi.date().required(),
-    name: joi.string().required(),
+    Feedstock_N: joi.string().required(),
   })
 );
 
