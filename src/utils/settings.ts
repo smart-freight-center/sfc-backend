@@ -35,3 +35,7 @@ export const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM;
 export const KEYCLOAK_HOST = process.env.KEYCLOAK_HOST;
 export const KEYCLOAK_PUBLIC_KEY = process.env.KEYCLOAK_PUBLIC_KEY || '';
 export const SFCAPI_BASEURL = process.env.SFCAPI_BASEURL;
+
+export const AWS_REGION = process.env.AWS_REGION;
+export const AWS_ACCESS_ID = process.env.AWS_ACCESS_ID;
+export const AWS_SECRET = process.env.AWS_SECRET;

@@ -1,6 +1,13 @@
 import { ShareFootprintInput } from 'entities';
-import { InvalidInput } from 'utils/error';
-import { provideFootprintUsecase } from 'participants/usecases';
+import {
+  EmptyFootprintData,
+  InvalidFootprintData,
+  InvalidInput,
+} from 'utils/error';
+import {
+  provideFootprintUsecase,
+  shareFootprintUsecase,
+} from 'participants/usecases';
 import { RouterContext } from '@koa/router';
 import {
   EdcConnectorClientError,
@@ -10,15 +17,30 @@ import {
 export class ProvideFootPrintController {
   static async shareFootprints(context: RouterContext) {
     try {
-      const data = await provideFootprintUsecase.share(
+      const data = await shareFootprintUsecase.execute(
         context.request.body as ShareFootprintInput
       );
+
       context.status = 201;
       context.body = data;
     } catch (error) {
       if (error instanceof InvalidInput) {
         context.status = 400;
         context.body = { errors: error.errors };
+        return;
+      }
+      if (error instanceof EmptyFootprintData) {
+        context.status = 400;
+        context.body = { message: 'The datasource is empty' };
+        return;
+      }
+      if (error instanceof InvalidFootprintData) {
+        context.status = 400;
+        context.body = {
+          message:
+            'The footprint data you specified does not meet the data model',
+          errors: error.errors,
+        };
         return;
       }
       if (error instanceof EdcConnectorClientError) {

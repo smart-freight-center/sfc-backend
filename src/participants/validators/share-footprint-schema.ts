@@ -1,3 +1,4 @@
+import joi from 'joi';
 const shared = {
   shipmentId: 'required|min:2',
   contentType: 'in:application/json,text/csv',
@@ -17,9 +18,8 @@ const s3Schema = {
   dataLocation: {
     name: 'required|min:1',
     bucketName: 'required|min:1|string',
-    keyName: 'min:4|string',
-    filename: 'min:3',
     region: 'required|min:1',
+    path: 'min:4|required',
   },
 };
 
@@ -47,6 +47,23 @@ const httpSchema = {
   },
 };
 
+const dataModelSchema = joi.array().items(
+  joi.object({
+    id_tce: joi.string(),
+    id_consignment: joi.string().required(),
+    id_shipment: joi.string().required(),
+    transport_activity: joi.number().required(),
+    mass: joi.number().required(),
+    mode_of_transport: joi.string().required(),
+    asset_type: joi.string().required(),
+    load_factor: joi.number().required(),
+    empty_distance: joi.number().required(),
+    energy_carrier_N: joi.string().required(),
+    Feedstock_N: joi.date().required(),
+    name: joi.string().required(),
+  })
+);
+
 export const customMessage = {
   shared: sharedCustomMessage,
 };
@@ -56,4 +73,5 @@ export const shareFootprintSchema = {
   azure: azureSchema,
   http: httpSchema,
   s3: s3Schema,
+  dataModel: dataModelSchema,
 };

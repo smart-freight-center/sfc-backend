@@ -1,4 +1,5 @@
 import { TypedError } from '@think-it-labs/typed-error';
+import { ValidationError } from 'joi';
 
 export enum EdcManagerErrorType {
   Duplicate = 'Duplicate',
@@ -24,3 +25,43 @@ export class InvalidCredentials extends SFCBaseError {}
 export class ParticipantNotFound extends SFCBaseError {}
 
 export class ContractNotFound extends SFCBaseError {}
+
+export class EmptyFootprintData extends SFCBaseError {}
+export class InvalidFootprintData extends SFCBaseError {
+  public readonly errors: object;
+  constructor(joiError: ValidationError) {
+    super();
+
+    const errors = this.formatError(joiError);
+    this.errors = errors;
+  }
+
+  private formatError(joiError: ValidationError) {
+    const finalObj = {};
+    const setBasedMsgs = {};
+    for (const errorItem of joiError.details) {
+      const { path, message } = errorItem;
+      const key = errorItem.path[1];
+      const currentKeyError = finalObj[key] || {
+        rows: [],
+        msgs: [],
+      };
+
+      const currentMsgSet = setBasedMsgs[key] || new Set<string>();
+
+      const firstSpace = message.indexOf(' ');
+      const msg = message.slice(firstSpace + 1);
+
+      currentKeyError.rows.push(+path[0] + 1);
+
+      if (!currentMsgSet.has(msg)) {
+        currentMsgSet.add(msg);
+        setBasedMsgs[key] = currentMsgSet;
+        currentKeyError.msgs.push(msg);
+      }
+
+      finalObj[key] = currentKeyError;
+    }
+    return finalObj;
+  }
+}
