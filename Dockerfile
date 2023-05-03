@@ -58,6 +58,6 @@ COPY --chown=node:node --from=builder /app/dist ./dist
 # Open desired port
 EXPOSE ${PORT}
 
-ENTRYPOINT ["npm", "run"]
+ENTRYPOINT ["yarn"]
 
 CMD [ "start" ]

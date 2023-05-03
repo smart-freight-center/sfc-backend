@@ -29,7 +29,7 @@ const APP_ENV = (process.env.NODE_ENV as DATABASE_ENVS) || 'development';
 
 // eslint-disable-next-line no-use-before-define
 export const SEQUELIZE_CONFIG = DATABASE_CONFIG[APP_ENV];
-export const REDIS_URL = process.env.REDIS_URL || 'localhost';
+export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 export const REDIS_PORT = process.env.REDIS_PORT || '6379';
 export const REDIS_PASSWORD = process.env.REDIS_PASSWORD || '';
 export const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM;
