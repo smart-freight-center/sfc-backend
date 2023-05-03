@@ -1,9 +1,10 @@
 import { createClient } from 'redis';
 import { promisify } from 'util';
-import { REDIS_URL } from 'utils/settings';
+import { REDIS_URL, REDIS_PORT, REDIS_PASSWORD } from 'utils/settings';
 
+const redisConnectionString = `redis://:${REDIS_PASSWORD}@${REDIS_URL}:${REDIS_PORT}`;
 const redisClient = createClient({
-  url: REDIS_URL,
+  url: redisConnectionString,
 });
 
 redisClient.connect();
