@@ -5,7 +5,7 @@ import { SFCAPIType } from 'participants/types';
 import { validateSchema } from 'utils/helpers';
 
 const listCatalogSchema = {
-  clientId: 'min:1|required',
+  companyId: 'min:1|required',
 };
 export class ListCatalogUsecase {
   constructor(private edcClient: EdcAdapter, private sfcAPI: SFCAPIType) {}
@@ -13,7 +13,7 @@ export class ListCatalogUsecase {
   async execute(authorization: string, input: ListCatalogInput) {
     validateSchema(input, listCatalogSchema);
     const sfcAPISession = await this.sfcAPI.createConnection(authorization);
-    const provider = await sfcAPISession.getCompany(input.clientId);
+    const provider = await sfcAPISession.getCompany(input.companyId);
     const catalog = await this.edcClient.listCatalog({
       providerUrl: provider.connector_data.addresses.protocol + '/data',
       querySpec: this.getQuerySpec(input.shipmentId),

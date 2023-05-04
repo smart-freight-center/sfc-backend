@@ -61,11 +61,11 @@ export class ShareFootprintUsecase {
     };
 
     try {
+      const provider = await this.getProvider(authorization, data.companyId);
       const assetInput = builder.assetInput(data);
       const newAsset = await this.edcClient.createAsset(assetInput);
       results.newAssetId = newAsset.id;
-      const provider = await this.getProvider(authorization, data.companyId);
-      const policyInput = builder.policyInput(provider.client_id);
+      const policyInput = builder.policyInput(provider.company_BNP);
       const newPolicy = await this.edcClient.createPolicy(policyInput);
       results.newPolicyId = newPolicy.id;
 
@@ -79,10 +79,7 @@ export class ShareFootprintUsecase {
       results.newContractId = newContract.id;
       return newAsset;
     } catch (error) {
-      if (!(error instanceof ParticipantNotFound)) {
-        await this.rollback(results);
-      }
-
+      await this.rollback(results);
       throw error;
     }
   }

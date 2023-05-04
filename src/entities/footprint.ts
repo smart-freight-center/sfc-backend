@@ -9,11 +9,11 @@ export type ShareFootprintInput = {
 };
 
 export interface ListCatalogInput {
-  clientId: string;
+  companyId: string;
   shipmentId?: string;
 }
 
 export type ContractNegotiationInput = {
-  clientId: string;
+  companyId: string;
   shipmentId: string;
 };
