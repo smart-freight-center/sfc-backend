@@ -9,6 +9,15 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+      redis:
+        # Docker Hub image
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
       postgres:
         image: postgres:latest
         env:
@@ -31,9 +40,7 @@ jobs:
           yarn test:unit
       - name: Run integration tests
         env:
-          TEST_PG_NAME: sfc_unit_db
-          TEST_PG_USER: postgres
-          TEST_PG_PASSWORD: password
+          REDIS_URL: redis://redis:6379/0
         run: 
           yarn test:integration
       - name: Check linting
