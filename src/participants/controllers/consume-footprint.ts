@@ -54,11 +54,10 @@ export class ConsumeFootPrintController {
   static async initiateFileTransfer(context: RouterContext) {
     try {
       const { shipmentId } = context.params;
-      const { contractNegotiationId, companyId } = context.query;
+      const { contractNegotiationId } = context.query;
       const inputData = {
         shipmentId: shipmentId as string,
         contractNegotiationId: contractNegotiationId as string,
-        companyId: companyId as string,
       };
       const data = await initiateFileTransferUsecase.execute(
         inputData,
