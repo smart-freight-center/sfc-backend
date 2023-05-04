@@ -58,7 +58,6 @@ export class ConsumeFootPrintController {
       const inputData = {
         shipmentId: shipmentId as string,
         contractNegotiationId: contractNegotiationId as string,
-        clientId: clientId as string,
       };
       const data = await initiateFileTransferUsecase.execute(
         inputData,

@@ -35,10 +35,4 @@ export const edcRouter = new KoaRouter({ prefix: '/emissions' })
     '/:shipmentId',
     AuthController.authMiddleware,
     ConsumeFootPrintController.getData
-  )
-  .get(
-    'Get Footprint data',
-    '/',
-    AuthController.authMiddleware,
-    ConsumeFootPrintController.getData
   );

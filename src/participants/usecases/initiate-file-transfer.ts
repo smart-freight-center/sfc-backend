@@ -13,7 +13,6 @@ const inputSchema = {
 };
 
 type Input = {
-  clientId: string;
   shipmentId: string;
 };
 
@@ -23,9 +22,21 @@ export class InitiateFileTransferUsecase {
   async execute(inputData: Input, authorization: string) {
     validateSchema(inputData, inputSchema);
 
-    const { clientId, shipmentId } = inputData;
-    const provider = await this.getProvider(authorization, clientId);
+    const { shipmentId } = inputData;
 
+    const catalogsAssets = await this.getCatalogsAssets(
+      authorization,
+      shipmentId
+    );
+
+    catalogsAssets.forEach((shipments, provider) => {
+      shipments.map((shipment) =>
+        this.initiateTransferProcess(provider, shipment)
+      );
+    });
+  }
+
+  private async initiateTransferProcess(provider, shipmentId: string) {
     const contractAgreementId = await this.getContractAgreementId(shipmentId);
     if (contractAgreementId) {
       const response = await this.initiateTransfer(
@@ -121,15 +132,6 @@ export class InitiateFileTransferUsecase {
     return contractNegotiationCreationResult;
   }
 
-  private async getProvider(authorization: string, clientId: string) {
-    const sfcConnection = await this.sfcAPI.createConnection(
-      authorization || ''
-    );
-
-    const provider = await sfcConnection.getCompany(clientId);
-    return provider;
-  }
-
   private async initiateTransfer(
     provider: Omit<ParticipantType, 'connection'>,
     shipmentId: string,
@@ -153,5 +155,40 @@ export class InitiateFileTransferUsecase {
       return undefined;
     }
     return response[0].id;
+  }
+
+  private async getConnections(authorization: string) {
+    const sfcConnection = await this.sfcAPI.createConnection(
+      authorization || ''
+    );
+
+    const connections = await sfcConnection.getCompanies();
+    return connections;
+  }
+
+  private async getCatalogsAssets(authorization: string, shipmentId: string) {
+    const catalogsAssets = new Map<
+      Omit<ParticipantType, 'connection'>,
+      string[]
+    >();
+    const connections = await this.getConnections(authorization);
+
+    await Promise.all(
+      connections.map(async (provider) => {
+        const catalog = await this.edcClient.listCatalog({
+          providerUrl: `${provider.connector_data.addresses.protocol}/data`,
+          querySpec: builder.filter('asset:prop:id', `${shipmentId}%`, 'LIKE'),
+        });
+
+        const offers: string[] = [];
+        if (catalog.contractOffers.length) {
+          catalog.contractOffers.forEach((offer) => {
+            offers.push(offer.asset?.id as string);
+          });
+          catalogsAssets.set(provider, [...new Set(offers)]);
+        }
+      })
+    );
+    return catalogsAssets;
   }
 }
