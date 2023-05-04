@@ -93,7 +93,9 @@ export class InitiateFileTransferUsecase {
     shipmentId: string,
     provider: Omit<ParticipantType, 'connection'>
   ) {
-    const assetFilter = builder.filter('asset:prop:id', shipmentId);
+    const assetFilter = {
+      filterExpression: [builder.filter('asset:prop:id', shipmentId)],
+    };
 
     const catalogs = await this.edcClient.listCatalog({
       providerUrl: provider.connector_data.addresses.protocol + '/data',
@@ -147,7 +149,9 @@ export class InitiateFileTransferUsecase {
   }
 
   private async getContractAgreementId(shipmentId: string) {
-    const agreementsFilter = builder.filter('assetId', shipmentId);
+    const agreementsFilter = {
+      filterExpression: [builder.filter('assetId', shipmentId)],
+    };
     const response = await this.edcClient.queryAllAgreements(agreementsFilter);
     if (!response.length) {
       return undefined;

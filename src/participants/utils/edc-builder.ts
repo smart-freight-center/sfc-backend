@@ -6,11 +6,10 @@ import {
   DataAddressType,
   IDS_PROTOCOL,
   PolicyDefinitionInput,
-  QuerySpec,
+  Criterion,
   ShareFootprintInput,
   Policy,
   TransferProcessInput,
-  Addresses,
   Connector,
 } from 'entities';
 import { defaults } from 'lodash';
@@ -51,12 +50,13 @@ export function assetInput(dataInput: ShareFootprintInput): AssetInput {
 }
 
 export function policyInput(
-  assetId: string,
+  policyBPN: string,
   dataInput: Partial<PolicyDefinitionInput> = {}
 ): PolicyDefinitionInput {
+  const constraints = BPNPolicyConstraint(policyBPN);
   const permissions = [
     {
-      target: assetId,
+      constraints: constraints,
       action: {
         type: 'USE',
       },
@@ -74,24 +74,40 @@ export function policyInput(
   });
 }
 
-export function contractDefinition(
-  dataInput: Partial<ContractDefinition> = {}
-): ContractDefinition {
-  return defaults(dataInput, {
-    id: randomUid(),
-    criteria: [],
-  });
+function BPNPolicyConstraint(policyBPN: string) {
+  return [
+    {
+      edctype: 'AtomicConstraint',
+      leftExpression: {
+        edctype: 'dataspaceconnector:literalexpression',
+        value: 'BusinessPartnerNumber',
+      },
+      rightExpression: {
+        edctype: 'dataspaceconnector:literalexpression',
+        value: policyBPN,
+      },
+      operator: 'EQ',
+    },
+  ];
 }
 
-export function filter(operandLeft, operandRight, operator = '='): QuerySpec {
+export function contractDefinition(
+  assetId: string,
+  policyId: string
+): ContractDefinition {
   return {
-    filterExpression: [
-      {
-        operandLeft: operandLeft,
-        operandRight: operandRight,
-        operator: operator,
-      },
-    ],
+    id: randomUid(),
+    criteria: [filter('asset:prop:id', assetId)],
+    accessPolicyId: policyId,
+    contractPolicyId: policyId,
+  };
+}
+
+export function filter(operandLeft, operandRight, operator = '='): Criterion {
+  return {
+    operandLeft: operandLeft,
+    operandRight: operandRight,
+    operator: operator,
   };
 }
 

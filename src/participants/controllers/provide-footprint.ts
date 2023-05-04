@@ -18,6 +18,7 @@ export class ProvideFootPrintController {
   static async shareFootprints(context: RouterContext) {
     try {
       const data = await shareFootprintUsecase.execute(
+        context.headers.authorization as string,
         context.request.body as ShareFootprintInput
       );
 

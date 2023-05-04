@@ -12,7 +12,8 @@ import { DataSourceService } from 'participants/clients';
 export const provideFootprintUsecase = new ProvideFootprintUsecase(edcAdapter);
 export const shareFootprintUsecase = new ShareFootprintUsecase(
   edcAdapter,
-  DataSourceService
+  DataSourceService,
+  SFCAPI
 );
 
 export const consumeFootprintUsecase = new ListCatalogUsecase(

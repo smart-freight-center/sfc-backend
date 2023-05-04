@@ -28,7 +28,9 @@ export class ListCatalogUsecase {
 
   private getQuerySpec(shipmentId?: string) {
     if (shipmentId) {
-      return builder.filter('asset:prop:id', shipmentId);
+      return {
+        filterExpression: [builder.filter('asset:prop:id', shipmentId)],
+      };
     }
     return undefined;
   }
