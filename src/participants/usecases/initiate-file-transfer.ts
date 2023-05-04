@@ -194,9 +194,9 @@ export class InitiateFileTransferUsecase {
 
         const offers: string[] = [];
         if (catalog.contractOffers.length) {
-          catalog.contractOffers.forEach((offer) => {
-            offers.push(offer.asset?.id as string);
-          });
+          const offers = catalog.contractOffers.map(
+            (offer) => offer.asset?.id as string
+          );
           catalogsAssets.set(provider, [...new Set(offers)]);
         }
       })
