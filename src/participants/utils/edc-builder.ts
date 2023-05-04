@@ -10,7 +10,6 @@ import {
   ShareFootprintInput,
   Policy,
   TransferProcessInput,
-  Addresses,
   Connector,
 } from 'entities';
 import { defaults } from 'lodash';

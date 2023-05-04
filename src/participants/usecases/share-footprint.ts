@@ -59,7 +59,7 @@ export class ShareFootprintUsecase {
     };
 
     try {
-      const assetInput = builder.assetInput(data);
+      const assetInput = builder.assetInput(data, this.edcClient.edcClientId);
       const newAsset = await this.edcClient.createAsset(assetInput);
       results.newAssetId = newAsset.id;
 
