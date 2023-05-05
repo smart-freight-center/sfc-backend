@@ -1,6 +1,7 @@
 import joi from 'joi';
 const shared = {
   shipmentId: 'required|min:2',
+  companyId: 'required|min:2',
   contentType: 'in:application/json,text/csv',
   type: 'required|in:azure,s3,http',
   dataLocation: 'required|present',

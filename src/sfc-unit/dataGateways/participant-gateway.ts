@@ -34,6 +34,7 @@ export class ParticipantGateway {
 
       return {
         client_id: participant.client_id,
+        company_BNP: participant.company_BNP,
         company_name: participant.company_name,
         connector_data: participant.connector_data,
         role: participant.role,
