@@ -30,3 +30,5 @@ export const SFCAPI_BASEURL = process.env.SFCAPI_BASEURL;
 export const AWS_REGION = process.env.AWS_REGION;
 export const AWS_ACCESS_ID = process.env.AWS_ACCESS_ID;
 export const AWS_SECRET = process.env.AWS_SECRET;
+
+export const PARTICIPANT_CONFIG_URL = process.env.PARTICIPANT_CONFIG_URL || '';
