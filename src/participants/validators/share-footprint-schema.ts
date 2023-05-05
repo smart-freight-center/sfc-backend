@@ -1,6 +1,7 @@
 import joi from 'joi';
 const shared = {
   shipmentId: 'required|min:2',
+  companyId: 'required|min:2',
   contentType: 'in:application/json,text/csv',
   type: 'required|in:azure,s3,http',
   dataLocation: 'required|present',
@@ -59,8 +60,7 @@ const dataModelSchema = joi.array().items(
     load_factor: joi.number().required(),
     empty_distance: joi.number().required(),
     energy_carrier_N: joi.string().required(),
-    Feedstock_N: joi.date().required(),
-    name: joi.string().required(),
+    Feedstock_N: joi.string().required(),
   })
 );
 

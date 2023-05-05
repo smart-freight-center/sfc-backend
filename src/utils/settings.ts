@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import dbConfig from 'sfc-unit/infrastructure/db/config';
 
 export const CLIENT_CONFIG = {
   id: process.env.EDC_ID || 'urn:connector:consumer',
@@ -20,15 +19,7 @@ export const CLIENT_CONFIG = {
 
 export const TRANSFER_EXP_PROCESS_IN_SECONDS = 2 * 60 * 60; //2 hours
 
-const DATABASE_CONFIG = {
-  ...dbConfig,
-};
-
-type DATABASE_ENVS = keyof typeof DATABASE_CONFIG;
-const APP_ENV = (process.env.NODE_ENV as DATABASE_ENVS) || 'development';
-
 // eslint-disable-next-line no-use-before-define
-export const SEQUELIZE_CONFIG = DATABASE_CONFIG[APP_ENV];
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 export const REDIS_PORT = process.env.REDIS_PORT || '6379';
 export const REDIS_PASSWORD = process.env.REDIS_PASSWORD || '';
@@ -40,3 +31,5 @@ export const SFCAPI_BASEURL = process.env.SFCAPI_BASEURL;
 export const AWS_REGION = process.env.AWS_REGION;
 export const AWS_ACCESS_ID = process.env.AWS_ACCESS_ID;
 export const AWS_SECRET = process.env.AWS_SECRET;
+
+export const PARTICIPANT_CONFIG_URL = process.env.PARTICIPANT_CONFIG_URL || '';

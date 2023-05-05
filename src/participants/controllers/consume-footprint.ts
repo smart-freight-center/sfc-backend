@@ -16,7 +16,7 @@ export class ConsumeFootprintController {
   static async requestFootprintsCatalog(context: RouterContext) {
     try {
       const args = {
-        clientId: context.query.clientId as string,
+        companyId: context.query.companyId as string,
         shipmentId: context.query.shipmentId as string,
       };
 
@@ -54,11 +54,11 @@ export class ConsumeFootprintController {
   static async initiateFileTransfer(context: RouterContext) {
     try {
       const { shipmentId } = context.params;
-      const { contractNegotiationId, clientId } = context.query;
+      const { contractNegotiationId, companyId } = context.query;
       const inputData = {
         shipmentId: shipmentId as string,
         contractNegotiationId: contractNegotiationId as string,
-        clientId: clientId as string,
+        companyId: companyId as string,
       };
       const data = await initiateFileTransferUsecase.execute(
         inputData,

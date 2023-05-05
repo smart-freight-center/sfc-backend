@@ -8,22 +8,24 @@ import {
   shareFootprintSchema,
 } from 'participants/validators/share-footprint-schema';
 
-import { InvalidFootprintData } from 'utils/error';
+import { InvalidFootprintData, ParticipantNotFound } from 'utils/error';
 import { convertRawDataToJSON } from 'participants/utils/data-converter';
-import { DataSourceServiceType } from 'participants/clients';
+import { DataSourceServiceType, SFCAPI } from 'participants/clients';
+import { SFCAPIType } from 'participants/types';
 
 export class ShareFootprintUsecase {
   constructor(
     private edcClient: EdcAdapter,
-    private dataSourceService: DataSourceServiceType
+    private dataSourceService: DataSourceServiceType,
+    private sfcAPI: SFCAPIType
   ) {}
 
-  public async execute(input: ShareFootprintInput) {
+  public async execute(authorization: string, input: ShareFootprintInput) {
     this.validateDataSchema(input);
     const rawData = await this.dataSourceService.fetchFootprintData(input);
 
     await this.verifyDataModel(rawData);
-    await this.createAsset(input);
+    await this.shareAsset(authorization, input);
   }
 
   private validateDataSchema(input: Partial<ShareFootprintInput>) {
@@ -51,7 +53,7 @@ export class ShareFootprintUsecase {
     throw new InvalidFootprintData(error);
   }
 
-  private async createAsset(data: ShareFootprintInput) {
+  private async shareAsset(authorization: string, data: ShareFootprintInput) {
     const results = {
       newAssetId: '',
       newPolicyId: '',
@@ -59,18 +61,18 @@ export class ShareFootprintUsecase {
     };
 
     try {
+      const provider = await this.getProvider(authorization, data.companyId);
       const assetInput = builder.assetInput(data);
       const newAsset = await this.edcClient.createAsset(assetInput);
       results.newAssetId = newAsset.id;
-
-      const policyInput = builder.policyInput(newAsset.id);
+      const policyInput = builder.policyInput(provider.company_BNP);
       const newPolicy = await this.edcClient.createPolicy(policyInput);
       results.newPolicyId = newPolicy.id;
 
-      const contractDefinitionInput = builder.contractDefinition({
-        accessPolicyId: newPolicy.id,
-        contractPolicyId: newPolicy.id,
-      });
+      const contractDefinitionInput = builder.contractDefinition(
+        newAsset.id,
+        newPolicy.id
+      );
       const newContract = await this.edcClient.createContractDefinitions(
         contractDefinitionInput
       );
@@ -78,9 +80,16 @@ export class ShareFootprintUsecase {
       return newAsset;
     } catch (error) {
       await this.rollback(results);
-
       throw error;
     }
+  }
+
+  private async getProvider(authorization: string, clientId: string) {
+    const sfcConnection = await this.sfcAPI.createConnection(
+      authorization || ''
+    );
+    const provider = await sfcConnection.getCompany(clientId);
+    return provider;
   }
 
   private async rollback(results) {

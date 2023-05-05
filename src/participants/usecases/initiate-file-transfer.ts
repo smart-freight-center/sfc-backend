@@ -8,12 +8,12 @@ import { ContractNegotiationState, ContractOffer } from 'entities';
 import { ContractAgreement } from '@think-it-labs/edc-connector-client';
 
 const inputSchema = {
-  clientId: 'required|min:2',
+  companyId: 'required|min:2',
   shipmentId: 'required|min:2',
 };
 
 type Input = {
-  clientId: string;
+  companyId: string;
   shipmentId: string;
 };
 
@@ -23,8 +23,8 @@ export class InitiateFileTransferUsecase {
   async execute(inputData: Input, authorization: string) {
     validateSchema(inputData, inputSchema);
 
-    const { clientId, shipmentId } = inputData;
-    const provider = await this.getProvider(authorization, clientId);
+    const { companyId, shipmentId } = inputData;
+    const provider = await this.getProvider(authorization, companyId);
 
     const contractAgreementId = await this.getContractAgreementId(shipmentId);
     if (contractAgreementId) {
@@ -81,22 +81,32 @@ export class InitiateFileTransferUsecase {
     }
   }
 
-  private async startContractNegotiation(provider, shipmentId) {
-    const contractOffer = await this.getContractOffer(shipmentId, provider);
+  private async startContractNegotiation(
+    provider: Omit<ParticipantType, 'connection'>,
+    shipmentId: string
+  ) {
+    const contractOffer = await this.getContractOffer(
+      shipmentId,
+      provider.connector_data.addresses.protocol
+    );
 
     const result = await this.negotiateContract(contractOffer, provider);
 
     return result;
   }
 
-  private async getContractOffer(
+  async getContractOffer(
     shipmentId: string,
-    provider: Omit<ParticipantType, 'connection'>
+    connectorProtocolAddress?: string
   ) {
-    const assetFilter = builder.filter('asset:prop:id', shipmentId);
+    const assetFilter = {
+      filterExpression: [builder.filter('asset:prop:id', shipmentId)],
+    };
 
     const catalogs = await this.edcClient.listCatalog({
-      providerUrl: provider.connector_data.addresses.protocol + '/data',
+      providerUrl: connectorProtocolAddress
+        ? `${connectorProtocolAddress}/data`
+        : `${this.edcClient.edcClientContext.protocol}/data`,
       querySpec: assetFilter,
     });
 
@@ -147,7 +157,9 @@ export class InitiateFileTransferUsecase {
   }
 
   private async getContractAgreementId(shipmentId: string) {
-    const agreementsFilter = builder.filter('assetId', shipmentId);
+    const agreementsFilter = {
+      filterExpression: [builder.filter('assetId', shipmentId)],
+    };
     const response = await this.edcClient.queryAllAgreements(agreementsFilter);
     if (!response.length) {
       return undefined;

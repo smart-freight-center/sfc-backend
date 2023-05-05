@@ -11,6 +11,7 @@ export type TokenInput = Partial<{
 export type ParticipantType = {
   company_name: string;
   client_id: string;
+  company_BNP: string;
   role: 'shipper' | 'lsp';
   connection: string[];
   public_key: string;

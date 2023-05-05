@@ -11,7 +11,7 @@
     "**/*.{md,mdx}": "prettier --write"
   },
   "scripts": {
-    "dev:key-cloak": "docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:21.0.1 start-dev",
+    "dev:keycloak": "docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:21.0.1 start-dev",
     "dev": "NODE_PATH=src  API_PORT=3000 nodemon --exec ts-node src/server.ts",
     "dev:provider": "cross-env KEYCLOAK_REALM=provider API_PORT=3001  NODE_PATH=src CONNECTOR_CONFIG=\"$PROVIDER_CONNECTOR_CONFIG\"  KEYCLOAK_PUBLIC_KEY=$PROVIDER_KEYCLOAK_PUBLIC_KEY nodemon --exec ts-node src/server.ts",
     "dev:consumer": "cross-env KEYCLOAK_REALM=consumer CONNECTOR_CONFIG=\"$CONSUMER_CONNECTOR_CONFIG\" KEYCLOAK_PUBLIC_KEY=$CONSUMER_KEYCLOAK_PUBLIC_KEY API_PORT=3002 NODE_PATH=src nodemon --exec ts-node src/server.ts",
@@ -21,10 +21,8 @@
     "build": "cross-env NODE_PATH=src tsc && rm -rf dist/__tests__ **/*.test.ts",
     "test:one-unit": "cross-env NODE_ENV=test NODE_PATH=src mocha --exit",
     "test:unit": "yarn  test:one-unit --  'src/**/*.unit.test.ts'",
-    "test:one-integration": "cross-env NODE_ENV=test NODE_PATH=src mocha  -r ts-node/register -r src/__tests__/hooks.ts --timeout 20000 --exit",
-    "test:integration": "yarn test:one-integration -- 'src/**/*.integration.test.ts' ",
-    "undo-migration": "sequelize db:migrate:undo:all",
-    "migrate": "sequelize db:migrate"
+    "test:one-integration": "cross-env NODE_ENV=test NODE_PATH=src mocha  -r ts-node/register --timeout 20000 --exit",
+    "test:integration": "yarn test:one-integration -- 'src/**/*.integration.test.ts' "
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.321.1",
@@ -43,11 +41,9 @@
     "pg": "^8.10.0",
     "redis": "^4.6.5",
     "reflect-metadata": "^0.1.13",
-    "sequelize": "^6.29.3",
-    "sequelize-cli": "^6.6.0",
-    "sequelize-typescript": "^2.1.5",
     "socket.io": "^4.6.1",
-    "validatorjs": "^3.22.1"
+    "validatorjs": "^3.22.1",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
