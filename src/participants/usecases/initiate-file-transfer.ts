@@ -81,22 +81,30 @@ export class InitiateFileTransferUsecase {
     }
   }
 
-  private async startContractNegotiation(provider, shipmentId) {
-    const contractOffer = await this.getContractOffer(shipmentId, provider);
+  private async startContractNegotiation(
+    provider: Omit<ParticipantType, 'connection'>,
+    shipmentId: string
+  ) {
+    const contractOffer = await this.getContractOffer(
+      shipmentId,
+      provider.connector_data.addresses.protocol
+    );
 
     const result = await this.negotiateContract(contractOffer, provider);
 
     return result;
   }
 
-  private async getContractOffer(
+  async getContractOffer(
     shipmentId: string,
-    provider: Omit<ParticipantType, 'connection'>
+    connectorProtocolAddress?: string
   ) {
     const assetFilter = builder.filter('asset:prop:id', shipmentId);
 
     const catalogs = await this.edcClient.listCatalog({
-      providerUrl: provider.connector_data.addresses.protocol + '/data',
+      providerUrl: connectorProtocolAddress
+        ? `${connectorProtocolAddress}/data`
+        : `${this.edcClient.edcClientContext.protocol}/data`,
       querySpec: assetFilter,
     });
 
