@@ -58,5 +58,6 @@ COPY --chown=node:node --from=builder /app/dist ./dist
 # Open desired port
 EXPOSE ${PORT}
 
-# Use PM2 to run the application as stated in config file
-ENTRYPOINT ["node", "./dist/src/server.js"]
+ENTRYPOINT ["yarn"]
+
+CMD [ "start" ]
