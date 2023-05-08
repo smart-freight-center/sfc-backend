@@ -10,12 +10,16 @@ export class ProvideFootprintUsecase {
 
     return assets
       .filter((asset) => uniqueAssetWithContract.has(asset.id))
-      .map((asset) => ({
-        createdAt: asset.createdAt,
-        id: asset.id,
-        name: asset.properties['asset:prop:name'],
-        sharedWith: asset.properties['asset:prop:sharedWith'],
-      }));
+      .map((asset) => {
+        const lastDashIndex = asset.id.lastIndexOf('-');
+
+        return {
+          createdAt: asset.createdAt,
+          id: asset.id.slice(0, lastDashIndex),
+          name: asset.properties['asset:prop:name'],
+          sharedWith: asset.properties['asset:prop:sharedWith'],
+        };
+      });
   }
 
   private async getAssetsWithContracts() {

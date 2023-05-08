@@ -16,19 +16,41 @@ export class GetFileUsecase {
   ) {}
 
   async pullData(shipmentId: string) {
-    const contextKeys = await this.getTransferKeys(shipmentId);
-    const response = await this.edcClient.getTranferedData(contextKeys);
+    logger.info('Pulling data for all assets...');
+    const { assetIds } = await this.getKeyFromCache(shipmentId);
+
+    const allAssetData = await Promise.all(
+      assetIds.map((assetId) => this.fetchData(assetId))
+    );
+    const combined: object[] = [];
+
+    for (const dataLeg of allAssetData) {
+      combined.push(...dataLeg);
+    }
+
+    logger.info('Successfully pulled data for this shipment.');
+
+    return combined;
+  }
+
+  private async getKeyFromCache(key: string) {
+    const data = await this.cacheService.retrieve(key);
+
+    if (!data) throw new TransferNotInitiated(key);
+    return data;
+  }
+
+  private async fetchData(assetId: string) {
+    const transferInput: TransferProcessResponse = await this.getKeyFromCache(
+      assetId
+    );
+
+    const response = await this.edcClient.getTranferedData(transferInput);
+
     if (response.body) {
       const textData = await response.text();
       return convertRawDataToJSON(textData);
     }
-  }
-
-  private async getTransferKeys(shipmentId: string) {
-    const contextKeys = await this.cacheService.retrieve(shipmentId);
-
-    if (!contextKeys) throw new TransferNotInitiated(shipmentId);
-    return contextKeys as TransferProcessResponse;
   }
 
   async getTransferProcessResponse(requestInput) {

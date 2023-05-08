@@ -1,4 +1,5 @@
 import { RouterContext } from '@koa/router';
+import { EdcConnectorClientError } from '@think-it-labs/edc-connector-client';
 import {
   ContractNotFound,
   InvalidInput,
@@ -53,15 +54,16 @@ export class ConsumeFootPrintController {
 
   static async initiateFileTransfer(context: RouterContext) {
     try {
+      const authorization = context.headers.authorization || '';
       const { shipmentId } = context.params;
       const { contractNegotiationId } = context.query;
       const inputData = {
-        shipmentId: shipmentId as string,
-        contractNegotiationId: contractNegotiationId as string,
+        shipmentId: shipmentId,
+        contractNegotiationId: contractNegotiationId,
       };
       const data = await initiateFileTransferUsecase.execute(
         inputData,
-        context.headers.authorization || ''
+        authorization
       );
 
       context.body = data;
@@ -102,6 +104,16 @@ export class ConsumeFootPrintController {
           error: 'Transfer for this shipment is not yet initiated',
         };
         return;
+      }
+
+      if (error instanceof EdcConnectorClientError) {
+        if (error.message.includes('Token validation failed')) {
+          context.status = 400;
+          context.body = {
+            error: 'Transfer process expired, please re-initialise',
+          };
+          return;
+        }
       }
       context.status = 500;
     }
