@@ -8,8 +8,10 @@ import { GetFileUsecase } from './get-file';
 import { CacheService } from 'clients';
 import { ShareFootprintUsecase } from './share-footprint';
 import { DataSourceService } from 'participants/clients';
+import { DeleteFootprintUsecase } from './delete-fooprint';
 
 export const provideFootprintUsecase = new ProvideFootprintUsecase(edcAdapter);
+export const deleteFootprintUsecase = new DeleteFootprintUsecase(edcAdapter);
 export const shareFootprintUsecase = new ShareFootprintUsecase(
   edcAdapter,
   DataSourceService,

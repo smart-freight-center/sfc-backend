@@ -2,9 +2,12 @@ import { RouterContext } from '@koa/router';
 
 import { retrieveCompaniesConnectionUsecase } from 'sfc-unit/usecases';
 import { ParticipantNotFound } from 'utils/error';
+import { AppLogger } from 'utils/logger';
 
+const logger = new AppLogger('SFCUnitController');
 export class SFCUnitController {
   static async companies(context: RouterContext) {
+    logger.info('Retrieving companies...');
     try {
       context.status = 200;
       context.body = await retrieveCompaniesConnectionUsecase.execute(
@@ -16,7 +19,7 @@ export class SFCUnitController {
         context.body = { error: 'invalid token' };
         return;
       }
-      console.log(error);
+      logger.error('Something is not correct in the SFC unit...', { error });
       context.status = 503;
     }
   }

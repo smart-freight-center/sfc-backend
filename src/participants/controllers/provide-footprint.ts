@@ -4,10 +4,11 @@ import {
   EmptyFootprintData,
   InvalidFootprintData,
   ParticipantNotFound,
+  ShipmentAlreadyShared,
 } from 'utils/error';
 import { ContractNotFound, InvalidInput } from 'utils/error';
 import {
-  initiateFileTransferUsecase,
+  deleteFootprintUsecase,
   provideFootprintUsecase,
   shareFootprintUsecase,
 } from 'participants/usecases';
@@ -61,6 +62,13 @@ export class ProvideFootPrintController {
           error: "Couldn't validate data in the specified source",
         };
       }
+      if (error instanceof ShipmentAlreadyShared) {
+        context.status = 409;
+        context.body = {
+          error: 'A shipment with that id has already been created',
+        };
+        return;
+      }
       if (error instanceof EdcConnectorClientError) {
         if (error.type === EdcConnectorClientErrorType.Unknown) {
           context.status = 503;
@@ -82,15 +90,12 @@ export class ProvideFootPrintController {
   static async unshareFootprint(context: RouterContext) {
     const { shipmentId } = context.params;
     try {
-      const contractToBecanceled =
-        await initiateFileTransferUsecase.getContractOffer(shipmentId);
-      if (contractToBecanceled.id) {
-        await provideFootprintUsecase.delete(
-          contractToBecanceled.id.split(':')[0]
-        );
-        context.status = 200;
-        context.body = 'access revoked successfully';
-      }
+      const data = await deleteFootprintUsecase.execute(shipmentId);
+      context.status = 200;
+      context.body = {
+        message: 'access revoked successfully',
+        data,
+      };
     } catch (error) {
       if (error instanceof ContractNotFound) {
         context.status = 404;

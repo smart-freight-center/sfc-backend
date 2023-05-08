@@ -8,7 +8,7 @@ import {
   shareFootprintSchema,
 } from 'participants/validators/share-footprint-schema';
 
-import { InvalidFootprintData } from 'utils/error';
+import { InvalidFootprintData, ShipmentAlreadyShared } from 'utils/error';
 import { convertRawDataToJSON } from 'participants/utils/data-converter';
 import { DataSourceServiceType } from 'participants/clients';
 import { SFCAPIType } from 'participants/types';
@@ -22,6 +22,7 @@ export class ShareFootprintUsecase {
 
   public async execute(authorization: string, input: ShareFootprintInput) {
     this.validateDataSchema(input);
+    await this.ensureShipmentHasNotBeenCreated(input.shipmentId);
     const rawData = await this.dataSourceService.fetchFootprintData(input);
 
     await this.verifyDataModel(rawData);
@@ -54,16 +55,44 @@ export class ShareFootprintUsecase {
     throw new InvalidFootprintData(error);
   }
 
+  private async ensureShipmentHasNotBeenCreated(shipmentId: string) {
+    const offers = await this.getShipmentOffers(shipmentId);
+
+    if (offers.length) throw new ShipmentAlreadyShared();
+    return offers;
+  }
+
+  private async getShipmentOffers(shipmentId: string) {
+    const assetFilter = builder.shipmentFilter(
+      'asset:prop:id',
+      `${shipmentId}%`,
+      'LIKE'
+    );
+
+    const catalogs = await this.edcClient.listCatalog({
+      providerUrl: `${this.edcClient.edcClientContext.protocol}/data`,
+      querySpec: assetFilter,
+    });
+
+    return catalogs?.contractOffers.filter((offer) =>
+      offer.asset?.id.startsWith(shipmentId)
+    );
+  }
   private async shareAsset(authorization: string, data: ShareFootprintInput) {
     const results = {
       newAssetId: '',
       newPolicyId: '',
       newContractId: '',
     };
+    const currentTimestamp = +new Date();
 
     try {
       const provider = await this.getProvider(authorization, data.companyId);
-      const assetInput = builder.assetInput(data);
+      const assetInput = builder.assetInput(
+        data,
+        currentTimestamp,
+        provider.client_id
+      );
 
       const newAsset = await this.edcClient.createAsset(assetInput);
       results.newAssetId = newAsset.id;
