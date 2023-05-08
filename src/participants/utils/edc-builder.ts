@@ -75,6 +75,7 @@ export function policyInput(
 }
 
 function BPNPolicyConstraint(policyBPN: string) {
+  if (!policyBPN) return [];
   return [
     {
       edctype: 'AtomicConstraint',

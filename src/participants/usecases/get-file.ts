@@ -3,7 +3,10 @@ import { TransferProcessResponse } from 'entities';
 import { CacheServiceType } from 'clients';
 import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
 import { TransferNotInitiated } from 'utils/error';
+import { AppLogger } from 'utils/logger';
+import { convertRawDataToJSON } from 'participants/utils/data-converter';
 
+const logger = new AppLogger('GetFileUsecase');
 export class GetFileUsecase {
   readonly dataQueue = [];
 
@@ -16,7 +19,8 @@ export class GetFileUsecase {
     const contextKeys = await this.getTransferKeys(shipmentId);
     const response = await this.edcClient.getTranferedData(contextKeys);
     if (response.body) {
-      return response.json();
+      const textData = await response.text();
+      return convertRawDataToJSON(textData);
     }
   }
 
@@ -28,6 +32,7 @@ export class GetFileUsecase {
   }
 
   async getTransferProcessResponse(requestInput) {
+    logger.info('Caching auth code and keys...');
     const transferProcessResponse = {
       ...requestInput,
       endpoint: this.edcClient.edcClientContext.public,
@@ -42,5 +47,7 @@ export class GetFileUsecase {
       transferProcessResponse,
       TRANSFER_EXP_PROCESS_IN_SECONDS
     );
+
+    logger.info('Successfully stored auth code in redis');
   }
 }

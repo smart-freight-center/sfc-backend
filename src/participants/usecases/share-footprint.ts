@@ -8,9 +8,9 @@ import {
   shareFootprintSchema,
 } from 'participants/validators/share-footprint-schema';
 
-import { InvalidFootprintData, ParticipantNotFound } from 'utils/error';
+import { InvalidFootprintData } from 'utils/error';
 import { convertRawDataToJSON } from 'participants/utils/data-converter';
-import { DataSourceServiceType, SFCAPI } from 'participants/clients';
+import { DataSourceServiceType } from 'participants/clients';
 import { SFCAPIType } from 'participants/types';
 
 export class ShareFootprintUsecase {
@@ -44,6 +44,7 @@ export class ShareFootprintUsecase {
 
   private async verifyDataModel(rawData: string) {
     const jsonData = convertRawDataToJSON(rawData);
+
     const { error, value } = shareFootprintSchema.dataModel.validate(jsonData, {
       abortEarly: false,
     });
@@ -63,8 +64,10 @@ export class ShareFootprintUsecase {
     try {
       const provider = await this.getProvider(authorization, data.companyId);
       const assetInput = builder.assetInput(data);
+
       const newAsset = await this.edcClient.createAsset(assetInput);
       results.newAssetId = newAsset.id;
+
       const policyInput = builder.policyInput(provider.company_BNP);
       const newPolicy = await this.edcClient.createPolicy(policyInput);
       results.newPolicyId = newPolicy.id;
