@@ -1,12 +1,19 @@
 import { createClient } from 'redis';
 import { promisify } from 'util';
-import { REDIS_HOST, REDIS_PORT, REDIS_PASSWORD } from 'utils/settings';
+import {
+  REDIS_HOST,
+  REDIS_PORT,
+  REDIS_PASSWORD,
+  REDIS_DB,
+} from 'utils/settings';
 
 const redisCredentials = REDIS_PASSWORD ? `:${REDIS_PASSWORD}@` : '';
-const redisConnectionString = `redis://${redisCredentials}${REDIS_HOST}:${REDIS_PORT}`;
+
+const redisConnectionString = `redis://${redisCredentials}${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}`;
 
 const redisClient = createClient({
   url: redisConnectionString,
+  legacyMode: true,
 });
 
 redisClient.connect();
@@ -29,13 +36,15 @@ export class CacheService {
   ) {
     await redisAsync.set(key, JSON.stringify(data));
 
-    if (expiresInSeconds) {
+    console.log('Got here...');
+    if (expiresInSeconds > 0) {
       await redisAsync.expire(key, expiresInSeconds);
     }
   }
   public static async retrieve(key: string) {
     console.log('Retrieving data with key=', key, '.....');
-    const data = await redisClient.get(key);
+    const data = await redisAsync.get(key);
+
     if (!data) return null;
 
     return JSON.parse(data);

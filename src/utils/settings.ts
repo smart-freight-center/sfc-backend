@@ -47,6 +47,8 @@ export const TRANSFER_EXP_PROCESS_IN_SECONDS = 2 * 60 * 60; //2 hours
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 export const REDIS_PORT = process.env.REDIS_PORT || '6379';
 export const REDIS_PASSWORD = process.env.REDIS_PASSWORD || '';
+export const REDIS_DB = process.env.REDIS_DATABASE || '';
+
 export const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM;
 export const KEYCLOAK_HOST = process.env.KEYCLOAK_HOST;
 export const KEYCLOAK_PUBLIC_KEY = process.env.KEYCLOAK_PUBLIC_KEY || '';
