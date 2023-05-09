@@ -22,8 +22,9 @@ function randomUid() {
 
 export function assetInput(
   dataInput: ShareFootprintInput,
+  providerClientId: string,
   currentTimestamp: number,
-  sharedWith = ''
+  sharedWith: string
 ): AssetInput {
   const {
     shipmentId = randomUid(),
@@ -40,7 +41,7 @@ export function assetInput(
   return {
     asset: {
       properties: {
-        'asset:prop:id': `${shipmentId}:${currentTimestamp}`,
+        'asset:prop:id': `${shipmentId}-${providerClientId}:${currentTimestamp}`,
         'asset:prop:name': dataLocation.name || shipmentId,
         'asset:prop:contenttype': contentType,
         'asset:prop:sharedWith': sharedWith,
@@ -123,6 +124,7 @@ export function shipmentFilter(
   operandRight: string,
   operator: 'LIKE' | '=' = '='
 ) {
+  console.log(EDC_FILTER_OPERATOR_SET, '<---', EDC_FILTER_OPERATOR_SET);
   if (EDC_FILTER_OPERATOR_SET.has(operator)) {
     return {
       filterExpression: [filter(operandLeft, operandRight, operator)],
@@ -148,12 +150,12 @@ export function contractNegotiationInput(
 }
 
 export function transferProcessInput(
-  shipmentId: string,
+  assetId: string,
   connector: Connector,
   contractId: string
 ): TransferProcessInput {
   return {
-    assetId: shipmentId,
+    assetId,
     connectorAddress: `${connector.addresses.protocol}/data`,
     connectorId: connector.id,
     contractId: contractId,

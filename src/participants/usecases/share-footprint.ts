@@ -86,18 +86,24 @@ export class ShareFootprintUsecase {
     };
     const currentTimestamp = +new Date();
 
+    const sfcConnection = await this.sfcAPI.createConnection(
+      authorization || ''
+    );
+    const consumer = await sfcConnection.getCompany(data.companyId);
+    const myProfile = await sfcConnection.getMyProfile();
+
     try {
-      const provider = await this.getProvider(authorization, data.companyId);
       const assetInput = builder.assetInput(
         data,
+        myProfile.client_id,
         currentTimestamp,
-        provider.client_id
+        consumer.client_id
       );
 
       const newAsset = await this.edcClient.createAsset(assetInput);
       results.newAssetId = newAsset.id;
 
-      const policyInput = builder.policyInput(provider.company_BNP);
+      const policyInput = builder.policyInput(consumer.company_BNP);
       const newPolicy = await this.edcClient.createPolicy(policyInput);
       results.newPolicyId = newPolicy.id;
 
@@ -114,14 +120,6 @@ export class ShareFootprintUsecase {
       await this.rollback(results);
       throw error;
     }
-  }
-
-  private async getProvider(authorization: string, clientId: string) {
-    const sfcConnection = await this.sfcAPI.createConnection(
-      authorization || ''
-    );
-    const provider = await sfcConnection.getCompany(clientId);
-    return provider;
   }
 
   private async rollback(results) {

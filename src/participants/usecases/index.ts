@@ -25,7 +25,8 @@ export const consumeFootprintUsecase = new ListCatalogUsecase(
 export const generateTokenUsecase = new GenerateTokenUsecase(KeyCloackClient);
 export const initiateFileTransferUsecase = new InitiateFileTransferUsecase(
   edcAdapter,
-  SFCAPI
+  SFCAPI,
+  CacheService
 );
 
 export const getFileUsecase = new GetFileUsecase(edcAdapter, CacheService);

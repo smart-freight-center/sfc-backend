@@ -30,6 +30,23 @@ export class SFCAPI {
     }
   }
 
+  async getMyProfile() {
+    try {
+      const response = await sfcAxios.get('/companies/me', {
+        headers: { Authorization: this.authorization },
+      });
+
+      return response.data as ParticipantType;
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 401) {
+        throw new InvalidTokenInSFCAPI();
+      }
+
+      throw error;
+    }
+  }
+
   async getCompany(clientId: string) {
     const companies = await this.getCompanies();
 

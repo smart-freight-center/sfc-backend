@@ -19,11 +19,15 @@ export class ListCatalogUsecase {
       querySpec: this.getQuerySpec(input.shipmentId),
     });
 
-    return catalog.contractOffers.map((contract) => ({
-      id: contract.asset?.id,
-      name: contract.asset?.properties['asset:prop:name'],
-      contentType: contract.asset?.properties['asset:prop:contenttype'],
-    }));
+    return catalog.contractOffers.map((contract) => {
+      const lastDashIndex = contract.asset?.id.lastIndexOf('-');
+
+      return {
+        id: contract.asset?.id.slice(0, lastDashIndex),
+        name: contract.asset?.properties['asset:prop:name'],
+        contentType: contract.asset?.properties['asset:prop:contenttype'],
+      };
+    });
   }
 
   private getQuerySpec(shipmentId?: string) {
