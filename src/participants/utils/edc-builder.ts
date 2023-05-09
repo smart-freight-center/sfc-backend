@@ -14,12 +14,17 @@ import {
 } from 'entities';
 import { defaults } from 'lodash';
 import * as crypto from 'node:crypto';
+import { EDC_FILTER_OPERATOR_SET } from 'utils/settings';
 
 function randomUid() {
   return crypto.randomUUID();
 }
 
-export function assetInput(dataInput: ShareFootprintInput): AssetInput {
+export function assetInput(
+  dataInput: ShareFootprintInput,
+  currentTimestamp: number,
+  sharedWith = ''
+): AssetInput {
   const {
     shipmentId = randomUid(),
     dataLocation,
@@ -35,9 +40,10 @@ export function assetInput(dataInput: ShareFootprintInput): AssetInput {
   return {
     asset: {
       properties: {
-        'asset:prop:id': shipmentId,
+        'asset:prop:id': `${shipmentId}:${currentTimestamp}`,
         'asset:prop:name': dataLocation.name || shipmentId,
         'asset:prop:contenttype': contentType,
+        'asset:prop:sharedWith': sharedWith,
       },
     },
     dataAddress: {
@@ -112,6 +118,19 @@ export function filter(operandLeft, operandRight, operator = '='): Criterion {
   };
 }
 
+export function shipmentFilter(
+  operandLeft: string,
+  operandRight: string,
+  operator: 'LIKE' | '=' = '='
+) {
+  if (EDC_FILTER_OPERATOR_SET.has(operator)) {
+    return {
+      filterExpression: [filter(operandLeft, operandRight, operator)],
+    };
+  }
+
+  return;
+}
 export function contractNegotiationInput(
   contractOffer: ContractOffer,
   connector: Connector

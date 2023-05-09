@@ -54,6 +54,12 @@ export const KEYCLOAK_HOST = process.env.KEYCLOAK_HOST;
 export const KEYCLOAK_PUBLIC_KEY = process.env.KEYCLOAK_PUBLIC_KEY || '';
 export const SFCAPI_BASEURL = process.env.SFCAPI_BASEURL;
 
+const SUPPORTED_EDC_FILTER_OPERATORS =
+  process.env.SUPPORTED_EDC_FILTER_OPERATORS || 'LIKE,=';
+
+export const EDC_FILTER_OPERATOR_SET = new Set(
+  SUPPORTED_EDC_FILTER_OPERATORS.toUpperCase().split(',')
+);
 export const AWS_REGION = process.env.AWS_REGION;
 export const AWS_ACCESS_ID = process.env.AWS_ACCESS_ID;
 export const AWS_SECRET = process.env.AWS_SECRET;
