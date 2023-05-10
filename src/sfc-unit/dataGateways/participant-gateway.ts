@@ -56,6 +56,7 @@ export class ParticipantGateway {
   }
 
   static async fetchParticipantConnections(participantId: string) {
+    console.log("Getting participant with participant ID ", participantId)
     const participants = await ParticipantGateway.getParticipants();
     const participant = participants[participantId];
     if (!participant) throw new ParticipantNotFound();

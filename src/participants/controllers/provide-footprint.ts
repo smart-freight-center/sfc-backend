@@ -62,9 +62,12 @@ export class ProvideFootPrintController {
 
   static async unshareFootprint(context: RouterContext) {
     const { shipmentId } = context.params;
+    console.log("Unsharing assets... ", shipmentId)
     try {
       const contractToBecanceled =
         await initiateFileTransferUsecase.getContractOffer(shipmentId);
+
+      console.log("Got contract : ", contractToBecanceled)
       if (contractToBecanceled.id) {
         await provideFootprintUsecase.delete(
           contractToBecanceled.id.split(':')[0]
@@ -73,6 +76,9 @@ export class ProvideFootPrintController {
         context.body = 'access revoked successfully';
       }
     } catch (error) {
+      console.log("=====================")
+      console.log(error)
+      console.log("=====================")
       if (error instanceof ContractNotFound) {
         context.status = 404;
         context.body = {

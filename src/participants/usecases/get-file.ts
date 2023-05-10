@@ -14,6 +14,7 @@ export class GetFileUsecase {
 
   async pullData(shipmentId: string) {
     const contextKeys = await this.getTransferKeys(shipmentId);
+    console.log("contextKeys : ", contextKeys)
     const response = await this.edcClient.getTranferedData(contextKeys);
     if (response.body) {
       return response.json();
@@ -33,6 +34,7 @@ export class GetFileUsecase {
       endpoint: this.edcClient.edcClientContext.public,
     };
 
+    console.log("transferProcessResponse : ", transferProcessResponse)
     const agreement = await this.edcClient.getContractAgreement(
       transferProcessResponse.properties.cid
     );

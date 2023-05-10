@@ -14,6 +14,9 @@ export class ListCatalogUsecase {
     validateSchema(input, listCatalogSchema);
     const sfcAPISession = await this.sfcAPI.createConnection(authorization);
     const provider = await sfcAPISession.getCompany(input.companyId);
+    console.log("********************")
+    console.log("Getting catalog from provider : ", provider.connector_data.addresses.protocol)
+    console.log("********************")
     const catalog = await this.edcClient.listCatalog({
       providerUrl: provider.connector_data.addresses.protocol + '/data',
       querySpec: this.getQuerySpec(input.shipmentId),

@@ -61,9 +61,13 @@ export class ShareFootprintUsecase {
     };
 
     try {
+      console.log("getting provider...")
       const provider = await this.getProvider(authorization, data.companyId);
+      console.log("got provider : ", provider)
       const assetInput = builder.assetInput(data);
+      console.log("asset input :", assetInput) 
       const newAsset = await this.edcClient.createAsset(assetInput);
+      console.log(newAsset)
       results.newAssetId = newAsset.id;
       const policyInput = builder.policyInput(provider.company_BNP);
       const newPolicy = await this.edcClient.createPolicy(policyInput);

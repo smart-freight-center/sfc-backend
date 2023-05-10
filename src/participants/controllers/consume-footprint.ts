@@ -92,6 +92,7 @@ export class ConsumeFootprintController {
   static async getData(context: RouterContext) {
     try {
       const shipmentId = context.params.shipmentId as string;
+      console.log("shipmentId :", shipmentId)
       const data = await getFileUsecase.pullData(shipmentId);
       context.body = data;
       context.status = 200;

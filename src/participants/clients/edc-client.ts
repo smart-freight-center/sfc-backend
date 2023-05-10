@@ -19,7 +19,7 @@ export class EdcAdapter {
   constructor(myConnector: Connector, token: string) {
     this.edcConnectorClient = new EdcConnectorClient();
     this.edcClientId = myConnector.id;
-
+    console.log("using connector with address : ", myConnector.addresses)
     const clientContext = this.edcConnectorClient.createContext(
       token,
       myConnector.addresses
@@ -29,6 +29,16 @@ export class EdcAdapter {
   }
 
   async createAsset(input: AssetInput) {
+    console.log("--- creating asset with input ---", input)
+    try {
+      this.edcConnectorClient.management.createAsset(
+        this.edcClientContext,
+        input
+      );
+    } catch (error) {
+      console.log("Can't create asset")
+      console.log(error)
+    }
     return this.edcConnectorClient.management.createAsset(
       this.edcClientContext,
       input
