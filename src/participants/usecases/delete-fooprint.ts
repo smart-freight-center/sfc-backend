@@ -20,7 +20,7 @@ export class DeleteFootprintUsecase {
   private async getContractdefintions(shipmentId: string) {
     const filter = builder.shipmentFilter('id', `${shipmentId}%`, 'LIKE');
     const contracts = await this.edcClient.queryAllContractDefinitions(filter);
-    return contracts;
+    return contracts.filter((contract) => contract.id.startsWith(shipmentId));
   }
 
   private async deleteContractOffers(contracts: ContractDefinition[]) {

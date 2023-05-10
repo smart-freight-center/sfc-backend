@@ -3,18 +3,22 @@ import { ContractNotFound } from 'utils/error';
 import { validateSchema } from 'utils/helpers';
 import * as builder from '../utils/edc-builder';
 import { ParticipantType } from 'entities/client-types';
+
 import { AppLogger } from 'utils/logger';
 import { CacheServiceType } from 'clients';
+import dateAndTime from 'date-and-time';
 import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
 import { EdcTransferService } from 'participants/clients/edc-transfer-service';
 import { ContractOffer } from 'entities';
 
 const inputSchema = {
-  shipmentId: 'required|min:2',
+  year: 'required|integer',
+  month: 'required|integer',
 };
 
 type Input = {
-  shipmentId: string;
+  year: number;
+  month: number;
 };
 
 type ProviderContract = {
@@ -23,9 +27,9 @@ type ProviderContract = {
   assetId: string;
 };
 
-const logger = new AppLogger('InitiateFileTransferUsecase');
+const logger = new AppLogger('InitiateBatchRequestUsecase');
 
-export class InitiateFileTransferUsecase {
+export class InitiateBatchRequestUsecase {
   constructor(
     private edcTransferService: EdcTransferService,
     private sfcAPI: SFCAPIType,
@@ -35,14 +39,12 @@ export class InitiateFileTransferUsecase {
   async execute(inputData: Input, authorization: string) {
     validateSchema(inputData, inputSchema);
 
-    logger.info('Initiating file transfer...');
+    logger.info('Initiating batch transfer...');
 
-    const { shipmentId } = inputData;
+    const { year, month } = inputData;
     const connections = await this.getConnections(authorization);
-    const { providerContracts, query: jobId } = await this.fetchByShipmentId(
-      connections,
-      shipmentId
-    );
+    const { providerContracts, query: jobId } =
+      await this.fetchAssetsByDateCreated(connections, year, month);
 
     const assetIds = await this.startTransferOnAllAssets(providerContracts);
 
@@ -54,7 +56,7 @@ export class InitiateFileTransferUsecase {
       TRANSFER_EXP_PROCESS_IN_SECONDS
     );
 
-    logger.info('Successfully initited file transfer');
+    logger.info('Successfully initited batch transfer transfer');
 
     return jobId;
   }
@@ -68,36 +70,43 @@ export class InitiateFileTransferUsecase {
     return connections;
   }
 
-  private async fetchByShipmentId(
+  private async fetchAssetsByDateCreated(
     connections: Omit<ParticipantType, 'connection'>[],
-    shipmentId: string
+    year: number,
+    month: number
   ) {
-    logger.info('Getting all assets that match shipment...');
+    logger.info('Getting all assets that by created date..');
 
     const providerContracts: ProviderContract[] = [];
 
-    const edcClient = this.edcTransferService.getEdcClient();
+    const date = new Date();
+    date.setFullYear(year);
+    date.setMonth(month - 1);
+    const queryKey = dateAndTime.format(date, 'YYYY-MM');
+
     await Promise.all(
       connections.map(async (provider) => {
-        const catalog = await edcClient.listCatalog({
-          providerUrl: `${provider.connector_data.addresses.protocol}/data`,
-          querySpec: builder.shipmentFilter(
-            'asset:prop:id',
-            `${shipmentId}%`,
-            'LIKE'
-          ),
-        });
+        const catalog = await this.edcTransferService
+          .getEdcClient()
+          .listCatalog({
+            providerUrl: `${provider.connector_data.addresses.protocol}/data`,
+            querySpec: builder.shipmentFilter(
+              'asset:prop:id',
+              `%${queryKey}-%`,
+              'LIKE'
+            ),
+          });
+
+        const regExp = new RegExp(`${queryKey}-\\d\\d$`);
 
         catalog.contractOffers
-          .filter((offer) => {
-            return offer.asset?.id.startsWith(shipmentId);
-          })
-          .forEach((offer) => {
-            if (offer.asset?.id) {
+          .filter((offer) => regExp.test(offer.asset?.id || ''))
+          .forEach((contractOffer) => {
+            if (contractOffer.asset?.id) {
               providerContracts.push({
                 provider,
-                assetId: offer.asset?.id as string,
-                contractOffer: offer,
+                contractOffer,
+                assetId: contractOffer.asset?.id,
               });
             }
           });
@@ -106,12 +115,10 @@ export class InitiateFileTransferUsecase {
 
     if (!providerContracts.length) throw new ContractNotFound();
 
-    logger.info('Successfully retrieved all related assets', {
-      providerContracts,
-    });
+    logger.info('Successfully retrieved all related assets');
 
     return {
-      query: shipmentId,
+      query: `batch_key:${queryKey}`,
       providerContracts,
     };
   }
@@ -119,7 +126,7 @@ export class InitiateFileTransferUsecase {
   private async startTransferOnAllAssets(shipmentLegs: ProviderContract[]) {
     const assetIds: string[] = [];
     for (const shipmentLeg of shipmentLegs) {
-      const { provider, assetId, contractOffer } = shipmentLeg;
+      const { provider, contractOffer, assetId } = shipmentLeg;
 
       assetIds.push(assetId);
       await this.edcTransferService.initiateTransferProcess(

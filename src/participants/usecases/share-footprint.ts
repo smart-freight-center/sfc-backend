@@ -84,7 +84,6 @@ export class ShareFootprintUsecase {
       newPolicyId: '',
       newContractId: '',
     };
-    const currentTimestamp = +new Date();
 
     const sfcConnection = await this.sfcAPI.createConnection(
       authorization || ''
@@ -95,7 +94,7 @@ export class ShareFootprintUsecase {
     try {
       const assetInput = builder.assetInput(
         data,
-        currentTimestamp,
+        myProfile.client_id,
         consumer.client_id
       );
 

@@ -1,3 +1,4 @@
+import dateAndTime from 'date-and-time';
 import {
   AssetInput,
   ContractDefinition,
@@ -22,28 +23,36 @@ function randomUid() {
 
 export function assetInput(
   dataInput: ShareFootprintInput,
-  currentTimestamp: number,
+  providerClientId: string,
   sharedWith: string
 ): AssetInput {
   const {
     shipmentId = randomUid(),
     dataLocation,
     type,
+    dateCreated,
     contentType,
   } = dataInput;
+
+  const now = new Date();
 
   const mapper = {
     s3: 'AmazonS3',
     http: 'HttpData',
     azure: 'AzureStorage',
   };
+
+  const defaultVersion = dateAndTime.format(now, 'YYYY-MM-DD');
+  const createdFilter = dateCreated || defaultVersion;
+
   return {
     asset: {
       properties: {
-        'asset:prop:id': `${shipmentId}-${sharedWith}-${currentTimestamp}`,
+        'asset:prop:id': `${shipmentId}-${sharedWith}__${+now}_${createdFilter}`,
         'asset:prop:name': dataLocation.name || shipmentId,
         'asset:prop:contenttype': contentType,
         'asset:prop:sharedWith': sharedWith,
+        'asset:prop:owner': providerClientId,
       },
     },
     dataAddress: {
