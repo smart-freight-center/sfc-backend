@@ -18,10 +18,8 @@ export class ListCatalogUsecase {
       providerUrl: provider.connector_data.addresses.protocol + '/data',
       querySpec: this.getQuerySpec(input.shipmentId),
     });
-
     return catalog.contractOffers.map((contract) => {
       const lastDashIndex = contract.asset?.id.lastIndexOf('-');
-
       return {
         id: contract.asset?.id.slice(0, lastDashIndex),
         name: contract.asset?.properties['asset:prop:name'],

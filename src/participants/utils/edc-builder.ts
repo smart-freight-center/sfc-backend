@@ -22,7 +22,6 @@ function randomUid() {
 
 export function assetInput(
   dataInput: ShareFootprintInput,
-  providerClientId: string,
   currentTimestamp: number,
   sharedWith: string
 ): AssetInput {
@@ -41,7 +40,7 @@ export function assetInput(
   return {
     asset: {
       properties: {
-        'asset:prop:id': `${shipmentId}-${providerClientId}:${currentTimestamp}`,
+        'asset:prop:id': `${shipmentId}-${sharedWith}-${currentTimestamp}`,
         'asset:prop:name': dataLocation.name || shipmentId,
         'asset:prop:contenttype': contentType,
         'asset:prop:sharedWith': sharedWith,
@@ -55,12 +54,11 @@ export function assetInput(
     },
   } as AssetInput;
 }
-
 export function policyInput(
-  policyBPN: string,
+  consumerPolicyBPN: string,
   dataInput: Partial<PolicyDefinitionInput> = {}
 ): PolicyDefinitionInput {
-  const constraints = BPNPolicyConstraint(policyBPN);
+  const constraints = BPNPolicyConstraint(consumerPolicyBPN);
   const permissions = [
     {
       constraints: constraints,
@@ -104,7 +102,7 @@ export function contractDefinition(
   policyId: string
 ): ContractDefinition {
   return {
-    id: randomUid(),
+    id: `${assetId}-${randomUid()}`,
     criteria: [filter('asset:prop:id', assetId)],
     accessPolicyId: policyId,
     contractPolicyId: policyId,
@@ -124,7 +122,6 @@ export function shipmentFilter(
   operandRight: string,
   operator: 'LIKE' | '=' = '='
 ) {
-  console.log(EDC_FILTER_OPERATOR_SET, '<---', EDC_FILTER_OPERATOR_SET);
   if (EDC_FILTER_OPERATOR_SET.has(operator)) {
     return {
       filterExpression: [filter(operandLeft, operandRight, operator)],

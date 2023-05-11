@@ -75,9 +75,10 @@ export class EdcAdapter {
       contractDefinitionId
     );
   }
-  async listContractDefinitions() {
+  async queryAllContractDefinitions(query?: QuerySpec) {
     return this.edcConnectorClient.management.queryAllContractDefinitions(
-      this.edcClientContext
+      this.edcClientContext,
+      query
     );
   }
 

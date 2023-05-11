@@ -28,7 +28,6 @@ export class ConsumeFootPrintController {
       context.body = catalogs;
       context.status = 200;
     } catch (error) {
-      console.log(error);
       if (error instanceof InvalidInput) {
         context.status = 400;
         context.body = { errors: error.errors };
@@ -56,10 +55,8 @@ export class ConsumeFootPrintController {
     try {
       const authorization = context.headers.authorization || '';
       const { shipmentId } = context.params;
-      const { contractNegotiationId } = context.query;
       const inputData = {
         shipmentId: shipmentId,
-        contractNegotiationId: contractNegotiationId,
       };
       const data = await initiateFileTransferUsecase.execute(
         inputData,
@@ -77,7 +74,10 @@ export class ConsumeFootPrintController {
         context.body = { error: 'invalid client id' };
         context.status = 404;
       } else if (error instanceof ContractNotFound) {
-        context.body = { error: 'invalid shipmentId' };
+        context.body = {
+          error:
+            'Please verify you entered a valid shipmentId and that you have access to it',
+        };
         context.status = 404;
       } else if (error instanceof InvalidTokenInSFCAPI) {
         context.status = 501;
@@ -97,7 +97,6 @@ export class ConsumeFootPrintController {
       context.body = data;
       context.status = 200;
     } catch (error) {
-      console.log(error);
       if (error instanceof TransferNotInitiated) {
         context.status = 409;
         context.body = {

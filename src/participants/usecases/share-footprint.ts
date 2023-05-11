@@ -95,7 +95,6 @@ export class ShareFootprintUsecase {
     try {
       const assetInput = builder.assetInput(
         data,
-        myProfile.client_id,
         currentTimestamp,
         consumer.client_id
       );

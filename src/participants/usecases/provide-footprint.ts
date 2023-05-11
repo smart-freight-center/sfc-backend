@@ -1,38 +1,18 @@
 import { EdcAdapter } from '../clients/edc-client';
-
 export class ProvideFootprintUsecase {
   constructor(private edcClient: EdcAdapter) {}
 
   async list() {
-    const assetWithContracts = await this.getAssetsWithContracts();
-    const uniqueAssetWithContract = new Set(assetWithContracts);
-    const assets = await this.edcClient.listAssets();
-
-    return assets
-      .filter((asset) => uniqueAssetWithContract.has(asset.id))
-      .map((asset) => {
-        const lastDashIndex = asset.id.lastIndexOf('-');
-
-        return {
-          createdAt: asset.createdAt,
-          id: asset.id.slice(0, lastDashIndex),
-          name: asset.properties['asset:prop:name'],
-          sharedWith: asset.properties['asset:prop:sharedWith'],
-        };
-      });
-  }
-
-  private async getAssetsWithContracts() {
-    const catalogs = await this.edcClient.listCatalog({
-      providerUrl: `${this.edcClient.edcClientContext.protocol}/data`,
+    const sharedContracts =
+      (await this.edcClient.queryAllContractDefinitions()) as any;
+    return sharedContracts.map((contract) => {
+      return {
+        createdAt: contract.createdAt,
+        shipmentId: contract.id.split('-')[0],
+        sharedWith: contract.criteria.map((company) => {
+          return company.operandRight.split('-')[1];
+        }),
+      };
     });
-
-    return catalogs?.contractOffers
-      .filter((offer) => offer.asset?.id)
-      .map((offer) => offer.asset?.id) as string[];
-  }
-
-  async delete(contractId: string) {
-    await this.edcClient.deleteContractDefinition(contractId);
   }
 }
