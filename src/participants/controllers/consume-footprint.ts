@@ -74,7 +74,10 @@ export class ConsumeFootPrintController {
         context.body = { error: 'invalid client id' };
         context.status = 404;
       } else if (error instanceof ContractNotFound) {
-        context.body = { error: 'invalid shipmentId' };
+        context.body = {
+          error:
+            'Please verify you entered a valid shipmentId and that you have access to it',
+        };
         context.status = 404;
       } else if (error instanceof InvalidTokenInSFCAPI) {
         context.status = 501;

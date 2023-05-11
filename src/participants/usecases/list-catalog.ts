@@ -16,9 +16,7 @@ export class ListCatalogUsecase {
     const provider = await sfcAPISession.getCompany(input.companyId);
     const catalog = await this.edcClient.listCatalog({
       providerUrl: provider.connector_data.addresses.protocol + '/data',
-      querySpec: input.shipmentId
-        ? this.getQuerySpec(input.shipmentId)
-        : undefined,
+      querySpec: this.getQuerySpec(input.shipmentId),
     });
     return catalog.contractOffers.map((contract) => {
       const lastDashIndex = contract.asset?.id.lastIndexOf('-');

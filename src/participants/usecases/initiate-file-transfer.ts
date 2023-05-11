@@ -47,7 +47,7 @@ export class InitiateFileTransferUsecase {
     );
 
     if (!catalogsAssets.length) {
-      throw error("We didn't find any shared data for shipment", shipmentId);
+      throw new ContractNotFound();
     }
     const assetIds: string[] = [];
     for (const shipmentLeg of catalogsAssets) {

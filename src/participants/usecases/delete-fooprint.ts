@@ -2,6 +2,7 @@ import { validateSchema } from 'utils/helpers';
 import { EdcAdapter } from '../clients/edc-client';
 import * as builder from 'participants/utils/edc-builder';
 import { ContractDefinition } from '@think-it-labs/edc-connector-client';
+import { ContractNotFound } from 'utils/error';
 
 export class DeleteFootprintUsecase {
   constructor(private edcClient: EdcAdapter) {}
@@ -10,7 +11,9 @@ export class DeleteFootprintUsecase {
     await validateSchema({ shipmentId }, { shipmentId: 'required|string' });
 
     const contracts = await this.getContractdefintions(shipmentId);
-
+    if (!contracts?.length) {
+      throw new ContractNotFound();
+    }
     await this.deleteContractOffers(contracts);
   }
 
