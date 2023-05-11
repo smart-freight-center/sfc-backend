@@ -28,7 +28,6 @@ export class ConsumeFootPrintController {
       context.body = catalogs;
       context.status = 200;
     } catch (error) {
-      console.log(error);
       if (error instanceof InvalidInput) {
         context.status = 400;
         context.body = { errors: error.errors };
@@ -56,10 +55,8 @@ export class ConsumeFootPrintController {
     try {
       const authorization = context.headers.authorization || '';
       const { shipmentId } = context.params;
-      const { contractNegotiationId } = context.query;
       const inputData = {
         shipmentId: shipmentId,
-        contractNegotiationId: contractNegotiationId,
       };
       const data = await initiateFileTransferUsecase.execute(
         inputData,
@@ -97,7 +94,6 @@ export class ConsumeFootPrintController {
       context.body = data;
       context.status = 200;
     } catch (error) {
-      console.log(error);
       if (error instanceof TransferNotInitiated) {
         context.status = 409;
         context.body = {

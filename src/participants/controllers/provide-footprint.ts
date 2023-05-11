@@ -82,7 +82,6 @@ export class ProvideFootPrintController {
         }
         return;
       }
-      console.log(error);
       context.status = 500;
     }
   }

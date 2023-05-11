@@ -8,6 +8,7 @@ import { ContractNegotiationState, ContractOffer } from 'entities';
 import { AppLogger } from 'utils/logger';
 import { CacheServiceType } from 'clients';
 import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
+import { error } from 'console';
 
 const inputSchema = {
   shipmentId: 'required|min:2',
@@ -45,6 +46,9 @@ export class InitiateFileTransferUsecase {
       shipmentId
     );
 
+    if (!catalogsAssets.length) {
+      throw error("We didn't find any shared data for shipment", shipmentId);
+    }
     const assetIds: string[] = [];
     for (const shipmentLeg of catalogsAssets) {
       const { provider, assetId } = shipmentLeg;
@@ -66,7 +70,6 @@ export class InitiateFileTransferUsecase {
 
   private async initiateTransferProcess(provider, assetId: string) {
     const contractAgreementId = await this.getContractAgreementId(assetId);
-
     if (contractAgreementId) {
       const response = await this.initiateTransfer(
         provider,
@@ -131,18 +134,13 @@ export class InitiateFileTransferUsecase {
     return result;
   }
 
-  async getContractOffer(
-    shipmentId: string,
-    connectorProtocolAddress?: string
-  ) {
+  async getContractOffer(shipmentId: string, connectorProtocolAddress: string) {
     const assetFilter = {
       filterExpression: [builder.filter('asset:prop:id', shipmentId)],
     };
 
     const catalogs = await this.edcClient.listCatalog({
-      providerUrl: connectorProtocolAddress
-        ? `${connectorProtocolAddress}/data`
-        : `${this.edcClient.edcClientContext.protocol}/data`,
+      providerUrl: `${connectorProtocolAddress}/data`,
       querySpec: assetFilter,
     });
 
@@ -206,24 +204,19 @@ export class InitiateFileTransferUsecase {
   private async getCatalogsAssets(authorization: string, shipmentId: string) {
     logger.info('Getting all assets that match shipment...');
     const connections = await this.getConnections(authorization);
-
     const allShipments = await Promise.all(
       connections.map(async (provider) => {
         const catalog = await this.edcClient.listCatalog({
           providerUrl: `${provider.connector_data.addresses.protocol}/data`,
           querySpec: builder.shipmentFilter(
             'asset:prop:id',
-            `${shipmentId}-${provider.client_id}%`,
+            `${shipmentId}%`,
             'LIKE'
           ),
         });
-
-        const assetIds = catalog.contractOffers
-          .filter((offer) =>
-            offer.asset?.id.startsWith(`${shipmentId}-${provider.client_id}`)
-          )
-          .map((offer) => offer.asset?.id as string);
-
+        const assetIds = catalog.contractOffers.map(
+          (offer) => offer.asset?.id as string
+        );
         if (assetIds[0]) {
           return {
             provider,
