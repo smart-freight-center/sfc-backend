@@ -2,8 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import { ParticipantType } from 'entities/client-types';
 import { ParticipantNotFound } from 'utils/error';
-import { PARTICIPANT_CONFIG_URL } from 'utils/settings';
-import axios from 'axios';
+import {
+  PARTICIPANT_CONFIG_S3_BUCKET,
+  PARTICIPANT_CONFIG_KEY,
+  AWS_REGION,
+} from 'utils/settings';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { sdkStreamMixin } from '@aws-sdk/util-stream-node';
 import { AppLogger } from 'utils/logger';
 
 const logger = AppLogger.createLogger('ParticipantGateway');
@@ -27,20 +32,38 @@ export class ParticipantGateway {
     return participantsMapper;
   }
   private static async fetchParticipantsData(): Promise<ParticipantType[]> {
-    if (PARTICIPANT_CONFIG_URL) {
-      return ParticipantGateway.fetchConfig(PARTICIPANT_CONFIG_URL);
+    if (PARTICIPANT_CONFIG_S3_BUCKET && PARTICIPANT_CONFIG_KEY) {
+      logger.info('Reading particiopants configuration file from S3');
+      return ParticipantGateway.fetchConfigFromS3(
+        PARTICIPANT_CONFIG_S3_BUCKET,
+        PARTICIPANT_CONFIG_KEY
+      );
     }
+    logger.warn(
+      'S3 participants configuration file location not defined, falling back to reading from local file'
+    );
     return ParticipantGateway.readParticipantConfigFile();
   }
 
-  private static async fetchConfig(url: string) {
-    logger.info('Retrieving participants config from upstream file...');
+  private static async fetchConfigFromS3(
+    s3Bucket: string,
+    configFileKey: string
+  ): Promise<ParticipantType[]> {
+    const client = new S3Client({ region: AWS_REGION });
 
-    const response = await axios.get(url);
-    const participants = response.data.participants as ParticipantType[];
-
-    logger.info('Successfully retrieved participants data');
-    return participants;
+    const awsResponse = await client.send(
+      new GetObjectCommand({
+        Bucket: s3Bucket,
+        Key: configFileKey,
+      })
+    );
+    const objectString = await sdkStreamMixin(
+      awsResponse.Body
+    ).transformToString();
+    const data = JSON.parse(objectString) as {
+      participants: ParticipantType[];
+    };
+    return data.participants;
   }
 
   private static readParticipantConfigFile() {
