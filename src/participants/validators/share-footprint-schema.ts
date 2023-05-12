@@ -22,7 +22,7 @@ const s3Schema = {
     name: 'required|min:1',
     bucketName: 'required|min:1|string',
     region: 'required|min:1',
-    path: 'min:4|required',
+    keyName: 'min:4|required',
   },
 };
 
