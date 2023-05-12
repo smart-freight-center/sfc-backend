@@ -23,6 +23,7 @@ export class InvalidTokenInSFCAPI extends SFCBaseError {}
 export class TransferNotInitiated extends SFCBaseError {}
 export class InvalidCredentials extends SFCBaseError {}
 export class ParticipantNotFound extends SFCBaseError {}
+export class TransferInitiationFailed extends SFCBaseError {}
 export class CouldntFetchDataInSource extends SFCBaseError {}
 
 export class ContractNotFound extends SFCBaseError {}

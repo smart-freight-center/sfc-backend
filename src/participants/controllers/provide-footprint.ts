@@ -21,13 +21,13 @@ import {
 export class ProvideFootPrintController {
   static async shareFootprints(context: RouterContext) {
     try {
-      const data = await shareFootprintUsecase.execute(
+      await shareFootprintUsecase.execute(
         context.headers.authorization as string,
         context.request.body as ShareFootprintInput
       );
 
       context.status = 201;
-      context.body = data;
+      context.body = { message: 'Successfully created asset' };
     } catch (error) {
       if (error instanceof InvalidInput) {
         context.status = 400;

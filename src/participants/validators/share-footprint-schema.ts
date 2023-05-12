@@ -5,6 +5,7 @@ const shared = {
   contentType: 'in:application/json,text/csv',
   type: 'required|in:azure,s3,http',
   dataLocation: 'required|present',
+  dateCreated: 'regex:/^\\d{4}-\\d{2}-[0-3]\\d$/',
 };
 
 const sharedCustomMessage = {
@@ -12,7 +13,8 @@ const sharedCustomMessage = {
     "The only data types that are allowed are 'azure', 's3' and 'http'",
   'in.contentType':
     "The allowed content Types are 'application/json' and 'text/csv'",
-  'data.present': 'You need to specify the data object',
+  'present.dataLocation': 'You need to specify the "dataLocation" object',
+  'regex.dateCreated': 'Should be a valid date in the format YYYY-MM-DD',
 };
 
 const s3Schema = {

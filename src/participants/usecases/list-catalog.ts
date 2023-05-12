@@ -19,20 +19,23 @@ export class ListCatalogUsecase {
       querySpec: this.getQuerySpec(input.shipmentId),
     });
     return catalog.contractOffers.map((contract) => {
-      const lastDashIndex = contract.asset?.id.lastIndexOf('-');
+      const assetId = contract.asset?.id || '';
+      const createdDelimiter = assetId.lastIndexOf('__');
+      const idWithClient = assetId.slice(0, createdDelimiter);
+
+      const companyIdDelimiter = idWithClient.lastIndexOf('-');
+
       return {
-        id: contract.asset?.id.slice(0, lastDashIndex),
+        id: idWithClient?.slice(0, companyIdDelimiter),
         name: contract.asset?.properties['asset:prop:name'],
-        contentType: contract.asset?.properties['asset:prop:contenttype'],
+        owner: contract.asset?.properties['asset:prop:owner'],
       };
     });
   }
 
   private getQuerySpec(shipmentId?: string) {
     if (shipmentId) {
-      return {
-        filterExpression: [builder.filter('asset:prop:id', shipmentId)],
-      };
+      return builder.shipmentFilter('asset:prop:id', `${shipmentId}%`, 'LIKE');
     }
     return undefined;
   }

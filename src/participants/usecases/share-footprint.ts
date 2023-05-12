@@ -63,20 +63,11 @@ export class ShareFootprintUsecase {
   }
 
   private async getShipmentOffers(shipmentId: string) {
-    const assetFilter = builder.shipmentFilter(
-      'asset:prop:id',
-      `${shipmentId}%`,
-      'LIKE'
+    const assetFilter = builder.shipmentFilter('id', `${shipmentId}%`, 'LIKE');
+    const contractOffers = await this.edcClient.queryAllContractDefinitions(
+      assetFilter
     );
-
-    const catalogs = await this.edcClient.listCatalog({
-      providerUrl: `${this.edcClient.edcClientContext.protocol}/data`,
-      querySpec: assetFilter,
-    });
-
-    return catalogs?.contractOffers.filter((offer) =>
-      offer.asset?.id.startsWith(shipmentId)
-    );
+    return contractOffers.filter((offer) => offer.id.startsWith(shipmentId));
   }
   private async shareAsset(authorization: string, data: ShareFootprintInput) {
     const results = {
@@ -84,7 +75,6 @@ export class ShareFootprintUsecase {
       newPolicyId: '',
       newContractId: '',
     };
-    const currentTimestamp = +new Date();
 
     const sfcConnection = await this.sfcAPI.createConnection(
       authorization || ''
@@ -95,7 +85,7 @@ export class ShareFootprintUsecase {
     try {
       const assetInput = builder.assetInput(
         data,
-        currentTimestamp,
+        myProfile.client_id,
         consumer.client_id
       );
 

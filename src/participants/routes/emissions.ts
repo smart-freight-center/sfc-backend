@@ -36,6 +36,14 @@ export const edcRouter = new KoaRouter({ prefix: '/emissions' })
     AuthController.authMiddleware,
     ConsumeFootPrintController.initiateFileTransfer
   )
+
+  .post(
+    'initiate file transfer on the connector',
+    '/inititate-batch-transfer',
+    AuthController.authMiddleware,
+    ConsumeFootPrintController.initiateBatchTransfer
+  )
+
   .get(
     'Get Footprint data by shipment',
     '/:shipmentId',

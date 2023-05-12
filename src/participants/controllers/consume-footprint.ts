@@ -10,6 +10,7 @@ import {
 import {
   consumeFootprintUsecase,
   getFileUsecase,
+  initiateBatchRequestUsecase,
   initiateFileTransferUsecase,
 } from '../usecases';
 
@@ -58,12 +59,12 @@ export class ConsumeFootPrintController {
       const inputData = {
         shipmentId: shipmentId,
       };
-      const data = await initiateFileTransferUsecase.execute(
+      const jobId = await initiateFileTransferUsecase.execute(
         inputData,
         authorization
       );
 
-      context.body = data;
+      context.body = { jobId };
       context.status = 201;
       return;
     } catch (error) {
@@ -85,6 +86,43 @@ export class ConsumeFootPrintController {
           error: 'Please share your public key with the SFC Admin.',
         };
       } else {
+        console.log(error);
+        context.status = 500;
+      }
+    }
+  }
+
+  static async initiateBatchTransfer(context: RouterContext) {
+    try {
+      const authorization = context.headers.authorization || '';
+
+      const jobId = await initiateBatchRequestUsecase.execute(
+        context.request.body as any,
+        authorization
+      );
+
+      context.body = { jobId };
+      context.status = 201;
+      return;
+    } catch (error) {
+      if (error instanceof InvalidInput) {
+        context.body = { errors: error.errors };
+        context.status = 400;
+      } else if (error instanceof ParticipantNotFound) {
+        context.body = { error: 'invalid client id' };
+        context.status = 404;
+      } else if (error instanceof ContractNotFound) {
+        context.body = {
+          error: 'No shipments were found for the month you specified',
+        };
+        context.status = 404;
+      } else if (error instanceof InvalidTokenInSFCAPI) {
+        context.status = 501;
+        context.body = {
+          error: 'Please share your public key with the SFC Admin.',
+        };
+      } else {
+        console.log(error);
         context.status = 500;
       }
     }
