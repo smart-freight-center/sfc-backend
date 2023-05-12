@@ -37,7 +37,7 @@ export class DataSourceService {
 
   private static async fetchDataOnS3(input: ShareFootprintInput) {
     const command = new GetObjectCommand({
-      Key: input.dataLocation.path,
+      Key: input.dataLocation.keyName,
       Bucket: input.dataLocation.bucketName,
     });
 
