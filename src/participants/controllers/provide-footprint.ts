@@ -104,6 +104,7 @@ export class ProvideFootPrintController {
       }
       if (error instanceof InvalidInput) {
         context.status = 400;
+        context.body = { errors: error.errors };
         return;
       }
       context.status = 500;
@@ -118,6 +119,7 @@ export class ProvideFootPrintController {
     } catch (error) {
       if (error instanceof InvalidInput) {
         context.status = 400;
+        context.body = { errors: error.errors };
         return;
       }
 
