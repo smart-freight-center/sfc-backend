@@ -14,7 +14,7 @@ export class GetFileUsecase {
     private cacheService: CacheServiceType
   ) {}
 
-  async pullData(shipmentId: string) {
+  async execute(shipmentId: string) {
     logger.info('Pulling data for all assets...');
     const { assetIds } = await this.getKeyFromCache(shipmentId);
 

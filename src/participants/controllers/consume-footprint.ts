@@ -129,7 +129,7 @@ export class ConsumeFootPrintController {
   static async getData(context: RouterContext) {
     try {
       const shipmentId = context.params.shipmentId as string;
-      const data = await getFileUsecase.pullData(shipmentId);
+      const data = await getFileUsecase.execute(shipmentId);
       context.body = data;
       context.status = 200;
     } catch (error) {
