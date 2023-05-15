@@ -86,7 +86,6 @@ export class ConsumeFootPrintController {
           error: 'Please share your public key with the SFC Admin.',
         };
       } else {
-        console.log(error);
         context.status = 500;
       }
     }
@@ -122,7 +121,6 @@ export class ConsumeFootPrintController {
           error: 'Please share your public key with the SFC Admin.',
         };
       } else {
-        console.log(error);
         context.status = 500;
       }
     }

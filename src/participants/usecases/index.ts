@@ -10,6 +10,7 @@ import { ShareFootprintUsecase } from './share-footprint';
 import { DataSourceService } from 'participants/clients';
 import { DeleteFootprintUsecase } from './delete-fooprint';
 import { InitiateBatchRequestUsecase } from './initiate-batch-request';
+import { GetTransferProcessUsecase } from './get-transfer-process';
 
 export const provideFootprintUsecase = new ProvideFootprintUsecase(edcAdapter);
 export const deleteFootprintUsecase = new DeleteFootprintUsecase(edcAdapter);
@@ -37,3 +38,7 @@ export const initiateBatchRequestUsecase = new InitiateBatchRequestUsecase(
 );
 
 export const getFileUsecase = new GetFileUsecase(edcAdapter, CacheService);
+export const getTransferProcessUsecase = new GetTransferProcessUsecase(
+  edcAdapter,
+  CacheService
+);
