@@ -8,7 +8,7 @@ export class ProvideFootprintUsecase {
       const firstDelimiter = contract.id.indexOf('__');
       const substring = contract.id.slice(0, firstDelimiter);
       const sharedWithIdx = substring.lastIndexOf('-');
-      const sharedWith = substring.slice(sharedWithIdx);
+      const sharedWith = substring.slice(sharedWithIdx + 1);
       return {
         id: substring.slice(0, sharedWithIdx),
         shipmentId: contract.id.split('-')[0],
