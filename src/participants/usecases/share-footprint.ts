@@ -25,7 +25,7 @@ export class ShareFootprintUsecase {
     await this.ensureShipmentHasNotBeenCreated(input.shipmentId);
     const rawData = await this.dataSourceService.fetchFootprintData(input);
 
-    await this.verifyDataModel(rawData);
+    await this.verifyDataModel(input.shipmentId, rawData);
     await this.shareAsset(authorization, input);
   }
 
@@ -43,12 +43,14 @@ export class ShareFootprintUsecase {
     }
   }
 
-  private async verifyDataModel(rawData: string) {
+  private async verifyDataModel(shipmentId: string, rawData: string) {
     const jsonData = convertRawDataToJSON(rawData);
 
-    const { error, value } = shareFootprintSchema.dataModel.validate(jsonData, {
-      abortEarly: false,
-    });
+    const { error, value } = shareFootprintSchema
+      .dataModel(shipmentId)
+      .validate(jsonData, {
+        abortEarly: false,
+      });
 
     if (!error?.details) return value;
 
