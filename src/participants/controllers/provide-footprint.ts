@@ -27,7 +27,7 @@ export class ProvideFootPrintController {
       );
 
       context.status = 201;
-      context.body = { message: 'Successfully created asset' };
+      context.body = { message: 'Successfully shared a shipment' };
     } catch (error) {
       if (error instanceof InvalidInput) {
         context.status = 400;
