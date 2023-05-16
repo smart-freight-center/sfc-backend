@@ -34,6 +34,7 @@ export class ShareFootprintUsecase {
   }
 
   private validateDataSchema(input: Partial<ShareFootprintInput>) {
+    // this regex is used to validate that shipmentId contains any character except `-`, `:` or `_`
     const regex = /^[a-zA-Z!@#$%^&*()+={}[\]|\\;"'<>,.?/~`]+$/;
     if (!regex.test(input.shipmentId as string)) {
       throw new InvalidShipmentIdFormat();
