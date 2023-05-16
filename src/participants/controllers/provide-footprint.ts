@@ -3,6 +3,7 @@ import {
   CouldntFetchDataInSource,
   EmptyFootprintData,
   InvalidFootprintData,
+  InvalidShipmentIdFormat,
   ParticipantNotFound,
   ShipmentAlreadyShared,
 } from 'utils/error';
@@ -68,6 +69,12 @@ export class ProvideFootPrintController {
           error: 'A shipment with that id has already been created',
         };
         return;
+      }
+      if (error instanceof InvalidShipmentIdFormat) {
+        context.status = 400;
+        context.body = {
+          message: 'The shipment Id should not containt `-`, `:` or `_`',
+        };
       }
       if (error instanceof EdcConnectorClientError) {
         if (error.type === EdcConnectorClientErrorType.Unknown) {

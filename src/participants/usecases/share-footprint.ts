@@ -8,7 +8,11 @@ import {
   shareFootprintSchema,
 } from 'participants/validators/share-footprint-schema';
 
-import { InvalidFootprintData, ShipmentAlreadyShared } from 'utils/error';
+import {
+  InvalidFootprintData,
+  InvalidShipmentIdFormat,
+  ShipmentAlreadyShared,
+} from 'utils/error';
 import { convertRawDataToJSON } from 'participants/utils/data-converter';
 import { DataSourceServiceType } from 'participants/clients';
 import { SFCAPIType } from 'participants/types';
@@ -30,6 +34,10 @@ export class ShareFootprintUsecase {
   }
 
   private validateDataSchema(input: Partial<ShareFootprintInput>) {
+    const regex = /^[a-zA-Z!@#$%^&*()+={}[\]|\\;"'<>,.?/~`]+$/;
+    if (!regex.test(input.shipmentId as string)) {
+      throw new InvalidShipmentIdFormat();
+    }
     input.type = input.type?.toLowerCase() as ShareFootprintInput['type'];
     validateSchema(input, shareFootprintSchema.shared, customMessage.shared);
     if (input.type === 'azure') {
@@ -63,7 +71,7 @@ export class ShareFootprintUsecase {
   }
 
   private async getShipmentOffers(shipmentId: string) {
-    const assetFilter = builder.shipmentFilter('id', `${shipmentId}%`, 'LIKE');
+    const assetFilter = builder.shipmentFilter('id', `${shipmentId}-%`, 'LIKE');
     const contractOffers = await this.edcClient.queryAllContractDefinitions(
       assetFilter
     );
