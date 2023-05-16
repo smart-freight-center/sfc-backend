@@ -7,10 +7,10 @@ export class ProvideFootprintUsecase {
     return sharedContracts.map((contract) => {
       const firstDelimiter = contract.id.indexOf('__');
       const substring = contract.id.slice(0, firstDelimiter);
-      const lastaDateDelimiter = contract.id.lastIndexOf('_');
+      const lastDateDelimiter = contract.id.lastIndexOf('_');
       const sharingDate = contract.id.slice(
         firstDelimiter + 2,
-        lastaDateDelimiter
+        lastDateDelimiter
       );
       const sharedWithIdx = substring.lastIndexOf('-');
       const sharedWith = substring.slice(sharedWithIdx + 1);
