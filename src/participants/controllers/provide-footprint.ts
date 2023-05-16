@@ -5,7 +5,6 @@ import {
   InvalidFootprintData,
   InvalidShipmentIdFormat,
   ParticipantNotFound,
-  ShipmentAlreadyShared,
 } from 'utils/error';
 import { ContractNotFound, InvalidInput } from 'utils/error';
 import {
@@ -63,13 +62,7 @@ export class ProvideFootPrintController {
           error: "Couldn't validate data in the specified source",
         };
       }
-      if (error instanceof ShipmentAlreadyShared) {
-        context.status = 409;
-        context.body = {
-          error: 'A shipment with that id has already been created',
-        };
-        return;
-      }
+
       if (error instanceof InvalidShipmentIdFormat) {
         context.status = 400;
         context.body = {
@@ -95,8 +88,10 @@ export class ProvideFootPrintController {
 
   static async unshareFootprint(context: RouterContext) {
     const { shipmentId } = context.params;
+    const companyId = context.query.companyId as string;
+
     try {
-      const data = await deleteFootprintUsecase.execute(shipmentId);
+      const data = await deleteFootprintUsecase.execute(shipmentId, companyId);
       context.status = 200;
       context.body = {
         message: 'access revoked successfully',
