@@ -29,7 +29,6 @@ export class CouldntFetchDataInSource extends SFCBaseError {}
 export class ContractNotFound extends SFCBaseError {}
 
 export class EmptyFootprintData extends SFCBaseError {}
-export class ShipmentAlreadyShared extends SFCBaseError {}
 export class InvalidShipmentIdFormat extends SFCBaseError {}
 export class InvalidFootprintData extends SFCBaseError {
   public readonly errors: object;
