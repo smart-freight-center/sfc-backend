@@ -8,11 +8,7 @@ import {
   shareFootprintSchema,
 } from 'participants/validators/share-footprint-schema';
 
-import {
-  InvalidFootprintData,
-  InvalidShipmentIdFormat,
-  ShipmentAlreadyShared,
-} from 'utils/error';
+import { InvalidFootprintData, InvalidShipmentIdFormat } from 'utils/error';
 import { convertRawDataToJSON } from 'participants/utils/data-converter';
 import { DataSourceServiceType } from 'participants/clients';
 import { SFCAPIType } from 'participants/types';
@@ -26,7 +22,6 @@ export class ShareFootprintUsecase {
 
   public async execute(authorization: string, input: ShareFootprintInput) {
     this.validateDataSchema(input);
-    await this.ensureShipmentHasNotBeenCreated(input.shipmentId);
     const rawData = await this.dataSourceService.fetchFootprintData(input);
 
     await this.verifyDataModel(rawData);
@@ -64,20 +59,6 @@ export class ShareFootprintUsecase {
     throw new InvalidFootprintData(error);
   }
 
-  private async ensureShipmentHasNotBeenCreated(shipmentId: string) {
-    const offers = await this.getShipmentOffers(shipmentId);
-
-    if (offers.length) throw new ShipmentAlreadyShared();
-    return offers;
-  }
-
-  private async getShipmentOffers(shipmentId: string) {
-    const assetFilter = builder.shipmentFilter('id', `${shipmentId}-%`, 'LIKE');
-    const contractOffers = await this.edcClient.queryAllContractDefinitions(
-      assetFilter
-    );
-    return contractOffers.filter((offer) => offer.id.startsWith(shipmentId));
-  }
   private async shareAsset(authorization: string, data: ShareFootprintInput) {
     const results = {
       newAssetId: '',
