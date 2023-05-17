@@ -50,21 +50,22 @@ const httpSchema = {
   },
 };
 
-const dataModelSchema = joi.array().items(
-  joi.object({
-    id_tce: joi.string(),
-    id_consignment: joi.string().required(),
-    id_shipment: joi.string().required(),
-    transport_activity: joi.number().required(),
-    mass: joi.number().required(),
-    mode_of_transport: joi.string().required(),
-    asset_type: joi.string().required(),
-    load_factor: joi.number().required(),
-    empty_distance: joi.number().required(),
-    energy_carrier_N: joi.string().required(),
-    Feedstock_N: joi.string().required(),
-  })
-);
+const dataModelSchema = (shipmentId: string) =>
+  joi.array().items(
+    joi.object({
+      id_tce: joi.string().required(),
+      id_consignment: joi.string().required(),
+      id_shipment: joi.string().required().equal(shipmentId),
+      transport_activity: joi.number().required(),
+      mass: joi.number().required(),
+      mode_of_transport: joi.string().required(),
+      asset_type: joi.string().required(),
+      load_factor: joi.number().required(),
+      empty_distance: joi.number().required(),
+      energy_carrier_N: joi.string().required(),
+      Feedstock_N: joi.string().required(),
+    })
+  );
 
 export const customMessage = {
   shared: sharedCustomMessage,
