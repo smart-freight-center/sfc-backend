@@ -1,4 +1,5 @@
 import joi from 'joi';
+
 const shared = {
   shipmentId: 'required|min:2',
   companyId: 'required|min:2',
@@ -58,8 +59,10 @@ const dataModelSchema = (shipmentId: string) =>
       id_shipment: joi.string().required().equal(shipmentId),
       transport_activity: joi.number().required(),
       mass: joi.number().required(),
+      actual_distance: joi.number().required(),
       mode_of_transport: joi.string().required(),
       asset_type: joi.string().required(),
+      co2_wtw: joi.number().required(),
       load_factor: joi.number().required(),
       empty_distance: joi.number().required(),
       energy_carrier_N: joi.string().required(),

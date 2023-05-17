@@ -4,7 +4,7 @@ import { ListCatalogUsecase } from './list-catalog';
 import { GenerateTokenUsecase } from './generate-token';
 import { edcAdapter, edcTransferService, SFCAPI } from 'participants/clients';
 import { InitiateFileTransferUsecase } from './initiate-file-transfer';
-import { GetFileUsecase } from './get-file';
+import { GetEmissionsUsecase } from './get-emissions';
 import { CacheService } from 'clients';
 import { ShareFootprintUsecase } from './share-footprint';
 import { DataSourceService } from 'participants/clients';
@@ -37,7 +37,10 @@ export const initiateBatchRequestUsecase = new InitiateBatchRequestUsecase(
   CacheService
 );
 
-export const getFileUsecase = new GetFileUsecase(edcAdapter, CacheService);
+export const getEmissionsUsecase = new GetEmissionsUsecase(
+  edcAdapter,
+  CacheService
+);
 export const authTokenCallbackUsecase = new AuthTokenCallbackUsecase(
   edcAdapter,
   CacheService

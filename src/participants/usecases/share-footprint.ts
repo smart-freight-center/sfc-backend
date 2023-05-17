@@ -21,17 +21,18 @@ export class ShareFootprintUsecase {
   ) {}
 
   public async execute(authorization: string, input: ShareFootprintInput) {
-    this.validateDataSchema(input);
+    this.validateInputSchema(input);
     const rawData = await this.dataSourceService.fetchFootprintData(input);
 
     await this.verifyDataModel(input.shipmentId, rawData);
     await this.shareAsset(authorization, input);
   }
 
-  private validateDataSchema(input: Partial<ShareFootprintInput>) {
+  private validateInputSchema(input: Partial<ShareFootprintInput>) {
     // this regex is used to validate that shipmentId contains any character except `-`, `:` or `_`
-    const regex = /^[a-zA-Z0-9!@#$%^&*()+={}[\]|\\;"'<>,./~`]+$/;
-    if (!regex.test(input.shipmentId as string)) {
+    const regex = /[_:-]/g;
+
+    if (regex.test(input.shipmentId as string)) {
       throw new InvalidShipmentIdFormat();
     }
     input.type = input.type?.toLowerCase() as ShareFootprintInput['type'];
