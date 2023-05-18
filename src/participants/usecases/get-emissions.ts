@@ -15,7 +15,7 @@ export class GetEmissionsUsecase {
     private cacheService: CacheServiceType
   ) {}
 
-  async execute(jobId: string) {
+  async execute(jobId: string, aggregate: boolean) {
     logger.info('Pulling data for all assets...');
     const { assetIds } = await this.getKeyFromCache(jobId);
 
@@ -30,7 +30,7 @@ export class GetEmissionsUsecase {
       emissions.push(...dataLeg);
     }
 
-    if (!dataIsForShipmentId) {
+    if (!aggregate || !dataIsForShipmentId) {
       return { data: emissions };
     }
     const aggregatedData = this.aggregateEmissions(emissions);
