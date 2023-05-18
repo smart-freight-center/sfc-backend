@@ -66,7 +66,7 @@ export class ProvideFootPrintController {
       if (error instanceof InvalidShipmentIdFormat) {
         context.status = 400;
         context.body = {
-          message: 'The shipment Id should not containt `-`, `:` or `_`',
+          message: 'The shipment Id should not containt `-`, `:`, `?` or `_`',
         };
       }
       if (error instanceof EdcConnectorClientError) {
