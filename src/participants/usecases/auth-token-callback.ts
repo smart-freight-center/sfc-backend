@@ -3,8 +3,8 @@ import { CacheServiceType } from 'clients';
 import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
 import { AppLogger } from 'utils/logger';
 
-const logger = new AppLogger('GetTransferProcessUsecase');
-export class GetTransferProcessUsecase {
+const logger = new AppLogger('AuthTokenCallbackUsecase');
+export class AuthTokenCallbackUsecase {
   readonly dataQueue = [];
 
   constructor(

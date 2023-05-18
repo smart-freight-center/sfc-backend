@@ -1,5 +1,5 @@
 import { EdcAdapter } from '../clients/edc-client';
-export class ProvideFootprintUsecase {
+export class ListSharedAssetsUsecsase {
   constructor(private edcClient: EdcAdapter) {}
 
   async execute() {

@@ -1,5 +1,5 @@
 import { KeyCloackClient } from 'clients/keycloak-client';
-import { ProvideFootprintUsecase } from './provide-footprint';
+import { ListSharedAssetsUsecsase } from './list-shared-assets';
 import { ListCatalogUsecase } from './list-catalog';
 import { GenerateTokenUsecase } from './generate-token';
 import { edcAdapter, edcTransferService, SFCAPI } from 'participants/clients';
@@ -10,9 +10,9 @@ import { ShareFootprintUsecase } from './share-footprint';
 import { DataSourceService } from 'participants/clients';
 import { DeleteFootprintUsecase } from './delete-fooprint';
 import { InitiateBatchRequestUsecase } from './initiate-batch-request';
-import { GetTransferProcessUsecase } from './get-transfer-process';
+import { AuthTokenCallbackUsecase } from './auth-token-callback';
 
-export const provideFootprintUsecase = new ProvideFootprintUsecase(edcAdapter);
+export const provideFootprintUsecase = new ListSharedAssetsUsecsase(edcAdapter);
 export const deleteFootprintUsecase = new DeleteFootprintUsecase(edcAdapter);
 export const shareFootprintUsecase = new ShareFootprintUsecase(
   edcAdapter,
@@ -38,7 +38,7 @@ export const initiateBatchRequestUsecase = new InitiateBatchRequestUsecase(
 );
 
 export const getFileUsecase = new GetFileUsecase(edcAdapter, CacheService);
-export const getTransferProcessUsecase = new GetTransferProcessUsecase(
+export const getTransferProcessUsecase = new AuthTokenCallbackUsecase(
   edcAdapter,
   CacheService
 );
