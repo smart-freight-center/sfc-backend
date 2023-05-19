@@ -1,8 +1,8 @@
 import { EdcAdapter } from '../clients/edc-client';
-export class ProvideFootprintUsecase {
+export class ListSharedAssetsUsecsase {
   constructor(private edcClient: EdcAdapter) {}
 
-  async list() {
+  async execute() {
     const sharedContracts = await this.edcClient.queryAllContractDefinitions();
     return sharedContracts.map((contract) => {
       const firstDelimiter = contract.id.indexOf('__');

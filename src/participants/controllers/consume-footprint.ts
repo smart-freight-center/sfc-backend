@@ -86,7 +86,6 @@ export class ConsumeFootPrintController {
           error: 'Please share your public key with the SFC Admin.',
         };
       } else {
-        console.log(error);
         context.status = 500;
       }
     }
@@ -122,7 +121,6 @@ export class ConsumeFootPrintController {
           error: 'Please share your public key with the SFC Admin.',
         };
       } else {
-        console.log(error);
         context.status = 500;
       }
     }
@@ -131,7 +129,7 @@ export class ConsumeFootPrintController {
   static async getData(context: RouterContext) {
     try {
       const shipmentId = context.params.shipmentId as string;
-      const data = await getFileUsecase.pullData(shipmentId);
+      const data = await getFileUsecase.execute(shipmentId);
       context.body = data;
       context.status = 200;
     } catch (error) {

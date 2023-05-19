@@ -115,7 +115,7 @@ export class ProvideFootPrintController {
 
   static async getSharedFootprints(context: RouterContext) {
     try {
-      const assets = await provideFootprintUsecase.list();
+      const assets = await provideFootprintUsecase.execute();
       context.body = assets;
       context.status = 200;
     } catch (error) {
