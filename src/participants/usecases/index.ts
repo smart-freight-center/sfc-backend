@@ -38,7 +38,7 @@ export const initiateBatchRequestUsecase = new InitiateBatchRequestUsecase(
 );
 
 export const getFileUsecase = new GetFileUsecase(edcAdapter, CacheService);
-export const getTransferProcessUsecase = new AuthTokenCallbackUsecase(
+export const authTokenCallbackUsecase = new AuthTokenCallbackUsecase(
   edcAdapter,
   CacheService
 );
