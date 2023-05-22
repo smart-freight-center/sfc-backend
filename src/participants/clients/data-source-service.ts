@@ -2,7 +2,7 @@ import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import axios from 'axios';
 import { ShareFootprintInput } from 'entities';
 import { CouldntFetchDataInSource } from 'utils/error';
-import { AWS_ACCESS_ID, AWS_REGION, AWS_SECRET } from 'utils/settings';
+import { AWS_ACCESS_ID, AWS_SECRET, CLIENT_CONFIG } from 'utils/settings';
 
 export class DataSourceService {
   public static async fetchFootprintData(input: ShareFootprintInput) {
@@ -42,7 +42,7 @@ export class DataSourceService {
     });
 
     const s3Client = new S3Client({
-      region: AWS_REGION,
+      region: CLIENT_CONFIG.region,
       credentials: {
         accessKeyId: AWS_ACCESS_ID || '',
         secretAccessKey: AWS_SECRET || '',
