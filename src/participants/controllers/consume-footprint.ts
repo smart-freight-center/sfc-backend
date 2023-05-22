@@ -9,7 +9,7 @@ import {
 } from 'utils/error';
 import {
   consumeFootprintUsecase,
-  getFileUsecase,
+  getEmissionsUsecase,
   initiateBatchRequestUsecase,
   initiateFileTransferUsecase,
 } from '../usecases';
@@ -129,7 +129,11 @@ export class ConsumeFootPrintController {
   static async getData(context: RouterContext) {
     try {
       const shipmentId = context.params.shipmentId as string;
-      const data = await getFileUsecase.execute(shipmentId);
+      const aggregate = context.query.aggregate || 'false';
+      const data = await getEmissionsUsecase.execute(
+        shipmentId,
+        aggregate == 'true'
+      );
       context.body = data;
       context.status = 200;
     } catch (error) {
