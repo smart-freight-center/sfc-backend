@@ -5,6 +5,7 @@ import {
   InvalidFootprintData,
   InvalidShipmentIdFormat,
   ParticipantNotFound,
+  ShipmentAlreadyShared,
 } from 'utils/error';
 import { ContractNotFound, InvalidInput } from 'utils/error';
 import {
@@ -37,6 +38,14 @@ export class ProvideFootPrintController {
       if (error instanceof EmptyFootprintData) {
         context.status = 400;
         context.body = { message: 'The datasource is empty' };
+        return;
+      }
+      if (error instanceof ShipmentAlreadyShared) {
+        context.status = 409;
+        context.body = {
+          message:
+            'This shipment has already been shared with that company. You can make updates to the data source instead',
+        };
         return;
       }
       if (error instanceof InvalidFootprintData) {

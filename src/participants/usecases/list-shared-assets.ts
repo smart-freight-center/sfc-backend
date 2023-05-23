@@ -14,9 +14,13 @@ export class ListSharedAssetsUsecsase {
       );
       const sharedWithIdx = substring.lastIndexOf('-');
       const sharedWith = substring.slice(sharedWithIdx + 1);
+
+      const shipmentAndConsumer = contract.id.slice(0, firstDelimiter);
+      const lastDashIdx = shipmentAndConsumer.lastIndexOf('-');
+
       return {
-        id: substring.slice(0, sharedWithIdx),
-        shipmentId: contract.id.split('-')[0],
+        id: shipmentAndConsumer,
+        shipmentId: shipmentAndConsumer.slice(0, lastDashIdx),
         sharedWith,
         sharingDate: new Date(parseInt(sharingDate)).toLocaleString('en-US'),
       };
