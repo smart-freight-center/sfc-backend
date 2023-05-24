@@ -8,7 +8,11 @@ import {
   shareFootprintSchema,
 } from 'participants/validators/share-footprint-schema';
 
-import { InvalidFootprintData, InvalidShipmentIdFormat } from 'utils/error';
+import {
+  InvalidFootprintData,
+  InvalidShipmentIdFormat,
+  ShipmentAlreadyShared,
+} from 'utils/error';
 import { convertRawDataToJSON } from 'participants/utils/data-converter';
 import { DataSourceServiceType } from 'participants/clients';
 import { SFCAPIType } from 'participants/types';
@@ -75,6 +79,11 @@ export class ShareFootprintUsecase {
     const consumer = await sfcConnection.getCompany(data.companyId);
     const myProfile = await sfcConnection.getMyProfile();
 
+    await this.ensureShipmentHasNotBeenShared(
+      data.shipmentId,
+      consumer.client_id
+    );
+
     try {
       const assetInput = builder.assetInput(
         data,
@@ -104,6 +113,16 @@ export class ShareFootprintUsecase {
     }
   }
 
+  private async ensureShipmentHasNotBeenShared(
+    shipmentId: string,
+    sharedWith: string
+  ) {
+    const assetId = `${shipmentId}-${sharedWith}`;
+    const filter = builder.shipmentFilter('id', `${assetId}%`, 'LIKE');
+    const contracts = await this.edcClient.queryAllContractDefinitions(filter);
+
+    if (contracts.length) throw new ShipmentAlreadyShared();
+  }
   private async rollback(results) {
     if (results.newId) {
       this.edcClient.deleteAsset(results.newAssetId);

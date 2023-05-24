@@ -26,13 +26,8 @@ export function assetInput(
   providerClientId: string,
   sharedWith: string
 ): AssetInput {
-  const {
-    shipmentId = randomUid(),
-    dataLocation,
-    type,
-    dateCreated,
-    contentType,
-  } = dataInput;
+  const { shipmentId, dataLocation, type, dateCreated, contentType } =
+    dataInput;
 
   const now = new Date();
 
