@@ -119,13 +119,7 @@ export class ShareFootprintUsecase {
   ) {
     const assetId = `${shipmentId}-${sharedWith}`;
     const filter = builder.shipmentFilter('id', `${assetId}%`, 'LIKE');
-    const foundContracts = await this.edcClient.queryAllContractDefinitions(
-      filter
-    );
-
-    const contracts = foundContracts.filter((contract) =>
-      contract.id.startsWith(assetId)
-    );
+    const contracts = await this.edcClient.queryAllContractDefinitions(filter);
 
     if (contracts.length) throw new ShipmentAlreadyShared();
   }
