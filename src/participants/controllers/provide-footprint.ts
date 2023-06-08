@@ -37,7 +37,9 @@ export class ProvideFootPrintController {
       }
       if (error instanceof EmptyFootprintData) {
         context.status = 400;
-        context.body = { message: 'The datasource is empty' };
+        context.body = {
+          message: 'The datasource is empty or has only the header',
+        };
         return;
       }
       if (error instanceof ShipmentAlreadyShared) {
@@ -68,8 +70,9 @@ export class ProvideFootPrintController {
       if (error instanceof CouldntFetchDataInSource) {
         context.status = 400;
         context.body = {
-          error: "Couldn't validate data in the specified source",
+          error: "Couldn't fetch data in the specified source",
         };
+        return;
       }
 
       if (error instanceof InvalidShipmentIdFormat) {
