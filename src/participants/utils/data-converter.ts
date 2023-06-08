@@ -15,6 +15,9 @@ export function convertRawDataToJSON(rawData: string | object) {
 
   if (isJSON(rawData)) return JSON.parse(rawData);
 
+  const numberOfRows = rawData.trim().split('\n').length;
+  if (numberOfRows < 2) throw new EmptyFootprintData();
+
   const columnDelimitedData = csvToObj(rawData, ';');
 
   if (!columnDelimitedData.length) throw new EmptyFootprintData();
