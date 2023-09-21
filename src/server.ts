@@ -1,15 +1,8 @@
-import { ApiServer } from './api';
+import { server } from './api';
 import 'clients/redis-client';
-
-const apiAllowedOrigins = process.env.API_ALLOWED_ORIGINS || '*';
-const allowedOrigins = apiAllowedOrigins.split(',').filter(Boolean);
-export const apiServer = ApiServer.create({
-  cors: {
-    allowedOrigins,
-  },
-});
 
 const apiPort = process.env.API_PORT || 3000;
 
-apiServer.listen(apiPort as number);
-console.log(`Listening on http://0.0.0.0:${apiPort}`);
+server.listen(apiPort, () => {
+  console.log(`Listening on http://0.0.0.0:${apiPort}`);
+});
