@@ -9,6 +9,8 @@ import {
 import {
   DataModelValidationFailed,
   InvalidShipmentIdFormat,
+  InvalidFootprintData,
+  InvalidShipmentIdFormat,
 } from 'utils/errors';
 import { convertRawDataToJSON } from 'core/utils/data-converter';
 import { EmissionDataModel, SFCAPIType } from 'core/types';
