@@ -6,7 +6,10 @@ import {
   shareFootprintSchema,
 } from 'core/validators/share-footprint-schema';
 
-import { InvalidFootprintData, InvalidShipmentIdFormat } from 'utils/errors';
+import {
+  DataModelValidationFailed,
+  InvalidShipmentIdFormat,
+} from 'utils/errors';
 import { convertRawDataToJSON } from 'core/utils/data-converter';
 import { EmissionDataModel, SFCAPIType } from 'core/types';
 import { IDataSourceFetcher, ISfcDataSpace } from 'core/usecases/interfaces';
@@ -63,6 +66,6 @@ export class ShareFootprintUsecase {
 
     if (!error?.details) return value as EmissionDataModel[];
 
-    throw new InvalidFootprintData(error);
+    throw new DataModelValidationFailed(error);
   }
 }

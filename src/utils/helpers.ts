@@ -1,6 +1,8 @@
 import Validator, { Rules } from 'validatorjs';
 import { EdcManagerError, EdcManagerErrorType, InvalidInput } from './errors';
 import { Context } from 'koa';
+import { CustomError, InvalidUserInput } from './errors/base-errors';
+import { EdcConnectorClientError } from '@think-it-labs/edc-connector-client';
 
 export const validateSchema = (
   data: object,
@@ -53,6 +55,30 @@ export const handleErrors = (context: Context, error: Error) => {
       }
     }
 
+    return;
+  }
+
+  if (error instanceof EdcConnectorClientError) {
+    if (error.message.includes('Token validation failed')) {
+      context.status = 400;
+      context.body = {
+        error: 'Transfer process expired, please re-initialise',
+      };
+      return;
+    }
+  }
+
+  const body: Record<string, string | object> = {};
+
+  if (error instanceof InvalidUserInput) {
+    body.errors = error.errors as object;
+  }
+
+  if (error instanceof CustomError) {
+    body.message = error.message;
+    body.code = error.name;
+    context.status = error.status;
+    context.body = body;
     return;
   }
 
