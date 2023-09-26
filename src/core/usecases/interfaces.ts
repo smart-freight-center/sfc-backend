@@ -20,6 +20,14 @@ export interface IDataSourceFetcher {
   fetchFootprintData(input: ShareFootprintInput): Promise<string>;
 }
 
+export interface ISFCAPIConnection {
+  getCompanies(): Promise<Omit<Participant, 'connection'>[]>;
+  getMyProfile(): Promise<Participant>;
+  getCompany(clientId: string): Promise<Omit<Participant, 'connection'>>;
+}
+export interface ISFCAPI {
+  createConnection(authorization: string): ISFCAPIConnection;
+}
 export interface ICacheService {
   storeItem(
     key: string,

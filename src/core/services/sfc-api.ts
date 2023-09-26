@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { Participant } from 'core/types';
+import { ISFCAPIConnection, ISFCAPI } from 'core/usecases/interfaces';
 import { InvalidTokenInSFCAPI, ParticipantNotFound } from 'utils/errors';
 import { SFCAPI_BASEURL } from 'utils/settings';
 
@@ -7,8 +8,14 @@ const sfcAxios = axios.create({
   baseURL: `${SFCAPI_BASEURL}/api`,
 });
 
-export class SFCAPI {
-  private constructor(private authorization = '') {}
+class SfcAPI implements ISFCAPI {
+  createConnection(authorization: string) {
+    return new SFCAPI(authorization);
+  }
+}
+
+export class SFCAPI implements ISFCAPIConnection {
+  constructor(private authorization = '') {}
 
   static async createConnection(authorization: string) {
     return new SFCAPI(authorization);
@@ -58,3 +65,5 @@ export class SFCAPI {
     return company;
   }
 }
+
+export const sfcAPI = new SfcAPI();

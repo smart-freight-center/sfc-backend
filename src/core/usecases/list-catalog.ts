@@ -1,14 +1,14 @@
 import { ListCatalogInput } from 'entities';
 import * as builder from '../utils/edc-builder';
-import { SFCAPIType } from 'core/types';
 import { validateSchema } from 'utils/helpers';
 import { EdcClient } from 'core/services/sfc-dataspace/edc-client';
+import { ISFCAPI } from './interfaces';
 
 const listCatalogSchema = {
   companyId: 'min:1|required',
 };
 export class ListCatalogUsecase {
-  constructor(private edcClient: EdcClient, private sfcAPI: SFCAPIType) {}
+  constructor(private edcClient: EdcClient, private sfcAPI: ISFCAPI) {}
 
   async execute(authorization: string, input: ListCatalogInput) {
     validateSchema(input, listCatalogSchema);

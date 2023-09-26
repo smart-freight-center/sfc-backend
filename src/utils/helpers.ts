@@ -1,8 +1,13 @@
 import Validator, { Rules } from 'validatorjs';
 import { EdcManagerError, EdcManagerErrorType, InvalidInput } from './errors';
 import { Context } from 'koa';
-import { CustomError, InvalidUserInput } from './errors/base-errors';
+import {
+  CustomError,
+  DataValidationError,
+  InvalidUserInput,
+} from './errors/base-errors';
 import { EdcConnectorClientError } from '@think-it-labs/edc-connector-client';
+import { ObjectSchema } from 'joi';
 
 export const validateSchema = (
   data: object,
@@ -15,6 +20,19 @@ export const validateSchema = (
     throw new InvalidInput(validation.errors.errors);
   }
 };
+
+export function validateData<T>(schema: ObjectSchema, data: T) {
+  const { value, error } = schema.validate(data, {
+    abortEarly: false,
+    allowUnknown: true,
+    errors: { wrap: { label: false } },
+  });
+  if (error) {
+    throw new DataValidationError(error);
+  }
+
+  return value as T;
+}
 
 export const sleep = (ms: number): Promise<void> => {
   return new Promise((resolve) => {

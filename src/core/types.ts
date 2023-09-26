@@ -1,7 +1,4 @@
 import { Addresses } from '@think-it-labs/edc-connector-client';
-import { SFCAPI } from './services/sfc-api';
-
-export type SFCAPIType = typeof SFCAPI;
 
 export type EmissionDataModel = {
   id_tce: string;

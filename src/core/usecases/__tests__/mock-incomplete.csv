@@ -1,0 +1,4 @@
+id_tce,id_consignment,id_shipment,transport_activity,mass,mode_of_transport,asset_type,load_factor,empty_distance,energy_carrier_N,Feedstock_N
+tce_1,1050700,shipmentid1,400,1000,Road,40-ft truck,0.8,50,<some string here>,biodiesel
+tce_2,2008750,shipmentid1,300,1000,Ocean,container ship X,0.7,0,<some string here>,marine oil
+tce_3,3006756,shipmentid1,200,1000,Air,Airplane XYZ,0.3,10,<some string here>,aviation fuel blend

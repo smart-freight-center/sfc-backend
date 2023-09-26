@@ -1,56 +1,5 @@
 import joi from 'joi';
 
-const shared = {
-  shipmentId: 'required|min:2',
-  companyId: 'required|min:2',
-  contentType: 'in:application/json,text/csv',
-  type: 'required|in:azure,s3,http',
-  dataLocation: 'required|present',
-  dateCreated: 'regex:/^\\d{4}-\\d{2}-[0-3]\\d$/',
-};
-
-const sharedCustomMessage = {
-  'in.type':
-    "The only data types that are allowed are 'azure', 's3' and 'http'",
-  'in.contentType':
-    "The allowed content Types are 'application/json' and 'text/csv'",
-  'present.dataLocation': 'You need to specify the "dataLocation" object',
-  'regex.dateCreated': 'Should be a valid date in the format YYYY-MM-DD',
-};
-
-const s3Schema = {
-  dataLocation: {
-    name: 'required|min:1',
-    bucketName: 'required|min:1|string',
-    region: 'required|min:1',
-    keyName: 'min:4|required',
-  },
-};
-
-const azureSchema = {
-  dataLocation: {
-    container: 'min:1|string',
-    account: 'min:1',
-    blobname: 'min:1|string',
-  },
-};
-const httpSchema = {
-  dataLocation: {
-    name: 'min:1|required',
-    baseUrl: 'required|min:5|url',
-    path: 'min:1',
-    method: 'min:1',
-    authKey: 'min:1',
-    authCode: 'min:1',
-    secretName: 'min:1',
-    proxyBody: 'min:1',
-    proxyPath: 'min:1',
-    proxyQueryParams: 'min:1',
-    proxyMethod: 'min:1',
-    contentType: 'min:1',
-  },
-};
-
 const dataModelSchema = (shipmentId: string) =>
   joi.array().items(
     joi.object({
@@ -70,14 +19,50 @@ const dataModelSchema = (shipmentId: string) =>
     })
   );
 
-export const customMessage = {
-  shared: sharedCustomMessage,
-};
+export const joiHttpSchema = joi.object({
+  dataLocation: {
+    name: joi.string().required(),
+    baseUrl: joi.string().uri().required(),
+    path: joi.string(),
+    method: joi.string(),
+    authKey: joi.string(),
+    authCode: joi.string(),
+    secretName: joi.string(),
+    proxyBody: joi.string(),
+    proxyPath: joi.string(),
+    proxyQueryParams: joi.string(),
+    proxyMethod: joi.string(),
+    contentType: joi.string(),
+  },
+});
+const joiS3Schema = joi.object({
+  dataLocation: joi.object({
+    name: joi.string().required(),
+    bucketName: joi.string().required(),
+    region: joi.string().required(),
+    keyName: joi.string().required(),
+  }),
+});
+const joiAzureSchema = joi.object({
+  dataLocation: {
+    container: joi.string().required(),
+    account: joi.string().required(),
+    blobname: joi.string().required(),
+  },
+});
+const sharedSchema = joi.object({
+  shipmentId: joi.string().required(),
+  companyId: joi.string().required(),
+  dateCreated: joi.string().required(),
+  contentType: joi.string().valid('application/json', 'text/csv'),
+  type: joi.string().required().lowercase().valid('azure', 'http', 's3'),
+  dataLocation: joi.object().required(),
+});
 
-export const shareFootprintSchema = {
-  shared,
-  azure: azureSchema,
-  http: httpSchema,
-  s3: s3Schema,
+export const shareFootprintInputSchema = {
+  shared: sharedSchema,
+  azure: joiAzureSchema,
+  http: joiHttpSchema,
+  s3: joiS3Schema,
   dataModel: dataModelSchema,
 };

@@ -1,4 +1,4 @@
-import { ValidationError } from 'joi';
+import { ValidationError as JoiValidationError } from 'joi';
 
 export abstract class CustomError extends Error {
   name = 'custom_error';
@@ -43,19 +43,40 @@ export class Unauthorized extends CustomError {
 export class DataValidationError extends InvalidUserInput {
   name = 'validation_error';
   public readonly errors: object;
-  constructor(error: ValidationError) {
+  constructor(error: JoiValidationError) {
     super('');
+    const errorObject = this.extractErrorsFromJoiValidation(error);
+    this.errors = errorObject;
+  }
+
+  private extractErrorsFromJoiValidation(error: JoiValidationError) {
     const errorObject: Record<string, string[]> = {};
+
     for (const detail of error.details) {
-      const key = detail.context?.key as string;
       const message = detail.message;
-      const keyErrors: string[] = errorObject[key] || [];
+
+      const keyErrors = this.transformJoiValidionObject(
+        errorObject,
+        detail.path as string[]
+      );
       const firstSpaceIndx = message.indexOf(' ');
       const prefix = 'This field ';
       keyErrors.push(prefix + message.slice(firstSpaceIndx + 1));
-      errorObject[key] = keyErrors;
+    }
+    return errorObject;
+  }
+  private transformJoiValidionObject(parentObject: object, keys: string[]) {
+    let currentObject = parentObject;
+    for (let i = 0; i < keys.length - 1; i++) {
+      const currentKey = keys[i];
+      currentObject[currentKey] = currentObject[currentKey] || {};
+      currentObject = currentObject[currentKey];
     }
 
-    this.errors = errorObject;
+    const lastKey = keys[keys.length - 1];
+
+    currentObject[lastKey] = currentObject[lastKey] || [];
+
+    return currentObject[lastKey];
   }
 }

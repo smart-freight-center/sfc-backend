@@ -3,7 +3,7 @@ import { ListSharedAssetsUsecsase } from './list-shared-assets';
 import { ListCatalogUsecase } from './list-catalog';
 import { GenerateTokenUsecase } from './generate-token';
 import {
-  SFCAPI,
+  sfcAPI,
   cacheService,
   dataSourceService,
   sfcDataSpace,
@@ -22,24 +22,24 @@ export const deleteFootprintUsecase = new DeleteFootprintUsecase(sfcDataSpace);
 export const shareFootprintUsecase = new ShareFootprintUsecase(
   sfcDataSpace,
   dataSourceService,
-  SFCAPI
+  sfcAPI
 );
 
 export const consumeFootprintUsecase = new ListCatalogUsecase(
   edcClient,
-  SFCAPI
+  sfcAPI
 );
 export const generateTokenUsecase = new GenerateTokenUsecase(KeyCloackClient);
 export const initiateFileTransferUsecase = new InitiateFileTransferUsecase(
   edcTransferService,
-  SFCAPI,
+  sfcAPI,
   cacheService,
   sfcDataSpace
 );
 
 export const initiateBatchRequestUsecase = new InitiateBatchRequestUsecase(
   edcTransferService,
-  SFCAPI,
+  sfcAPI,
   cacheService
 );
 
