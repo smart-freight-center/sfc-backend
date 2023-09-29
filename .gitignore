@@ -7,3 +7,5 @@ node_modules/
 participants.json
 dump.rdb
 temp.json
+local-participants.json
+upstream-participants.json

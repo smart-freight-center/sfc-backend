@@ -1,6 +1,6 @@
 import KoaRouter from '@koa/router';
 
-export const router = new KoaRouter().get(
+export const healthRoutes = new KoaRouter().get(
   'Check if the backend is healthy',
   '/health',
   async (context) => {

@@ -2,7 +2,10 @@ import axios, { AxiosError } from 'axios';
 import url from 'url';
 import jwt from 'jsonwebtoken';
 import { KEYCLOAK_HOST, KEYCLOAK_REALM } from 'utils/settings';
-import { InvalidCredentials, KeyCloakCouldNotGenerateToken } from 'utils/error';
+import {
+  InvalidCredentials,
+  KeyCloakCouldNotGenerateToken,
+} from 'utils/errors';
 
 const keyCloakClient = axios.create({
   baseURL: `${KEYCLOAK_HOST}/realms/${KEYCLOAK_REALM}`,
@@ -44,12 +47,6 @@ export class KeyCloackClient {
       algorithm: ['RS256'],
     });
 
-    return data;
-  }
-
-  static async decodeToken(authorization: string) {
-    const accessToken = authorization?.split(' ')[1] || '';
-    const data = jwt.decode(accessToken);
     return data;
   }
 }

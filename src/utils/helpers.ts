@@ -1,5 +1,6 @@
 import Validator, { Rules } from 'validatorjs';
-import { InvalidInput } from './error';
+import { EdcManagerError, EdcManagerErrorType, InvalidInput } from './errors';
+import { Context } from 'koa';
 
 export const validateSchema = (
   data: object,
@@ -19,4 +20,45 @@ export const sleep = (ms: number): Promise<void> => {
       resolve();
     }, ms);
   });
+};
+
+export const handleErrors = (context: Context, error: Error) => {
+  if (error instanceof EdcManagerError) {
+    context.set('Content-type', 'application/json');
+    switch (error.type) {
+      case EdcManagerErrorType.NotFound: {
+        context.status = 404;
+        context.body = {
+          code: error.type,
+          message: error.message,
+        };
+        break;
+      }
+      case EdcManagerErrorType.Duplicate: {
+        context.status = 409;
+        context.body = {
+          code: error.type,
+          message: error.message,
+        };
+        break;
+      }
+      case EdcManagerErrorType.Unknown:
+      default: {
+        context.status = 500;
+        context.body = {
+          code: error.type,
+          message: error.message,
+        };
+        break;
+      }
+    }
+
+    return;
+  }
+
+  context.status = 500;
+  context.body = {
+    code: 'Unknown',
+    error,
+  };
 };
