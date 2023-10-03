@@ -1,103 +1,22 @@
 import { ShareFootprintInput } from 'entities';
-import {
-  CouldntFetchDataInSource,
-  EmptyFootprintData,
-  InvalidFootprintData,
-  InvalidShipmentIdFormat,
-  ParticipantNotFound,
-  ShipmentAlreadyShared,
-  ContractNotFound,
-  InvalidInput,
-} from 'utils/errors';
+import { InvalidInput, ContractNotFound } from 'utils/errors';
 import {
   deleteFootprintUsecase,
   provideFootprintUsecase,
   shareFootprintUsecase,
 } from 'core/usecases';
 import { RouterContext } from '@koa/router';
-import {
-  EdcConnectorClientError,
-  EdcConnectorClientErrorType,
-} from '@think-it-labs/edc-connector-client';
+import { EdcConnectorClientError } from '@think-it-labs/edc-connector-client';
 
 export class ProvideFootPrintController {
   static async shareFootprints(context: RouterContext) {
-    try {
-      await shareFootprintUsecase.execute(
-        context.headers.authorization as string,
-        context.request.body as ShareFootprintInput
-      );
+    await shareFootprintUsecase.execute(
+      context.headers.authorization as string,
+      context.request.body as ShareFootprintInput
+    );
 
-      context.status = 201;
-      context.body = { message: 'Successfully shared a shipment' };
-    } catch (error) {
-      if (error instanceof InvalidInput) {
-        context.status = 400;
-        context.body = { errors: error.errors };
-        return;
-      }
-      if (error instanceof EmptyFootprintData) {
-        context.status = 400;
-        context.body = {
-          message: 'The datasource is empty or has only the header',
-        };
-        return;
-      }
-      if (error instanceof ShipmentAlreadyShared) {
-        context.status = 409;
-        context.body = {
-          message:
-            'This shipment has already been shared with that company. You can make updates to the data source instead',
-        };
-        return;
-      }
-      if (error instanceof InvalidFootprintData) {
-        context.status = 400;
-        context.body = {
-          message:
-            'The footprint data you specified does not meet the data model',
-          errors: error.errors,
-        };
-        return;
-      }
-      if (error instanceof ParticipantNotFound) {
-        context.status = 404;
-        context.body = {
-          error: 'Participant not found',
-        };
-        return;
-      }
-
-      if (error instanceof CouldntFetchDataInSource) {
-        context.status = 400;
-        context.body = {
-          error: "Couldn't fetch data in the specified source",
-        };
-        return;
-      }
-
-      if (error instanceof InvalidShipmentIdFormat) {
-        context.status = 400;
-        context.body = {
-          message: 'The shipment Id should not containt `-`, `:`, `?` or `_`',
-        };
-      }
-      console.log(error);
-      if (error instanceof EdcConnectorClientError) {
-        if (error.type === EdcConnectorClientErrorType.Unknown) {
-          context.status = 503;
-        } else if (error.type === EdcConnectorClientErrorType.Duplicate) {
-          context.status = 409;
-          context.body = {
-            error: 'A shipment with that id has already been created',
-          };
-        } else {
-          context.status = 500;
-        }
-        return;
-      }
-      context.status = 500;
-    }
+    context.status = 201;
+    context.body = { message: 'Successfully shared a shipment' };
   }
 
   static async unshareFootprint(context: RouterContext) {
