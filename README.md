@@ -48,3 +48,9 @@ Once redis is installed you can run it with:
 #### Postman Docs
 
 View Postman Docs here [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/4208573-c278aa53-81d5-4511-839d-bb8b3b90dcad?action=collection%2Ffork&collection-url=entityId%3D4208573-c278aa53-81d5-4511-839d-bb8b3b90dcad%26entityType%3Dcollection%26workspaceId%3Dda069bda-ef41-4880-addf-f4e466564e79)
+
+### Using docker for local development
+Running the `docker-compose up` command will start:
+- redis-server
+- keycloak-server
+- edc-manager
