@@ -9,4 +9,4 @@ dump.rdb
 temp.json
 local-participants.json
 upstream-participants.json
-conf/keycloak-realms-data.config
+conf/keycloak-realms-config

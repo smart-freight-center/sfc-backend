@@ -13,7 +13,7 @@ services:
       - ./conf/keycloak-realms-config:/opt/keycloak/data/
     entrypoint: ["/opt/keycloak/bin/kc.sh","start-dev", "--import-realm"]
   consumer-connector:
-    image: ghcr.io/think-it-labs/internal-edc-ui/connector:0.0.1-milestone-8
+    build: connector
     platform: ${DOCKER_PLATFORM:-linux/amd64}
     ports:
       - "19191:9191" # connector default
@@ -30,7 +30,7 @@ services:
       - ./conf/consumer-connector.config:/config
 
   provider-connector:
-    image: ghcr.io/think-it-labs/internal-edc-ui/connector:0.0.1-milestone-8
+    build: connector
     platform: ${DOCKER_PLATFORM:-linux/amd64}
     ports:
       - "29191:9191" # connector default
