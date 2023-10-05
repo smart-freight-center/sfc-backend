@@ -2,7 +2,7 @@ import { ShareFootprintInput } from 'entities';
 import { EmissionDataModel, Participant } from '../types';
 
 export interface ISfcDataSpace {
-  shareFootPrint(
+  shareAsset(
     provider: Participant,
     consumer: Omit<Participant, 'connection'>,
     input: ShareFootprintInput

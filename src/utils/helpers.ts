@@ -1,12 +1,15 @@
 import Validator, { Rules } from 'validatorjs';
-import { EdcManagerError, EdcManagerErrorType, InvalidInput } from './errors';
+import { InvalidInput } from './errors';
 import { Context } from 'koa';
 import {
   CustomError,
   DataValidationError,
   InvalidUserInput,
 } from './errors/base-errors';
-import { EdcConnectorClientError } from '@think-it-labs/edc-connector-client';
+import {
+  EdcConnectorClientError,
+  EdcConnectorClientErrorType,
+} from '@think-it-labs/edc-connector-client';
 import { ObjectSchema } from 'joi';
 
 export const validateSchema = (
@@ -43,10 +46,11 @@ export const sleep = (ms: number): Promise<void> => {
 };
 
 export const handleErrors = (context: Context, error: Error) => {
-  if (error instanceof EdcManagerError) {
+  console.log(error);
+  if (error instanceof EdcConnectorClientError) {
     context.set('Content-type', 'application/json');
     switch (error.type) {
-      case EdcManagerErrorType.NotFound: {
+      case EdcConnectorClientErrorType.NotFound: {
         context.status = 404;
         context.body = {
           code: error.type,
@@ -54,7 +58,7 @@ export const handleErrors = (context: Context, error: Error) => {
         };
         break;
       }
-      case EdcManagerErrorType.Duplicate: {
+      case EdcConnectorClientErrorType.Duplicate: {
         context.status = 409;
         context.body = {
           code: error.type,
@@ -62,7 +66,7 @@ export const handleErrors = (context: Context, error: Error) => {
         };
         break;
       }
-      case EdcManagerErrorType.Unknown:
+      case EdcConnectorClientErrorType.Unknown:
       default: {
         context.status = 500;
         context.body = {

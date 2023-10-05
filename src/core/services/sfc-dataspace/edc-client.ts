@@ -11,13 +11,18 @@ import {
   TransferProcessResponse,
 } from '@think-it-labs/edc-connector-client';
 import { Connector } from 'entities';
+import { IEdcClient } from './interfaces';
 
-export class EdcClient {
+export class EdcClient implements IEdcClient {
   readonly edcConnectorClient: EdcConnectorClient;
   edcClientContext: EdcConnectorClientContext;
   edcClientId: string;
   constructor(myConnector: Connector, token: string) {
-    this.edcConnectorClient = new EdcConnectorClient();
+    const builder = new EdcConnectorClient.Builder();
+
+    builder.managementUrl(myConnector.addresses.management as string);
+    builder.publicUrl(myConnector.addresses.public as string);
+    this.edcConnectorClient = builder.build();
     this.edcClientId = myConnector.id;
 
     const clientContext = this.edcConnectorClient.createContext(
@@ -29,116 +34,92 @@ export class EdcClient {
   }
 
   async createAsset(input: AssetInput) {
-    return this.edcConnectorClient.management.createAsset(
-      this.edcClientContext,
-      input
-    );
-  }
-  async deleteAsset(assetId: string) {
-    return this.edcConnectorClient.management.deleteAsset(
-      this.edcClientContext,
-      assetId
-    );
-  }
-  async listAssets() {
-    return this.edcConnectorClient.management.listAssets(this.edcClientContext);
-  }
-
-  async createPolicy(input: PolicyDefinitionInput) {
-    const policy = await this.edcConnectorClient.management.createPolicy(
-      this.edcClientContext,
-      input
-    );
-    return policy;
-  }
-  async deletePolicy(policyId: string) {
-    return this.edcConnectorClient.management.deletePolicy(
-      this.edcClientContext,
-      policyId
-    );
-  }
-  async listPolicy() {
-    return this.edcConnectorClient.management.queryAllPolicies(
+    return this.edcConnectorClient.management.assets.create(
+      input,
       this.edcClientContext
     );
   }
-
-  async createContractDefinitions(input: ContractDefinitionInput) {
-    return this.edcConnectorClient.management.createContractDefinition(
-      this.edcClientContext,
-      input
+  async deleteAsset(assetId: string) {
+    return this.edcConnectorClient.management.assets.delete(
+      assetId,
+      this.edcClientContext
     );
   }
+  async listAssets() {
+    return this.edcConnectorClient.management.assets.queryAll();
+  }
+
+  async createPolicy(input: PolicyDefinitionInput) {
+    const policy =
+      await this.edcConnectorClient.management.policyDefinitions.create(
+        input,
+        this.edcClientContext
+      );
+    return policy;
+  }
+  async deletePolicy(policyId: string) {
+    return this.edcConnectorClient.management.policyDefinitions.delete(
+      policyId,
+      this.edcClientContext
+    );
+  }
+  async listPolicy() {
+    return this.edcConnectorClient.management.policyDefinitions.queryAll();
+  }
+
+  async createContractDefinitions(input: ContractDefinitionInput) {
+    return this.edcConnectorClient.management.contractDefinitions.create(input);
+  }
   async deleteContractDefinition(contractDefinitionId: string) {
-    return this.edcConnectorClient.management.deleteContractDefinition(
-      this.edcClientContext,
+    return this.edcConnectorClient.management.contractDefinitions.delete(
       contractDefinitionId
     );
   }
   async queryAllContractDefinitions(query?: QuerySpec) {
-    return this.edcConnectorClient.management.queryAllContractDefinitions(
-      this.edcClientContext,
+    return this.edcConnectorClient.management.contractDefinitions.queryAll(
       query
     );
   }
 
   async listCatalog(input: CatalogRequest) {
-    return this.edcConnectorClient.management.requestCatalog(
-      this.edcClientContext,
-      input
-    );
+    return this.edcConnectorClient.management.catalog.request(input);
   }
   async queryAllPolicies(input) {
-    return this.edcConnectorClient.management.queryAllPolicies(
-      this.edcClientContext,
-      input
-    );
+    return this.edcConnectorClient.management.policyDefinitions.queryAll(input);
   }
   async starContracttNegotiation(input: ContractNegotiationRequest) {
-    return this.edcConnectorClient.management.initiateContractNegotiation(
-      this.edcClientContext,
+    // return this.edcConnectorClient.management.initiateContractNegotiation(
+    return this.edcConnectorClient.management.contractNegotiations.initiate(
       input
     );
   }
   async getContractNegotiationResponse(contracNegotiationId: string) {
-    return this.edcConnectorClient.management.getNegotiation(
-      this.edcClientContext,
+    return this.edcConnectorClient.management.contractNegotiations.get(
+      // return this.edcConnectorClient.management.getNegotiation(
       contracNegotiationId
     );
   }
   async initiateTransfer(input: TransferProcessInput) {
-    return this.edcConnectorClient.management.initiateTransfer(
-      this.edcClientContext,
-      input
-    );
+    return this.edcConnectorClient.management.transferProcesses.initiate(input);
   }
   async getTranferedData(input: TransferProcessResponse) {
-    return this.edcConnectorClient.public.getTranferedData(
-      this.edcClientContext,
-      { [input.authKey]: input.authCode }
-    );
+    return this.edcConnectorClient.public.getTransferredData({
+      [input.authKey]: input.authCode,
+    });
   }
   async getContractAgreement(input: string) {
-    return this.edcConnectorClient.management.getAgreement(
-      this.edcClientContext,
-      input
-    );
+    return this.edcConnectorClient.management.contractAgreements.get(input);
   }
   async getAgreementForNegotiation(input: string) {
-    return this.edcConnectorClient.management.getAgreementForNegotiation(
-      this.edcClientContext,
-      input
-    );
+    return this.edcConnectorClient.management.contractAgreements.get(input);
   }
   async queryAllAgreements(query?: QuerySpec) {
-    return this.edcConnectorClient.management.queryAllAgreements(
-      this.edcClientContext,
+    return this.edcConnectorClient.management.contractAgreements.queryAll(
       query
     );
   }
   async getNegotiationState(input: string) {
-    return this.edcConnectorClient.management.getNegotiationState(
-      this.edcClientContext,
+    return this.edcConnectorClient.management.contractNegotiations.getState(
       input
     );
   }

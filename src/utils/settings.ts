@@ -24,7 +24,7 @@ export const CLIENT_CONFIG = {
     management:
       process.env.EDC_MANAGEMENT ||
       connectorJSONConfig?.addresses?.management ||
-      'http://localhost:19193/api/v1/data',
+      'http://localhost:29193/management',
     protocol:
       process.env.EDC_PROTOCOL ||
       connectorJSONConfig?.addresses?.protocol ||

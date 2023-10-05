@@ -1,4 +1,4 @@
-import { DataAddress } from './data-address';
+import { DataAddress } from '@think-it-labs/edc-connector-client';
 
 export type ShareFootprintInput = {
   shipmentId: string;

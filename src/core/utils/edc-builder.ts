@@ -1,24 +1,25 @@
 import dateAndTime from 'date-and-time';
+import { v4 } from 'uuid';
+
 import {
   AssetInput,
-  ContractDefinition,
-  ContractOffer,
   ContractNegotiationRequest,
   DataAddressType,
-  IDS_PROTOCOL,
   PolicyDefinitionInput,
-  Criterion,
   ShareFootprintInput,
-  Policy,
   TransferProcessInput,
   Connector,
+  ContractDefinitionInput,
 } from 'entities';
-import { defaults } from 'lodash';
-import * as crypto from 'node:crypto';
 import { EDC_FILTER_OPERATOR_SET } from 'utils/settings';
+import {
+  Constraint,
+  CriterionInput,
+  Offer,
+} from '@think-it-labs/edc-connector-client';
 
 function randomUid() {
-  return crypto.randomUUID();
+  return v4();
 }
 
 export function assetInput(
@@ -26,8 +27,7 @@ export function assetInput(
   providerClientId: string,
   sharedWith: string
 ): AssetInput {
-  const { shipmentId, dataLocation, type, dateCreated, contentType } =
-    dataInput;
+  const { shipmentId, dataLocation, type, dateCreated } = dataInput;
 
   const now = new Date();
 
@@ -41,27 +41,21 @@ export function assetInput(
   const createdFilter = dateCreated || defaultVersion;
 
   return {
-    asset: {
-      properties: {
-        'asset:prop:id': `${shipmentId}-${sharedWith}__${+now}_${createdFilter}`,
-        'asset:prop:name': dataLocation.name || shipmentId,
-        'asset:prop:contenttype': contentType,
-        'asset:prop:sharedWith': sharedWith,
-        'asset:prop:owner': providerClientId,
-      },
+    '@id': `${shipmentId}-${sharedWith}__${+now}_${createdFilter}`,
+    properties: {
+      name: shipmentId,
+      owner: providerClientId,
+      sharedWith,
     },
+    privateProperties: {},
     dataAddress: {
-      properties: {
-        ...dataLocation,
-        type: mapper[type.toLowerCase()],
-      },
+      ...dataLocation,
+      '@type': mapper[type.toLowerCase()],
+      type: mapper[type.toLowerCase()],
     },
-  } as AssetInput;
+  };
 }
-export function policyInput(
-  consumerPolicyBPN: string,
-  dataInput: Partial<PolicyDefinitionInput> = {}
-): PolicyDefinitionInput {
+export function policyInput(consumerPolicyBPN: string): PolicyDefinitionInput {
   const constraints = BPNPolicyConstraint(consumerPolicyBPN);
   const permissions = [
     {
@@ -73,17 +67,14 @@ export function policyInput(
     },
   ];
 
-  return defaults(dataInput, {
+  return {
     policy: {
-      permissions: permissions,
-      '@type': {
-        '@policytype': 'set',
-      },
+      permission: permissions,
     },
-  });
+  };
 }
 
-function BPNPolicyConstraint(policyBPN: string) {
+function BPNPolicyConstraint(policyBPN: string): Constraint[] {
   if (!policyBPN) return [];
   return [
     {
@@ -104,16 +95,26 @@ function BPNPolicyConstraint(policyBPN: string) {
 export function contractDefinition(
   assetId: string,
   policyId: string
-): ContractDefinition {
+): ContractDefinitionInput {
   return {
-    id: `${assetId}-${randomUid()}`,
-    criteria: [filter('asset:prop:id', assetId)],
+    '@id': `${assetId}-${randomUid()}`,
     accessPolicyId: policyId,
     contractPolicyId: policyId,
+    assetsSelector: [
+      {
+        operandLeft: 'asset:prop:id',
+        operator: '=',
+        operandRight: 'new-asset-id',
+      },
+    ],
   };
 }
 
-export function filter(operandLeft, operandRight, operator = '='): Criterion {
+export function filter(
+  operandLeft,
+  operandRight,
+  operator = '='
+): CriterionInput {
   return {
     operandLeft: operandLeft,
     operandRight: operandRight,
@@ -135,18 +136,18 @@ export function shipmentFilter(
   return;
 }
 export function contractNegotiationInput(
-  contractOffer: ContractOffer,
+  contractOffer: Offer,
   connector: Connector
 ): ContractNegotiationRequest {
   return {
-    connectorAddress: `${connector.addresses.protocol}/data`,
+    connectorAddress: connector.addresses.protocol as string,
     connectorId: connector.id,
+    providerId: connector.id,
     offer: {
-      offerId: contractOffer.id as string,
-      assetId: contractOffer.asset?.id as string,
-      policy: contractOffer.policy as Policy,
+      offerId: contractOffer.id,
+      assetId: contractOffer.assetId,
+      policy: contractOffer,
     },
-    protocol: IDS_PROTOCOL,
   };
 }
 
@@ -161,6 +162,5 @@ export function transferProcessInput(
     connectorId: connector.id,
     contractId: contractId,
     dataDestination: { type: DataAddressType.HttpType },
-    managedResources: false,
   };
 }
