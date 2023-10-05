@@ -1,11 +1,11 @@
-import { Participant, SFCAPIType } from 'core/types';
+import { Participant } from 'core/types';
 import { validateSchema } from 'utils/helpers';
 import * as builder from '../utils/edc-builder';
 import { AppLogger } from 'utils/logger';
 import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
 import { EdcTransferService } from 'core/services/sfc-dataspace/edc-transfer-service';
 import { ContractOffer } from 'entities';
-import { ICacheService, ISfcDataSpace } from './interfaces';
+import { ICacheService, ISFCAPI, ISfcDataSpace } from './interfaces';
 import { ContractNotFound } from 'utils/errors';
 
 const inputSchema = {
@@ -27,7 +27,7 @@ const logger = new AppLogger('InitiateFileTransferUsecase');
 export class InitiateFileTransferUsecase {
   constructor(
     private edcTransferService: EdcTransferService,
-    private sfcAPI: SFCAPIType,
+    private sfcAPI: ISFCAPI,
     private cacheService: ICacheService,
     private sfcDataSpace: ISfcDataSpace
   ) {}
