@@ -1,14 +1,11 @@
 {
-  "id": "urn:connector:provider",
-  "title": "provider.edc.think-it.io",
-  "catalogId": "default",
-  "description": "The provider connector for the EDC manager demo",
-  "region": "eu-west-1",
+  "uid": "2",
+  "name": "provider.edc.think-it.io",
   "addresses": {
-    "default": "http://localhost:29191",
-    "control": "http://localhost:29192",
-    "data": "http://localhost:29193",
-    "ids": "http://provider-connector:9194",
-    "public": "http://localhost:29291"
+    "default": "http://localhost:29191/api",
+    "management": "http://localhost:29193/management",
+    "protocol": "http://provider-connector:9194/protocol",
+    "public": "http://localhost:29291/public",
+    "control": "http://localhost:29292/control"
   }
 }

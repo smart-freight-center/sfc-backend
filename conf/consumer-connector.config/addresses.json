@@ -1,14 +1,11 @@
 {
-  "id": "urn:connector:consumer",
-  "title": "consumer.edc.think-it.io",
-  "catalogId": "default",
-  "description": "The consumer connector for the EDC manager demo",
-  "region": "eu-west-1",
+  "uid": "1",
+  "name": "consumer.edc.think-it.io",
   "addresses": {
-    "default": "http://localhost:19191",
-    "control": "http://localhost:19192",
-    "data": "http://localhost:19193",
-    "ids": "http://consumer-connector:9194",
-    "public": "http://localhost:19291"
+    "default": "http://localhost:19191/api",
+    "management": "http://localhost:19193/management",
+    "protocol": "http://consumer-connector:9194/protocol",
+    "public": "http://localhost:19291/public",
+    "control": "http://localhost:19292/control"
   }
 }
