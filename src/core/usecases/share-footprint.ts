@@ -68,7 +68,7 @@ export class ShareFootprintUsecase {
     const jsonData = convertRawDataToJSON(rawData);
 
     const { error, value } = shareFootprintInputSchema
-      .dataModel(shipmentId)
+      .dataModel()
       .validate(jsonData, {
         abortEarly: false,
       });

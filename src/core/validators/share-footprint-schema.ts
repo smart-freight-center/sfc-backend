@@ -1,11 +1,11 @@
 import joi from 'joi';
 
-const dataModelSchema = (shipmentId: string) =>
+const dataModelSchema = () =>
   joi.array().items(
     joi.object({
       id_tce: joi.string().required(),
       id_consignment: joi.string().required(),
-      id_shipment: joi.string().required().equal(shipmentId),
+      id_shipment: joi.string().required(),
       transport_activity: joi.number().required(),
       mass: joi.number().required(),
       actual_distance: joi.number().required(),
