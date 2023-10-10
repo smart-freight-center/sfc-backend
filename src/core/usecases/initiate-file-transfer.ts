@@ -4,9 +4,9 @@ import * as builder from '../utils/edc-builder';
 import { AppLogger } from 'utils/logger';
 import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
 import { EdcTransferService } from 'core/services/sfc-dataspace/edc-transfer-service';
-import { ContractOffer } from 'entities';
 import { ICacheService, ISFCAPI, ISfcDataSpace } from './interfaces';
 import { ContractNotFound } from 'utils/errors';
+import { Offer } from '@think-it-labs/edc-connector-client';
 
 const inputSchema = {
   shipmentId: 'required|min:2',
@@ -18,7 +18,7 @@ type Input = {
 
 type ProviderContract = {
   provider: Omit<Participant, 'connection'>;
-  contractOffer: ContractOffer;
+  contractOffer: Offer;
   assetId: string;
 };
 
@@ -88,18 +88,21 @@ export class InitiateFileTransferUsecase {
           ),
         });
 
-        catalog.contractOffers
-          .filter((offer) => {
-            return offer.asset?.id.startsWith(shipmentId);
+        catalog.datasets
+          .filter((dataset) => {
+            return dataset.asset?.id.startsWith(shipmentId);
           })
-          .forEach((offer) => {
-            if (offer.asset?.id) {
-              providerContracts.push({
-                provider,
-                assetId: offer.asset?.id as string,
-                contractOffer: offer,
-              });
-            }
+
+          .forEach((dataset) => {
+            dataset.offers.forEach((offer) => {
+              if (offer.asset?.id) {
+                providerContracts.push({
+                  provider,
+                  assetId: offer.asset?.id as string,
+                  contractOffer: offer,
+                });
+              }
+            });
           });
       })
     );

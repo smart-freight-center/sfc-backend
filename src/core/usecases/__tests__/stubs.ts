@@ -11,7 +11,7 @@ export const mockDataSourceFetcher: SinonStubbedInstance<IDataSourceFetcher> = {
 };
 
 export const mockSfcDataSpace: SinonStubbedInstance<ISfcDataSpace> = {
-  shareFootPrint: sinon.stub(),
+  shareAsset: sinon.stub(),
   unshareFootprint: sinon.stub(),
   fetchCarbonFootprint: sinon.stub(),
   startTransferProcess: sinon.stub(),

@@ -6,9 +6,9 @@ import { AppLogger } from 'utils/logger';
 import dateAndTime from 'date-and-time';
 import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
 import { EdcTransferService } from 'core/services/sfc-dataspace/edc-transfer-service';
-import { ContractOffer } from 'entities';
 import { ICacheService, ISFCAPI } from './interfaces';
 import { ContractNotFound } from 'utils/errors';
+import { Offer } from '@think-it-labs/edc-connector-client';
 
 const inputSchema = {
   year: 'required|integer',
@@ -22,7 +22,7 @@ type Input = {
 
 type ProviderContract = {
   provider: Omit<Participant, 'connection'>;
-  contractOffer: ContractOffer;
+  contractOffer: Offer;
   assetId: string;
 };
 

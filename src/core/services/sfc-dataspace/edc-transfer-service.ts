@@ -1,22 +1,22 @@
 import * as builder from '../../utils/edc-builder';
-import { ContractOffer } from '@think-it-labs/edc-connector-client';
 import { ContractNegotiationState } from 'entities';
 import { TransferInitiationFailed } from 'utils/errors';
 import { sleep } from 'utils/helpers';
 import { AppLogger } from 'utils/logger';
-import { EdcClient } from './edc-client';
 import { Participant } from 'core/types';
+import { IEdcClient } from './interfaces';
+import { Offer } from '@think-it-labs/edc-connector-client';
 
 const logger = new AppLogger('EdcTransferService');
 
 export class EdcTransferService {
-  constructor(private edcClient: EdcClient) {}
+  constructor(private edcClient: IEdcClient) {}
 
   public getEdcClient() {
     return this.edcClient;
   }
 
-  public async initiateTransferProcess(provider, contractOffer: ContractOffer) {
+  public async initiateTransferProcess(provider, contractOffer: Offer) {
     logger.info('Initiating transfer...');
     const assetId = contractOffer.asset?.id as string;
     const contractAgreementId = await this.getContractAgreementId(assetId);
@@ -40,7 +40,7 @@ export class EdcTransferService {
 
   private async negotiateContractAndWaitToComplete(
     provider,
-    contractOffer: ContractOffer
+    contractOffer: Offer
   ) {
     const negotiationResponse = await this.startContractNegotiation(
       provider,
@@ -83,7 +83,7 @@ export class EdcTransferService {
 
   private async startContractNegotiation(
     provider: Omit<Participant, 'connection'>,
-    contractOffer: ContractOffer
+    contractOffer: Offer
   ) {
     logger.info('Starting contract negotiation...');
 
@@ -95,7 +95,7 @@ export class EdcTransferService {
   }
 
   private async negotiateContract(
-    contractOffer: ContractOffer,
+    contractOffer: Offer,
     provider: Omit<Participant, 'connection'>
   ) {
     const contractNegotitionInput = builder.contractNegotiationInput(

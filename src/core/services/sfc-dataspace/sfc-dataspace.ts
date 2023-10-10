@@ -4,12 +4,12 @@ import { ISfcDataSpace } from 'core/usecases/interfaces';
 import { ContractDefinition, ShareFootprintInput } from 'entities';
 import { convertRawDataToJSON } from 'core/utils/data-converter';
 import { Participant } from 'core/types';
-import { EdcClient } from './edc-client';
 import { ContractNotFound, ShipmentAlreadyShared } from 'utils/errors';
 import { EdcTransferService } from './edc-transfer-service';
+import { IEdcClient } from './interfaces';
 
 export class SfcDataSpace implements ISfcDataSpace {
-  constructor(private edcClient: EdcClient) {}
+  constructor(private edcClient: IEdcClient) {}
 
   public async startTransferProcess(provider, contractOffer) {
     const edcTransferService = new EdcTransferService(this.edcClient);
@@ -46,7 +46,7 @@ export class SfcDataSpace implements ISfcDataSpace {
     }
   }
 
-  async shareFootPrint(
+  async shareAsset(
     provider: Participant,
     consumer: Participant,
     data: ShareFootprintInput

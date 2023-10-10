@@ -38,7 +38,7 @@ export class ShareFootprintUsecase {
     const consumer = await sfcConnection.getCompany(validatedInput.companyId);
     const provider = await sfcConnection.getMyProfile();
 
-    return this.sfcDataSpace.shareFootPrint(provider, consumer, validatedInput);
+    return this.sfcDataSpace.shareAsset(provider, consumer, validatedInput);
   }
 
   private validateInput(input: Partial<ShareFootprintInput>) {
