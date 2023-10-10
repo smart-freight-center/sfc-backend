@@ -1,5 +1,5 @@
 import { ListCatalogInput } from 'entities';
-import * as builder from '../utils/edc-builder';
+import * as builder from 'utils/edc-builder';
 import { validateSchema } from 'utils/helpers';
 import { EdcClient } from 'core/services/sfc-dataspace/edc-client';
 import { ISFCAPI } from './interfaces';

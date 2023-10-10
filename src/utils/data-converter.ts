@@ -1,5 +1,5 @@
 import { csvToObj } from 'csv-to-js-parser';
-import { EmptyDataSource } from 'utils/errors';
+import { EmptyDataSource } from './errors';
 
 function isJSON(text: string) {
   try {
