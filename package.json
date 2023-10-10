@@ -11,7 +11,6 @@
     "**/*.{md,mdx}": "prettier --write"
   },
   "scripts": {
-    "dev:keycloak": "docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:21.0.1 start-dev",
     "dev:provider": "cross-env KEYCLOAK_REALM=provider API_PORT=3001  NODE_PATH=src CONNECTOR_CONFIG=\"$PROVIDER_CONNECTOR_CONFIG\"  KEYCLOAK_PUBLIC_KEY=$PROVIDER_KEYCLOAK_PUBLIC_KEY nodemon --exec ts-node src/server.ts",
     "dev:consumer": "cross-env KEYCLOAK_REALM=consumer CONNECTOR_CONFIG=\"$CONSUMER_CONNECTOR_CONFIG\" KEYCLOAK_PUBLIC_KEY=$CONSUMER_KEYCLOAK_PUBLIC_KEY API_PORT=3002 NODE_PATH=src nodemon --exec ts-node src/server.ts",
     "lint": "eslint .",
