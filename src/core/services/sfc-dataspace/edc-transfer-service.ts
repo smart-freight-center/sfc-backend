@@ -1,4 +1,4 @@
-import * as builder from '../../utils/edc-builder';
+import * as builder from 'utils/edc-builder';
 import { ContractNegotiationState } from 'entities';
 import { TransferInitiationFailed } from 'utils/errors';
 import { sleep } from 'utils/helpers';

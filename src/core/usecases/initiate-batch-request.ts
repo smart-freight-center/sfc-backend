@@ -1,6 +1,6 @@
 import { Participant } from 'core/types';
 import { validateSchema } from 'utils/helpers';
-import * as builder from '../utils/edc-builder';
+import * as builder from 'utils/edc-builder';
 
 import { AppLogger } from 'utils/logger';
 import dateAndTime from 'date-and-time';

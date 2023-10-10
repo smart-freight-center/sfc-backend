@@ -7,7 +7,7 @@ import {
   DataModelValidationFailed,
   InvalidShipmentIdFormat,
 } from 'utils/errors';
-import { convertRawDataToJSON } from 'core/utils/data-converter';
+import { convertRawDataToJSON } from 'utils/data-converter';
 import { EmissionDataModel } from 'core/types';
 import {
   IDataSourceFetcher,

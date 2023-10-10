@@ -1,8 +1,8 @@
-import * as builder from 'core/utils/edc-builder';
+import * as builder from 'utils/edc-builder';
 
 import { ISfcDataSpace } from 'core/usecases/interfaces';
 import { ContractDefinition, ShareFootprintInput } from 'entities';
-import { convertRawDataToJSON } from 'core/utils/data-converter';
+import { convertRawDataToJSON } from 'utils/data-converter';
 import { Participant } from 'core/types';
 import { ContractNotFound, ShipmentAlreadyShared } from 'utils/errors';
 import { EdcTransferService } from './edc-transfer-service';
