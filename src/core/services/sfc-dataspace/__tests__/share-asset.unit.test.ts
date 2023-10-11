@@ -53,6 +53,22 @@ const consumer: Participant = {
   },
 };
 
+const mockShareAssetInput = {
+  provider,
+  consumer,
+  month: 10,
+  year: 2023,
+  numberOfRows: 100,
+  shipmentId: 'my-shipment-id',
+  companyId: consumer.client_id,
+  type: 's3' as const,
+  dataLocation: {
+    name: 'my-file',
+    bucketName: 'provider-bucket',
+    accessKeyId: 'provider-aws-secret-key',
+    secretAccessKey: 'provider-aws-scret-key',
+  },
+};
 const now = new Date();
 let clock: SinonFakeTimers;
 
@@ -84,7 +100,7 @@ describe('SfcDataspace', () => {
     });
 
     it('should throw error when asset has been created previously', async () => {
-      mockEdcClient.queryAllContractDefinitions.returns(
+      mockEdcClient.listAssets.returns(
         Promise.resolve([
           {
             accessPolicyId: '',
@@ -94,39 +110,22 @@ describe('SfcDataspace', () => {
       );
 
       await expect(
-        sfcDataspace.shareAsset(provider, consumer, {
-          shipmentId: 'my-shipment-id',
-          companyId: consumer.client_id,
-          type: 's3',
-          dataLocation: {
-            uid: '123',
-          },
-        })
+        sfcDataspace.shareAsset(mockShareAssetInput)
       ).to.be.rejectedWith(ShipmentAlreadyShared);
     });
 
     it('should create an asset on the connector', async () => {
-      mockEdcClient.queryAllContractDefinitions.returns(Promise.resolve([]));
+      mockEdcClient.listAssets.returns(Promise.resolve([]));
       const consumerId = consumer.client_id;
-      await sfcDataspace.shareAsset(provider, consumer, {
-        shipmentId: 'my-shipment-id',
-        companyId: consumerId,
-        type: 's3',
-        dateCreated: '2023-01-01',
-        contentType: 'text/plain',
-        dataLocation: {
-          name: 'my-file',
-          bucketName: 'provider-bucket',
-          accessKeyId: 'provider-aws-secret-key',
-          secretAccessKey: 'provider-aws-scret-key',
-        },
-      });
+      await sfcDataspace.shareAsset(mockShareAssetInput);
 
       mockEdcClient.createAsset.should.have.been.calledOnce;
 
       mockEdcClient.createAsset.firstCall.firstArg.should.containSubset({
         properties: {
-          name: 'my-shipment-id',
+          month: mockShareAssetInput.month,
+          numberOfRows: mockShareAssetInput.numberOfRows,
+          year: mockShareAssetInput.year,
           owner: provider.client_id,
           sharedWith: consumerId,
         },
@@ -145,21 +144,8 @@ describe('SfcDataspace', () => {
     });
 
     it('should correctly create a policy using the companyBPN', async () => {
-      mockEdcClient.queryAllContractDefinitions.returns(Promise.resolve([]));
-      const consumerId = consumer.client_id;
-      await sfcDataspace.shareAsset(provider, consumer, {
-        shipmentId: 'my-shipment-id',
-        companyId: consumerId,
-        type: 's3',
-        dateCreated: '2023-01-01',
-        contentType: 'text/plain',
-        dataLocation: {
-          name: 'my-file',
-          bucketName: 'provider-bucket',
-          accessKeyId: 'provider-aws-secret-key',
-          secretAccessKey: 'provider-aws-scret-key',
-        },
-      });
+      mockEdcClient.listAssets.returns(Promise.resolve([]));
+      await sfcDataspace.shareAsset(mockShareAssetInput);
 
       mockEdcClient.createPolicy.should.have.been.calledOnceWithExactly({
         policy: {
@@ -190,22 +176,9 @@ describe('SfcDataspace', () => {
     });
 
     it('should correctly create a contract definitions using the companyBPN', async () => {
-      mockEdcClient.queryAllContractDefinitions.returns(Promise.resolve([]));
-      const consumerId = consumer.client_id;
+      mockEdcClient.listAssets.returns(Promise.resolve([]));
 
-      await sfcDataspace.shareAsset(provider, consumer, {
-        shipmentId: 'my-shipment-id',
-        companyId: consumerId,
-        type: 's3',
-        dateCreated: '2023-01-01',
-        contentType: 'text/plain',
-        dataLocation: {
-          name: 'my-file',
-          bucketName: 'provider-bucket',
-          accessKeyId: 'provider-aws-secret-key',
-          secretAccessKey: 'provider-aws-scret-key',
-        },
-      });
+      await sfcDataspace.shareAsset(mockShareAssetInput);
 
       mockEdcClient.createContractDefinitions.should.have.been.calledOnce;
 
@@ -217,7 +190,7 @@ describe('SfcDataspace', () => {
         contractPolicyId: 'new-policy-id',
         assetsSelector: [
           {
-            operandLeft: 'asset:prop:id',
+            operandLeft: 'https://w3id.org/edc/v0.0.1/ns/id',
             operator: '=',
             operandRight: 'new-asset-id',
           },

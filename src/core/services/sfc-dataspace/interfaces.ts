@@ -1,4 +1,5 @@
 import {
+  Asset,
   AssetInput,
   Catalog,
   CatalogRequest,
@@ -18,7 +19,7 @@ import {
 
 export interface IEdcClient {
   deleteAsset: (assetId: string) => Promise<void>;
-  listAssets: () => Promise<unknown>;
+  listAssets: (query?: QuerySpec) => Promise<Asset[]>;
   createPolicy: (input: PolicyDefinitionInput) => Promise<CreateResult>;
   createAsset: (input: AssetInput) => Promise<CreateResult>;
   deletePolicy: (policyId: string) => Promise<void>;

@@ -1,12 +1,13 @@
 import { ShareFootprintInput } from 'entities';
 import { EmissionDataModel, Participant } from '../types';
 
+export type ShareDataspaceAssetInput = ShareFootprintInput & {
+  provider: Participant;
+  consumer: Omit<Participant, 'connection'>;
+  numberOfRows: number;
+};
 export interface ISfcDataSpace {
-  shareAsset(
-    provider: Participant,
-    consumer: Omit<Participant, 'connection'>,
-    input: ShareFootprintInput
-  ): Promise<object>;
+  shareAsset(input: ShareDataspaceAssetInput): Promise<object>;
   unshareFootprint(shipmentId: string, companyId: string): Promise<void>;
   fetchCarbonFootprint(input): Promise<EmissionDataModel[]>;
 

@@ -52,8 +52,9 @@ const joiAzureSchema = joi.object({
 });
 const sharedSchema = joi.object({
   shipmentId: joi.string().required(),
+  month: joi.number().integer().greater(0).less(13).required(),
+  year: joi.number().required(),
   companyId: joi.string().required(),
-  dateCreated: joi.string().required(),
   contentType: joi.string().valid('application/json', 'text/csv'),
   type: joi.string().required().lowercase().valid('azure', 'http', 's3'),
   dataLocation: joi.object().required(),

@@ -1,4 +1,3 @@
-import dateAndTime from 'date-and-time';
 import { v4 } from 'uuid';
 
 import {
@@ -22,12 +21,14 @@ function randomUid() {
   return v4();
 }
 
-export function assetInput(
-  dataInput: ShareFootprintInput,
-  providerClientId: string,
-  sharedWith: string
-): AssetInput {
-  const { shipmentId, dataLocation, type, dateCreated } = dataInput;
+type ShareAssetInput = ShareFootprintInput & {
+  providerClientId: string;
+  sharedWith: string;
+  numberOfRows: number;
+};
+
+export function assetInput(dataInput: ShareAssetInput): AssetInput {
+  const { month, year, dataLocation, type } = dataInput;
 
   const now = new Date();
 
@@ -37,15 +38,14 @@ export function assetInput(
     azure: 'AzureStorage',
   };
 
-  const defaultVersion = dateAndTime.format(now, 'YYYY-MM-DD');
-  const createdFilter = dateCreated || defaultVersion;
-
   return {
-    '@id': `${shipmentId}-${sharedWith}__${+now}_${createdFilter}`,
+    '@id': `${month}-${year}_$${+now}`,
     properties: {
-      name: shipmentId,
-      owner: providerClientId,
-      sharedWith,
+      month: dataInput.month,
+      year: dataInput.year,
+      owner: dataInput.providerClientId,
+      sharedWith: dataInput.sharedWith,
+      numberOfRows: dataInput.numberOfRows,
     },
     privateProperties: {},
     dataAddress: {
@@ -102,9 +102,9 @@ export function contractDefinition(
     contractPolicyId: policyId,
     assetsSelector: [
       {
-        operandLeft: 'asset:prop:id',
+        operandLeft: 'https://w3id.org/edc/v0.0.1/ns/id',
         operator: '=',
-        operandRight: 'new-asset-id',
+        operandRight: assetId,
       },
     ],
   };
