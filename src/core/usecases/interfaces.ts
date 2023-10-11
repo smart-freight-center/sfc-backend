@@ -6,10 +6,20 @@ export type ShareDataspaceAssetInput = ShareFootprintInput & {
   consumer: Omit<Participant, 'connection'>;
   numberOfRows: number;
 };
+
+export type FootprintMetaData = {
+  owner: string;
+  numberOfRows: number | string;
+  month: number;
+  sharedWith: number;
+  year: number;
+  id: string;
+};
 export interface ISfcDataSpace {
   shareAsset(input: ShareDataspaceAssetInput): Promise<object>;
   unshareFootprint(shipmentId: string, companyId: string): Promise<void>;
   fetchCarbonFootprint(input): Promise<EmissionDataModel[]>;
+  fetchFootprintsMetaData(provider: Participant): Promise<FootprintMetaData[]>;
 
   startTransferProcess(
     provider: Omit<Participant, 'connection'>,

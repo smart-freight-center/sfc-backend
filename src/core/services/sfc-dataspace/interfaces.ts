@@ -9,7 +9,7 @@ import {
   ContractNegotiation,
   ContractNegotiationRequest,
   ContractNegotiationState,
-  CreateResult,
+  IdResponse,
   PolicyDefinition,
   PolicyDefinitionInput,
   QuerySpec,
@@ -20,13 +20,13 @@ import {
 export interface IEdcClient {
   deleteAsset: (assetId: string) => Promise<void>;
   listAssets: (query?: QuerySpec) => Promise<Asset[]>;
-  createPolicy: (input: PolicyDefinitionInput) => Promise<CreateResult>;
-  createAsset: (input: AssetInput) => Promise<CreateResult>;
+  createPolicy: (input: PolicyDefinitionInput) => Promise<IdResponse>;
+  createAsset: (input: AssetInput) => Promise<IdResponse>;
   deletePolicy: (policyId: string) => Promise<void>;
   listPolicy: () => Promise<PolicyDefinition[]>;
   createContractDefinitions: (
     input: ContractDefinitionInput
-  ) => Promise<CreateResult>;
+  ) => Promise<IdResponse>;
 
   deleteContractDefinition: (contractDefinitionId: string) => Promise<void>;
   queryAllContractDefinitions: (
@@ -36,7 +36,7 @@ export interface IEdcClient {
   queryAllPolicies: (input) => Promise<PolicyDefinition[]>;
   starContracttNegotiation: (
     input: ContractNegotiationRequest
-  ) => Promise<CreateResult>;
+  ) => Promise<IdResponse>;
 
   getContractNegotiationResponse: (
     contracNegotiationId: string
@@ -48,5 +48,5 @@ export interface IEdcClient {
   ) => Promise<ContractAgreement>;
   queryAllAgreements: (query?: QuerySpec) => Promise<ContractAgreement[]>;
   getNegotiationState: (input: string) => Promise<ContractNegotiationState>;
-  initiateTransfer: (input: TransferProcessInput) => Promise<CreateResult>;
+  initiateTransfer: (input: TransferProcessInput) => Promise<IdResponse>;
 }

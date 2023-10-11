@@ -82,16 +82,16 @@ describe('SfcDataspace', () => {
       mockEdcClient.createContractDefinitions.reset();
 
       mockEdcClient.createAsset.returns(
-        Promise.resolve({ id: 'new-asset-id', createdAt: 50 })
+        Promise.resolve({ id: 'new-asset-id', createdAt: 50 } as any)
       );
       mockEdcClient.createPolicy.returns(
-        Promise.resolve({ id: 'new-policy-id', createdAt: 50 })
+        Promise.resolve({ id: 'new-policy-id', createdAt: 50 } as any)
       );
       mockEdcClient.createContractDefinitions.returns(
         Promise.resolve({
           id: 'new-contract-definition',
           createdAt: 60,
-        })
+        } as any)
       );
     });
 

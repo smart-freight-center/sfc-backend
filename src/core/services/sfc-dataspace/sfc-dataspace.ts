@@ -1,6 +1,7 @@
 import * as builder from 'utils/edc-builder';
 
 import {
+  FootprintMetaData,
   ISfcDataSpace,
   ShareDataspaceAssetInput,
 } from 'core/usecases/interfaces';
@@ -9,6 +10,7 @@ import { convertRawDataToJSON } from 'utils/data-converter';
 import { ContractNotFound, ShipmentAlreadyShared } from 'utils/errors';
 import { EdcTransferService } from './edc-transfer-service';
 import { IEdcClient } from './interfaces';
+import { Participant } from 'core/types';
 
 export class SfcDataSpace implements ISfcDataSpace {
   constructor(private edcClient: IEdcClient) {}
@@ -16,6 +18,29 @@ export class SfcDataSpace implements ISfcDataSpace {
   public async startTransferProcess(provider, contractOffer) {
     const edcTransferService = new EdcTransferService(this.edcClient);
     await edcTransferService.initiateTransferProcess(provider, contractOffer);
+  }
+
+  public async fetchFootprintsMetaData(
+    provider: Participant
+  ): Promise<FootprintMetaData[]> {
+    const assets = await this.edcClient.listAssets({
+      filterExpression: [
+        builder.filter('owner', '=', provider.client_id),
+        builder.filter('deleted', '=', 'false'),
+      ],
+    });
+
+    return assets.map((asset) => {
+      const properties = asset['edc:properties'];
+      return {
+        owner: properties['edc:owner'],
+        numberOfRows: properties['edc:numberOfRows'],
+        month: properties['edc:month'],
+        sharedWith: properties['edc:sharedWith'],
+        year: properties['edc:year'],
+        id: properties['edc:id'],
+      };
+    });
   }
 
   public async unshareFootprint(shipmentId: string, companyId: string) {
@@ -92,21 +117,9 @@ export class SfcDataSpace implements ISfcDataSpace {
   ) {
     const assets = await this.edcClient.listAssets({
       filterExpression: [
-        {
-          operandLeft: 'https://w3id.org/edc/v0.0.1/ns/sharedWith',
-          operator: '=',
-          operandRight: sharedWith,
-        },
-        {
-          operandLeft: 'https://w3id.org/edc/v0.0.1/ns/year',
-          operator: '=',
-          operandRight: input.year,
-        },
-        {
-          operandLeft: 'https://w3id.org/edc/v0.0.1/ns/month',
-          operator: '=',
-          operandRight: input.month,
-        },
+        builder.filter('sharedWith', '=', sharedWith),
+        builder.filter('year', '=', input.year),
+        builder.filter('month', '=', input.month),
       ],
     });
 

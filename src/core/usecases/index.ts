@@ -17,7 +17,10 @@ import { DeleteFootprintUsecase } from './delete-fooprint';
 import { InitiateBatchRequestUsecase } from './initiate-batch-request';
 import { AuthTokenCallbackUsecase } from './auth-token-callback';
 
-export const provideFootprintUsecase = new ListSharedAssetsUsecsase(edcClient);
+export const provideFootprintUsecase = new ListSharedAssetsUsecsase(
+  sfcDataSpace,
+  sfcAPI
+);
 export const deleteFootprintUsecase = new DeleteFootprintUsecase(sfcDataSpace);
 export const shareFootprintUsecase = new ShareFootprintUsecase(
   sfcDataSpace,
