@@ -2,12 +2,12 @@ name: Create and publish a Docker image
 
 on:
   push:
-    branches: 
+    branches:
     - main
 
 env:
-  AWS_DEFAULT_REGION : eu-west-1
-  ECR_REPOSITORY: sfc-private
+  AWS_DEFAULT_REGION: eu-west-1
+  ECR_REPOSITORY: sfc-backend
 
 jobs:
   build-and-push-image:
@@ -18,25 +18,25 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: configureawscredentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: arn:aws:iam::210441722938:role/smart-freight-center-Role-1QYCX6DONZ4GD
-          role-session-name: sfc_backend_session
-          aws-region: ${{env.AWS_DEFAULT_REGION}}
+    - name: configureawscredentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: arn:aws:iam::930704694895:role/administrator-access-gh-actions
+        role-session-name: sfc_backend_session
+        aws-region: ${{env.AWS_DEFAULT_REGION}}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-          IMAGE_TAG: latest
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
