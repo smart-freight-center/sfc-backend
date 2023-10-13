@@ -3,12 +3,8 @@ import { ShareFootprintInput } from 'entities';
 import { validateData } from 'utils/helpers';
 import { shareFootprintInputSchema } from 'core/validators/';
 
-import {
-  DataModelValidationFailed,
-  InvalidShipmentIdFormat,
-} from 'utils/errors';
-import { convertRawDataToJSON } from 'utils/data-converter';
-import { EmissionDataModel } from 'core/types';
+import { InvalidShipmentIdFormat } from 'utils/errors';
+import { verifyDataModel } from 'utils/data-model-verifier';
 import {
   IDataSourceFetcher,
   ISFCAPI,
@@ -31,7 +27,7 @@ export class ShareFootprintUsecase {
       validatedInput
     );
 
-    const data = await this.verifyDataModel(validatedInput.shipmentId, rawData);
+    const data = await verifyDataModel(validatedInput.shipmentId, rawData);
     const sfcConnection = await this.sfcAPI.createConnection(
       authorization || ''
     );
@@ -68,19 +64,5 @@ export class ShareFootprintUsecase {
     }
 
     return input as ShareFootprintInput;
-  }
-
-  private async verifyDataModel(shipmentId: string, rawData: string | object) {
-    const jsonData = convertRawDataToJSON(rawData);
-
-    const { error, value } = shareFootprintInputSchema
-      .dataModel()
-      .validate(jsonData, {
-        abortEarly: false,
-      });
-
-    if (!error?.details) return value as EmissionDataModel[];
-
-    throw new DataModelValidationFailed(error);
   }
 }
