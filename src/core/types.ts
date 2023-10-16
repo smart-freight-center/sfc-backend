@@ -14,6 +14,10 @@ export type EmissionDataModel = {
   empty_distance: number;
   energy_carrier_N: string;
   Feedstock_N: string;
+  loading_date: string;
+  unloading_date: string;
+  verification: string;
+  accreditation: string;
 };
 
 export type Participant = {
