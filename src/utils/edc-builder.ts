@@ -45,6 +45,7 @@ export function assetInput(dataInput: ShareAssetInput): AssetInput {
       year: dataInput.year,
       owner: dataInput.providerClientId,
       sharedWith: dataInput.sharedWith,
+      deleted: 'false',
       numberOfRows: dataInput.numberOfRows,
     },
     privateProperties: {},
@@ -111,12 +112,12 @@ export function contractDefinition(
 }
 
 export function filter(
-  operandLeft,
-  operandRight,
-  operator = '='
+  operandLeft: string,
+  operator = '=',
+  operandRight: string | number | boolean
 ): CriterionInput {
   return {
-    operandLeft: operandLeft,
+    operandLeft: `https://w3id.org/edc/v0.0.1/ns/${operandLeft}`,
     operandRight: operandRight,
     operator: operator,
   };

@@ -1,29 +1,12 @@
-import { EdcClient } from '../services/sfc-dataspace/edc-client';
+import { ISFCAPI, ISfcDataSpace } from './interfaces';
 export class ListSharedAssetsUsecsase {
-  constructor(private edcClient: EdcClient) {}
+  constructor(private sfcDataspace: ISfcDataSpace, private sfcUnit: ISFCAPI) {}
 
-  async execute() {
-    const sharedContracts = await this.edcClient.queryAllContractDefinitions();
-    return sharedContracts.map((contract) => {
-      const firstDelimiter = contract.id.indexOf('__');
-      const substring = contract.id.slice(0, firstDelimiter);
-      const lastDateDelimiter = contract.id.lastIndexOf('_');
-      const sharingDate = contract.id.slice(
-        firstDelimiter + 2,
-        lastDateDelimiter
-      );
-      const sharedWithIdx = substring.lastIndexOf('-');
-      const sharedWith = substring.slice(sharedWithIdx + 1);
+  async execute(authorization: string) {
+    const provider = await this.sfcUnit
+      .createConnection(authorization)
+      .getMyProfile();
 
-      const shipmentAndConsumer = contract.id.slice(0, firstDelimiter);
-      const lastDashIdx = shipmentAndConsumer.lastIndexOf('-');
-
-      return {
-        id: shipmentAndConsumer,
-        shipmentId: shipmentAndConsumer.slice(0, lastDashIdx),
-        sharedWith,
-        sharingDate: new Date(parseInt(sharingDate)).toLocaleString('en-US'),
-      };
-    });
+    return this.sfcDataspace.fetchFootprintsMetaData(provider);
   }
 }

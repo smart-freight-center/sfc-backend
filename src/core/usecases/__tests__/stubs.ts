@@ -15,6 +15,7 @@ export const mockSfcDataSpace: SinonStubbedInstance<ISfcDataSpace> = {
   unshareFootprint: sinon.stub(),
   fetchCarbonFootprint: sinon.stub(),
   startTransferProcess: sinon.stub(),
+  fetchFootprintsMetaData: sinon.stub(),
 };
 
 export const sfcConnectionStub = () => {

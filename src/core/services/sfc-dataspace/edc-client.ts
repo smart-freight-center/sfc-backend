@@ -1,3 +1,4 @@
+import axios, { AxiosInstance } from 'axios';
 import {
   AssetInput,
   CatalogRequest,
@@ -17,6 +18,7 @@ export class EdcClient implements IEdcClient {
   readonly edcConnectorClient: EdcConnectorClient;
   edcClientContext: EdcConnectorClientContext;
   edcClientId: string;
+  managementAxiosInstance: AxiosInstance;
   constructor(myConnector: Connector, token: string) {
     const builder = new EdcConnectorClient.Builder();
 
@@ -25,28 +27,33 @@ export class EdcClient implements IEdcClient {
     this.edcConnectorClient = builder.build();
     this.edcClientId = myConnector.id;
 
-    const clientContext = this.edcConnectorClient.createContext(
-      token,
-      myConnector.addresses
-    );
+    const managementUrl = myConnector.addresses.management as string;
 
-    this.edcClientContext = clientContext;
+    this.managementAxiosInstance = axios.create({
+      baseURL: `${managementUrl}/v3`,
+      headers: {
+        'X-Api-Key': token,
+      },
+    });
   }
 
   async createAsset(input: AssetInput) {
-    return this.edcConnectorClient.management.assets.create(
-      input,
-      this.edcClientContext
-    );
+    return this.edcConnectorClient.management.assets.create(input);
   }
   async deleteAsset(assetId: string) {
-    return this.edcConnectorClient.management.assets.delete(
-      assetId,
-      this.edcClientContext
-    );
+    return this.edcConnectorClient.management.assets.delete(assetId);
   }
   async listAssets(query?: QuerySpec) {
-    return this.edcConnectorClient.management.assets.queryAll(query);
+    const res = await this.managementAxiosInstance.post('/assets/request', {
+      ...query,
+      '@type': 'QuerySpec',
+      '@context': {
+        odrl: 'http://www.w3.org/ns/odrl/2/',
+      },
+    });
+
+    return res.data;
+    // return this.edcConnectorClient.management.assets.queryAll(query);
   }
 
   async createPolicy(input: PolicyDefinitionInput) {

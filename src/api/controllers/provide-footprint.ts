@@ -48,7 +48,9 @@ export class ProvideFootPrintController {
 
   static async getSharedFootprints(context: RouterContext) {
     try {
-      const assets = await provideFootprintUsecase.execute();
+      const assets = await provideFootprintUsecase.execute(
+        context.headers.authorization as string
+      );
       context.body = assets;
       context.status = 200;
     } catch (error) {

@@ -44,7 +44,8 @@ export class ParticipantNotFound extends NotFound {
   message = 'Participant not found';
 }
 export class ShipmentAlreadyShared extends DataConflict {
-  message = 'This shipment has already been shared with that company.';
+  message =
+    'The carbon footprint for that month has already been shared with that company.';
   name = 'shipment_already_shared';
 }
 export class TransferInitiationFailed {}
