@@ -22,6 +22,16 @@ const shareFootprint = new ShareFootprintUsecase(
   mockSfcAPI
 );
 
+const mockInput = {
+  month: 10,
+  year: 2023,
+  companyId: 'consumer-id',
+  dateCreated: '2020-01-01',
+  shipmentId: 'shipment1',
+  type: 's3',
+  dataLocation: {},
+};
+
 describe('ShareFootprintUsecase', () => {
   describe('Input validation', () => {
     it('should throw an error when the input is invalid', async () => {
@@ -31,22 +41,17 @@ describe('ShareFootprintUsecase', () => {
 
       errors.should.be.eql({
         companyId: ['This field is required'],
-        dateCreated: ['This field is required'],
         shipmentId: ['This field is required'],
         type: ['This field is required'],
         dataLocation: ['This field is required'],
+        year: ['This field is required'],
+        month: ['This field is required'],
       });
     });
 
     it('AWS S3 fields should be required when type=s3', async () => {
       const { errors } = await expect(
-        shareFootprint.execute('auth-code', {
-          companyId: 'consumer-id',
-          dateCreated: '2020-01-01',
-          shipmentId: 'shipment1',
-          type: 's3',
-          dataLocation: {},
-        })
+        shareFootprint.execute('auth-code', mockInput)
       ).to.be.rejectedWith(DataValidationError);
 
       errors.should.be.eql({
@@ -62,9 +67,7 @@ describe('ShareFootprintUsecase', () => {
     it('Azure Blob fields should be required when type=azure', async () => {
       const { errors } = await expect(
         shareFootprint.execute('auth-code', {
-          companyId: 'consumer-id',
-          dateCreated: '2020-01-01',
-          shipmentId: 'shipment1',
+          ...mockInput,
           type: 'azure',
           dataLocation: {},
         })
@@ -82,9 +85,7 @@ describe('ShareFootprintUsecase', () => {
     it('HTTP  fields should be required when type=http', async () => {
       const { errors } = await expect(
         shareFootprint.execute('auth-code', {
-          companyId: 'consumer-id',
-          dateCreated: '2020-01-01',
-          shipmentId: 'shipment1',
+          ...mockInput,
           type: 'http',
           dataLocation: {},
         })
@@ -109,10 +110,8 @@ describe('ShareFootprintUsecase', () => {
         mockDataSourceFetcher.fetchFootprintData.returns(Promise.resolve(''));
 
         const validInput = {
-          companyId: 'consumer-id',
-          dateCreated: '2020-01-01',
-          shipmentId: 'shipment1',
-          type: 'http' as const,
+          ...mockInput,
+          type: 'http',
           dataLocation: {
             name: 'ShipmentId-1',
             baseUrl: 'http://example.com/footprints.csv',
@@ -132,9 +131,7 @@ describe('ShareFootprintUsecase', () => {
         );
 
         const validInput = {
-          companyId: 'consumer-id',
-          dateCreated: '2020-01-01',
-          shipmentId: 'shipmentid1',
+          ...mockInput,
           type: 'http' as const,
           dataLocation: {
             name: 'ShipmentId-1',
@@ -168,9 +165,7 @@ describe('ShareFootprintUsecase', () => {
         );
 
         const validInput = {
-          companyId: 'consumer-id',
-          dateCreated: '2020-01-01',
-          shipmentId: 'shipment1',
+          ...mockInput,
           type: 'http' as const,
           dataLocation: {
             name: 'ShipmentId-1',
@@ -237,9 +232,7 @@ describe('ShareFootprintUsecase', () => {
         );
 
         const validInput = {
-          companyId: 'consumer-id',
-          dateCreated: '2020-01-01',
-          shipmentId: 'shipmentid1',
+          ...mockInput,
           type: 'http' as const,
           dataLocation: {
             name: 'ShipmentId-1',

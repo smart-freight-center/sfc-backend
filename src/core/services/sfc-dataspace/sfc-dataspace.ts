@@ -1,9 +1,11 @@
 import * as builder from 'utils/edc-builder';
 
-import { ISfcDataSpace } from 'core/usecases/interfaces';
-import { ContractDefinition, ShareFootprintInput } from 'entities';
+import {
+  ISfcDataSpace,
+  ShareDataspaceAssetInput,
+} from 'core/usecases/interfaces';
+import { ContractDefinition } from 'entities';
 import { convertRawDataToJSON } from 'utils/data-converter';
-import { Participant } from 'core/types';
 import { ContractNotFound, ShipmentAlreadyShared } from 'utils/errors';
 import { EdcTransferService } from './edc-transfer-service';
 import { IEdcClient } from './interfaces';
@@ -46,26 +48,21 @@ export class SfcDataSpace implements ISfcDataSpace {
     }
   }
 
-  async shareAsset(
-    provider: Participant,
-    consumer: Participant,
-    data: ShareFootprintInput
-  ) {
-    await this.ensureShipmentHasNotBeenShared(
-      data.shipmentId,
-      consumer.client_id
-    );
+  async shareAsset(input: ShareDataspaceAssetInput) {
+    const { consumer, provider, numberOfRows, ...data } = input;
+    await this.ensureFootprintHasNotBeenShared(input, consumer.client_id);
     const results = {
       newAssetId: '',
       newPolicyId: '',
       newContractId: '',
     };
     try {
-      const assetInput = builder.assetInput(
-        data,
-        provider.client_id,
-        consumer.client_id
-      );
+      const assetInput = builder.assetInput({
+        ...data,
+        providerClientId: provider.client_id,
+        sharedWith: consumer.client_id,
+        numberOfRows,
+      });
 
       const newAsset = await this.edcClient.createAsset(assetInput);
       results.newAssetId = newAsset.id;
@@ -89,15 +86,31 @@ export class SfcDataSpace implements ISfcDataSpace {
     }
   }
 
-  private async ensureShipmentHasNotBeenShared(
-    shipmentId: string,
+  private async ensureFootprintHasNotBeenShared(
+    input: ShareDataspaceAssetInput,
     sharedWith: string
   ) {
-    const assetId = `${shipmentId}-${sharedWith}`;
-    const filter = builder.shipmentFilter('id', `${assetId}%`, 'LIKE');
-    const contracts = await this.edcClient.queryAllContractDefinitions(filter);
+    const assets = await this.edcClient.listAssets({
+      filterExpression: [
+        {
+          operandLeft: 'https://w3id.org/edc/v0.0.1/ns/sharedWith',
+          operator: '=',
+          operandRight: sharedWith,
+        },
+        {
+          operandLeft: 'https://w3id.org/edc/v0.0.1/ns/year',
+          operator: '=',
+          operandRight: input.year,
+        },
+        {
+          operandLeft: 'https://w3id.org/edc/v0.0.1/ns/month',
+          operator: '=',
+          operandRight: input.month,
+        },
+      ],
+    });
 
-    if (contracts.length) throw new ShipmentAlreadyShared();
+    if (assets.length) throw new ShipmentAlreadyShared();
   }
 
   private async rollback(results) {

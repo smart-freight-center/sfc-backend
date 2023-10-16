@@ -46,7 +46,6 @@ export const sleep = (ms: number): Promise<void> => {
 };
 
 export const handleErrors = (context: Context, error: Error) => {
-  console.log(error);
   if (error instanceof EdcConnectorClientError) {
     context.set('Content-type', 'application/json');
     switch (error.type) {

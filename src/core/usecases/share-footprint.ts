@@ -31,14 +31,20 @@ export class ShareFootprintUsecase {
       validatedInput
     );
 
-    await this.verifyDataModel(validatedInput.shipmentId, rawData);
+    const data = await this.verifyDataModel(validatedInput.shipmentId, rawData);
     const sfcConnection = await this.sfcAPI.createConnection(
       authorization || ''
     );
     const consumer = await sfcConnection.getCompany(validatedInput.companyId);
     const provider = await sfcConnection.getMyProfile();
 
-    return this.sfcDataSpace.shareAsset(provider, consumer, validatedInput);
+    const numberOfRows = data.length;
+    return this.sfcDataSpace.shareAsset({
+      ...validatedInput,
+      provider,
+      consumer,
+      numberOfRows,
+    });
   }
 
   private validateInput(input: Partial<ShareFootprintInput>) {

@@ -45,8 +45,8 @@ export class EdcClient implements IEdcClient {
       this.edcClientContext
     );
   }
-  async listAssets() {
-    return this.edcConnectorClient.management.assets.queryAll();
+  async listAssets(query?: QuerySpec) {
+    return this.edcConnectorClient.management.assets.queryAll(query);
   }
 
   async createPolicy(input: PolicyDefinitionInput) {
