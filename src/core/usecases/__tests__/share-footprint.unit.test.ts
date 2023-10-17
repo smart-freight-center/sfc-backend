@@ -143,7 +143,19 @@ describe('ShareFootprintUsecase', () => {
         ).to.be.rejectedWith(DataModelValidationFailed);
 
         errors.should.be.eql({
+          accreditation: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
           actual_distance: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          unloading_date: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          verification: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
@@ -244,9 +256,21 @@ describe('ShareFootprintUsecase', () => {
         ).to.be.rejectedWith(DataModelValidationFailed);
 
         errors.should.be.eql({
+          accreditation: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
           co2_wtw: {
             msgs: ['is required'],
             rows: [2, 3],
+          },
+          unloading_date: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          verification: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
           },
         });
         mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
