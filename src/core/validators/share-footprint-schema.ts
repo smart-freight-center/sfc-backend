@@ -17,7 +17,7 @@ const dataModelSchema = () =>
       energy_carrier_N: joi.string().required(),
       Feedstock_N: joi.string().required(),
       loading_date: joi.date().optional(),
-      unloading_date: joi.date().optional(),
+      unloading_date: joi.date().required(),
       verification: joi.boolean().required(),
       accreditation: joi.boolean().required(),
     })

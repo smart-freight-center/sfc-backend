@@ -151,6 +151,10 @@ describe('ShareFootprintUsecase', () => {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
+          unloading_date: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
           verification: {
             msgs: ['is required'],
             rows: [1, 2, 3],
@@ -259,6 +263,10 @@ describe('ShareFootprintUsecase', () => {
           co2_wtw: {
             msgs: ['is required'],
             rows: [2, 3],
+          },
+          unloading_date: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
           },
           verification: {
             msgs: ['is required'],
