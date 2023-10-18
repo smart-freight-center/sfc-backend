@@ -21,7 +21,11 @@ export const provideFootprintUsecase = new ListSharedAssetsUsecsase(
   sfcDataSpace,
   sfcAPI
 );
-export const deleteFootprintUsecase = new DeleteFootprintUsecase(sfcDataSpace);
+export const deleteFootprintUsecase = new DeleteFootprintUsecase(
+  sfcAPI,
+  sfcDataSpace
+);
+
 export const shareFootprintUsecase = new ShareFootprintUsecase(
   sfcDataSpace,
   dataSourceService,

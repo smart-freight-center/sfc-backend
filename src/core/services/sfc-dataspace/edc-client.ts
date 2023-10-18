@@ -53,7 +53,6 @@ export class EdcClient implements IEdcClient {
     });
 
     return res.data;
-    // return this.edcConnectorClient.management.assets.queryAll(query);
   }
 
   async createPolicy(input: PolicyDefinitionInput) {
@@ -95,14 +94,12 @@ export class EdcClient implements IEdcClient {
     return this.edcConnectorClient.management.policyDefinitions.queryAll(input);
   }
   async starContracttNegotiation(input: ContractNegotiationRequest) {
-    // return this.edcConnectorClient.management.initiateContractNegotiation(
     return this.edcConnectorClient.management.contractNegotiations.initiate(
       input
     );
   }
   async getContractNegotiationResponse(contracNegotiationId: string) {
     return this.edcConnectorClient.management.contractNegotiations.get(
-      // return this.edcConnectorClient.management.getNegotiation(
       contracNegotiationId
     );
   }

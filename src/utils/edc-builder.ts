@@ -95,23 +95,18 @@ function BPNPolicyConstraint(policyBPN: string): Constraint[] {
 
 export function contractDefinition(
   assetId: string,
-  policyId: string
+  policyId: string,
+  assetsSelector: CriterionInput[]
 ): ContractDefinitionInput {
   return {
     '@id': `${assetId}-${randomUid()}`,
     accessPolicyId: policyId,
     contractPolicyId: policyId,
-    assetsSelector: [
-      {
-        operandLeft: 'https://w3id.org/edc/v0.0.1/ns/id',
-        operator: '=',
-        operandRight: assetId,
-      },
-    ],
+    assetsSelector,
   };
 }
 
-export function filter(
+export function assetFilter(
   operandLeft: string,
   operator = '=',
   operandRight: string | number | boolean
@@ -130,7 +125,7 @@ export function shipmentFilter(
 ) {
   if (EDC_FILTER_OPERATOR_SET.has(operator)) {
     return {
-      filterExpression: [filter(operandLeft, operandRight, operator)],
+      filterExpression: [assetFilter(operandLeft, operandRight, operator)],
     };
   }
 
