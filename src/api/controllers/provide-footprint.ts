@@ -9,7 +9,7 @@ import { RouterContext } from '@koa/router';
 import { EdcConnectorClientError } from '@think-it-labs/edc-connector-client';
 import { DeleteFootprintInput } from 'core/usecases/delete-fooprint';
 
-export class ProvideFootPrintController {
+export class ProviderController {
   static async shareFootprints(context: RouterContext) {
     await shareFootprintUsecase.execute(
       context.headers.authorization as string,

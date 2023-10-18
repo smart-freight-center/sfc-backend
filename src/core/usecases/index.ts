@@ -1,6 +1,6 @@
 import { KeyCloackClient } from 'clients/keycloak-client';
 import { ListSharedAssetsUsecsase } from './list-shared-assets';
-import { ListCatalogUsecase } from './list-catalog';
+import { RetrieveFootprintMetaUsecase } from './retrieve-footprint-meta';
 import { GenerateTokenUsecase } from './generate-token';
 import {
   sfcAPI,
@@ -32,7 +32,7 @@ export const shareFootprintUsecase = new ShareFootprintUsecase(
   sfcAPI
 );
 
-export const consumeFootprintUsecase = new ListCatalogUsecase(
+export const retrieveFootprintsUsecase = new RetrieveFootprintMetaUsecase(
   edcClient,
   sfcAPI
 );

@@ -45,7 +45,6 @@ export function assetInput(dataInput: ShareAssetInput): AssetInput {
       year: dataInput.year,
       owner: dataInput.providerClientId,
       sharedWith: dataInput.sharedWith,
-      deleted: 'false',
       numberOfRows: dataInput.numberOfRows,
     },
     privateProperties: {},

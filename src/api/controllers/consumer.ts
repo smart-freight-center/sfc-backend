@@ -1,19 +1,19 @@
 import { RouterContext } from '@koa/router';
 import {
-  consumeFootprintUsecase,
+  retrieveFootprintsUsecase,
   getEmissionsUsecase,
   initiateBatchRequestUsecase,
   initiateFileTransferUsecase,
 } from 'core/usecases';
 
-export class ConsumeFootPrintController {
+export class ConsumerController {
   static async requestFootprintsCatalog(context: RouterContext) {
     const args = {
       companyId: context.query.companyId as string,
       shipmentId: context.query.shipmentId as string,
     };
 
-    const catalogs = await consumeFootprintUsecase.execute(
+    const catalogs = await retrieveFootprintsUsecase.execute(
       context.headers.authorization as string,
       args
     );

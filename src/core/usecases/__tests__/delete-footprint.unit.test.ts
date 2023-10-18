@@ -6,7 +6,7 @@ import { expect } from 'chai';
 import { DataValidationError } from 'utils/errors/base-errors';
 import { ShipmentForMonthNotFound } from 'utils/errors';
 import { mockProvider } from 'core/__tests__/mocks';
-import { Asset } from '@think-it-labs/edc-connector-client';
+import { Asset, expandArray } from '@think-it-labs/edc-connector-client';
 
 const { mockSfcAPI, mockSFCAPIConnection } = sfcConnectionStub();
 
@@ -58,21 +58,29 @@ describe('Delete Footprint Tests', () => {
     mockSFCAPIConnection.getMyProfile.returns(
       Promise.resolve({ ...mockProvider, client_id: 'provider-client' })
     );
-    mockEdcClient.listAssets.returns(
-      Promise.resolve([
-        {
-          '@id': 'sample-asset-id',
-          '@type': 'edc:Asset',
-          'edc:properties': {
-            'edc:owner': 'provider-client',
-            'edc:numberOfRows': 3.0,
-            'edc:month': 12.0,
-            'edc:sharedWith': validInput.companyId,
-          },
-          'edc:dataAddress': {},
+
+    const body = [
+      {
+        '@id': 'sample-asset-id',
+        '@type': 'edc:Asset',
+        'edc:properties': {
+          'edc:owner': 'provider-client',
+          'edc:numberOfRows': 3.0,
+          'edc:month': 12.0,
+          'edc:sharedWith': validInput.companyId,
         },
-      ] as unknown[] as Asset[])
-    );
+        'edc:dataAddress': {},
+        '@context': {
+          dct: 'https://purl.org/dc/terms/',
+          edc: 'https://w3id.org/edc/v0.0.1/ns/',
+          dcat: 'https://www.w3.org/ns/dcat/',
+          odrl: 'http://www.w3.org/ns/odrl/2/',
+          dspace: 'https://w3id.org/dspace/v0.8/',
+        },
+      },
+    ];
+
+    mockEdcClient.listAssets.returns(expandArray(body, () => new Asset()));
     await expect(
       deleteFootprintUsecase.execute('provider-auth', {
         month: '8',

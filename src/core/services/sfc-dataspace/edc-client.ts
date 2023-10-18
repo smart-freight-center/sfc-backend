@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import { AxiosInstance } from 'axios';
 import {
   AssetInput,
   CatalogRequest,
@@ -24,17 +24,9 @@ export class EdcClient implements IEdcClient {
 
     builder.managementUrl(myConnector.addresses.management as string);
     builder.publicUrl(myConnector.addresses.public as string);
+    builder.apiToken(token);
     this.edcConnectorClient = builder.build();
     this.edcClientId = myConnector.id;
-
-    const managementUrl = myConnector.addresses.management as string;
-
-    this.managementAxiosInstance = axios.create({
-      baseURL: `${managementUrl}/v3`,
-      headers: {
-        'X-Api-Key': token,
-      },
-    });
   }
 
   async createAsset(input: AssetInput) {
@@ -44,15 +36,7 @@ export class EdcClient implements IEdcClient {
     return this.edcConnectorClient.management.assets.delete(assetId);
   }
   async listAssets(query?: QuerySpec) {
-    const res = await this.managementAxiosInstance.post('/assets/request', {
-      ...query,
-      '@type': 'QuerySpec',
-      '@context': {
-        odrl: 'http://www.w3.org/ns/odrl/2/',
-      },
-    });
-
-    return res.data;
+    return this.edcConnectorClient.management.assets.queryAll(query);
   }
 
   async createPolicy(input: PolicyDefinitionInput) {
