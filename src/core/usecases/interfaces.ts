@@ -15,9 +15,18 @@ export type FootprintMetaData = {
   year: number;
   id: string;
 };
+
+export type DeleteAssetInput = {
+  year: string;
+  month: string;
+  companyId: string;
+};
 export interface ISfcDataSpace {
   shareAsset(input: ShareDataspaceAssetInput): Promise<object>;
-  unshareFootprint(shipmentId: string, companyId: string): Promise<void>;
+  unshareFootprint(
+    providerId: string,
+    assetToDelete: DeleteAssetInput
+  ): Promise<void>;
   fetchCarbonFootprint(input): Promise<EmissionDataModel[]>;
   fetchFootprintsMetaData(provider: Participant): Promise<FootprintMetaData[]>;
 

@@ -20,7 +20,7 @@ export const emissionRoutes = new KoaRouter({ prefix: '/emissions' })
   )
   .delete(
     'Revoke access to a shipment',
-    '/sent/:shipmentId',
+    '/sent',
     ProvideFootPrintController.unshareFootprint
   )
 

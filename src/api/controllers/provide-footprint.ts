@@ -1,5 +1,5 @@
 import { ShareFootprintInput } from 'entities';
-import { InvalidInput, ContractNotFound } from 'utils/errors';
+import { InvalidInput } from 'utils/errors';
 import {
   deleteFootprintUsecase,
   provideFootprintUsecase,
@@ -7,6 +7,7 @@ import {
 } from 'core/usecases';
 import { RouterContext } from '@koa/router';
 import { EdcConnectorClientError } from '@think-it-labs/edc-connector-client';
+import { DeleteFootprintInput } from 'core/usecases/delete-fooprint';
 
 export class ProvideFootPrintController {
   static async shareFootprints(context: RouterContext) {
@@ -20,30 +21,16 @@ export class ProvideFootPrintController {
   }
 
   static async unshareFootprint(context: RouterContext) {
-    const { shipmentId } = context.params;
-    const companyId = context.query.companyId as string;
-
-    try {
-      const data = await deleteFootprintUsecase.execute(shipmentId, companyId);
-      context.status = 200;
-      context.body = {
-        message: 'access revoked successfully',
-        data,
-      };
-    } catch (error) {
-      if (error instanceof ContractNotFound) {
-        context.status = 404;
-        context.body = {
-          error: `No shipment with id ${shipmentId} is currently shared`,
-        };
-      }
-      if (error instanceof InvalidInput) {
-        context.status = 400;
-        context.body = { errors: error.errors };
-        return;
-      }
-      context.status = 500;
-    }
+    const authorization = context.headers.authorization as string;
+    const data = await deleteFootprintUsecase.execute(
+      authorization,
+      context.request.body as DeleteFootprintInput
+    );
+    context.status = 200;
+    context.body = {
+      message: 'We have successfully revoked access for that asset',
+      data,
+    };
   }
 
   static async getSharedFootprints(context: RouterContext) {

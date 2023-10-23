@@ -1,66 +1,21 @@
 import { validate } from 'uuid';
-import { Participant } from 'core/types';
 import { SfcDataSpace } from '../sfc-dataspace';
 import { mockEdcClient } from './stubs';
 import { expect } from 'chai';
 import { ShipmentAlreadyShared } from 'utils/errors';
 import sinon, { SinonFakeTimers } from 'sinon';
+import { mockProvider, mockConsumer } from 'core/__tests__/mocks';
 
 const sfcDataspace = new SfcDataSpace(mockEdcClient);
 
-const mockConsumerConnector = {
-  default: 'http://consumer:29191/api',
-  validation: 'http://consumer:29292',
-  management: 'http://consumer:29193/api/v1/data',
-  protocol: 'http://provider-connector:9194/api/v1/ids',
-  dataplane: 'http://consumer:29195',
-  public: 'http://consumer:29291/public',
-  control: 'http://consumer:29292/control',
-};
-
-const mockProviderConnector = {
-  default: 'http://provider-host:29191/api',
-  validation: 'http://provider-host:29292',
-  management: 'http://provider-host:29193/api/v1/data',
-  protocol: 'http://provider-connector:9194/api/v1/ids',
-  dataplane: 'http://provider-host:29195',
-  public: 'http://provider-host:29291/public',
-  control: 'http://provider-host:29292/control',
-};
-const provider: Participant = {
-  company_name: 'data-provider',
-  client_id: 'provider',
-  company_BNP: 'provider-bpn',
-  role: 'shipper',
-  connection: ['data-consuer'],
-  public_key: 'provider-pb',
-  connector_data: {
-    id: 'urn:connector:provider',
-    addresses: mockProviderConnector,
-  },
-};
-
-const consumer: Participant = {
-  company_name: 'data-consumer',
-  client_id: 'consumer',
-  company_BNP: 'consumer-bpn',
-  role: 'lsp',
-  connection: ['data-provider'],
-  public_key: 'consumer-pb',
-  connector_data: {
-    id: '',
-    addresses: mockConsumerConnector,
-  },
-};
-
 const mockShareAssetInput = {
-  provider,
-  consumer,
+  provider: mockProvider,
+  consumer: mockConsumer,
   month: 10,
   year: 2023,
   numberOfRows: 100,
   shipmentId: 'my-shipment-id',
-  companyId: consumer.client_id,
+  companyId: mockConsumer.client_id,
   type: 's3' as const,
   dataLocation: {
     name: 'my-file',
@@ -116,7 +71,7 @@ describe('SfcDataspace', () => {
 
     it('should create an asset on the connector', async () => {
       mockEdcClient.listAssets.returns(Promise.resolve([]));
-      const consumerId = consumer.client_id;
+      const consumerId = mockConsumer.client_id;
       await sfcDataspace.shareAsset(mockShareAssetInput);
 
       mockEdcClient.createAsset.should.have.been.calledOnce;
@@ -126,7 +81,7 @@ describe('SfcDataspace', () => {
           month: mockShareAssetInput.month,
           numberOfRows: mockShareAssetInput.numberOfRows,
           year: mockShareAssetInput.year,
-          owner: provider.client_id,
+          owner: mockProvider.client_id,
           sharedWith: consumerId,
         },
         privateProperties: {},
@@ -160,7 +115,7 @@ describe('SfcDataspace', () => {
                   },
                   rightExpression: {
                     edctype: 'dataspaceconnector:literalexpression',
-                    value: consumer.company_BNP,
+                    value: mockConsumer.company_BNP,
                   },
                   operator: 'EQ',
                 },
@@ -190,9 +145,24 @@ describe('SfcDataspace', () => {
         contractPolicyId: 'new-policy-id',
         assetsSelector: [
           {
-            operandLeft: 'https://w3id.org/edc/v0.0.1/ns/id',
+            operandLeft: 'https://w3id.org/edc/v0.0.1/ns/owner',
             operator: '=',
-            operandRight: 'new-asset-id',
+            operandRight: 'provider',
+          },
+          {
+            operandLeft: 'https://w3id.org/edc/v0.0.1/ns/month',
+            operandRight: 10,
+            operator: '=',
+          },
+          {
+            operandLeft: 'https://w3id.org/edc/v0.0.1/ns/year',
+            operandRight: 2023,
+            operator: '=',
+          },
+          {
+            operandLeft: 'https://w3id.org/edc/v0.0.1/ns/sharedWith',
+            operandRight: 'consumer',
+            operator: '=',
           },
         ],
       });

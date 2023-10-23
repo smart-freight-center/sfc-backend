@@ -59,6 +59,11 @@ export class ContractNotFound extends NotFound {
   message = 'Contract Not Found';
 }
 
+export class ShipmentForMonthNotFound extends NotFound {
+  name = 'shipment_not_found';
+  message = 'No Shipment that month exists';
+}
+
 export class EmptyDataSource extends InvalidUserInput {
   name = 'empty_datasource';
   message = 'The datasource is empty or has only the header';
