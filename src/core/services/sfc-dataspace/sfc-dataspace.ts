@@ -28,17 +28,14 @@ export class SfcDataSpace implements ISfcDataSpace {
       filterExpression: [builder.assetFilter('owner', '=', provider.client_id)],
     });
 
-    return assets.map((asset) => {
-      const properties = asset['edc:properties'];
-      return {
-        owner: properties['edc:owner'],
-        numberOfRows: properties['edc:numberOfRows'],
-        month: properties['edc:month'],
-        sharedWith: properties['edc:sharedWith'],
-        year: properties['edc:year'],
-        id: properties['edc:id'],
-      };
-    });
+    return assets.map((asset) => ({
+      owner: asset.properties.mandatoryValue('edc', 'owner'),
+      numberOfRows: asset.properties.mandatoryValue('edc', 'numberOfRows'),
+      month: asset.properties.mandatoryValue('edc', 'month'),
+      sharedWith: asset.properties.mandatoryValue('edc', 'sharedWith'),
+      year: asset.properties.mandatoryValue('edc', 'year'),
+      id: asset.properties.mandatoryValue('edc', 'id'),
+    }));
   }
 
   public async unshareFootprint(

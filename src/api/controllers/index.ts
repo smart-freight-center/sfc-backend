@@ -1,3 +1,3 @@
 export * from './provide-footprint';
-export * from './consume-footprint';
+export * from './consumer';
 export * from './receiver';
