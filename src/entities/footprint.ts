@@ -1,7 +1,6 @@
 import { DataAddress } from '@think-it-labs/edc-connector-client';
 
 export type ShareFootprintInput = {
-  shipmentId: string;
   month: number;
   year: number;
   companyId: string;

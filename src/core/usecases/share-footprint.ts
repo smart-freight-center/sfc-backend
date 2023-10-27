@@ -3,7 +3,6 @@ import { ShareFootprintInput } from 'entities';
 import { validateData } from 'utils/helpers';
 import { shareFootprintInputSchema } from 'core/validators/';
 
-import { InvalidShipmentIdFormat } from 'utils/errors';
 import { verifyDataModel } from 'utils/data-model-verifier';
 import {
   IDataSourceFetcher,
@@ -27,7 +26,8 @@ export class ShareFootprintUsecase {
       validatedInput
     );
 
-    const data = await verifyDataModel(validatedInput.shipmentId, rawData);
+    const { month, year } = validatedInput;
+    const data = await verifyDataModel({ month, year }, rawData);
     const sfcConnection = await this.sfcAPI.createConnection(
       authorization || ''
     );
@@ -44,13 +44,6 @@ export class ShareFootprintUsecase {
   }
 
   private validateInput(input: Partial<ShareFootprintInput>) {
-    // this regex is used to validate that shipmentId contains any character except `-`, `:` or `_`
-    const regex = /[_:-]/g;
-
-    if (regex.test(input.shipmentId as string)) {
-      throw new InvalidShipmentIdFormat();
-    }
-
     input = validateData(shareFootprintInputSchema.shared, input);
 
     if (input.type === 'azure') {

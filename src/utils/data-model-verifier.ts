@@ -4,13 +4,13 @@ import { DataModelValidationFailed } from './errors';
 import { EmissionDataModel } from 'core/types';
 
 export async function verifyDataModel(
-  shipmentId: string,
+  { month, year }: { month: number; year: number },
   rawData: string | object
 ) {
   const jsonData = convertRawDataToJSON(rawData);
 
   const { error, value } = shareFootprintInputSchema
-    .dataModel()
+    .dataModel(month, year)
     .validate(jsonData, {
       abortEarly: false,
     });
