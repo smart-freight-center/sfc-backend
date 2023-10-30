@@ -11,7 +11,7 @@ import {
   TransferProcessInput,
   TransferProcessResponse,
 } from '@think-it-labs/edc-connector-client';
-import { Connector } from 'entities';
+import { Connector, ContractNegotiationState } from 'entities';
 import { IEdcClient } from './interfaces';
 
 export class EdcClient implements IEdcClient {
@@ -107,8 +107,11 @@ export class EdcClient implements IEdcClient {
     );
   }
   async getNegotiationState(input: string) {
-    return this.edcConnectorClient.management.contractNegotiations.getState(
-      input
-    );
+    const negotiation =
+      await this.edcConnectorClient.management.contractNegotiations.getState(
+        input
+      );
+
+    return negotiation.state as ContractNegotiationState;
   }
 }

@@ -13,6 +13,7 @@ export async function verifyDataModel(
     .dataModel(month, year)
     .validate(jsonData, {
       abortEarly: false,
+      allowUnknown: true,
     });
 
   if (!error?.details) return value as EmissionDataModel[];

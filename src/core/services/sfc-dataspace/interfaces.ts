@@ -8,7 +8,6 @@ import {
   ContractDefinitionInput,
   ContractNegotiation,
   ContractNegotiationRequest,
-  ContractNegotiationState,
   IdResponse,
   PolicyDefinition,
   PolicyDefinitionInput,
@@ -16,6 +15,7 @@ import {
   TransferProcessInput,
   TransferProcessResponse,
 } from '@think-it-labs/edc-connector-client';
+import { ContractNegotiationState } from 'entities';
 
 export interface IEdcClient {
   deleteAsset: (assetId: string) => Promise<void>;

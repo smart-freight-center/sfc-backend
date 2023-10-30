@@ -1,5 +1,3 @@
-import { v4 } from 'uuid';
-
 import {
   AssetInput,
   ContractNegotiationRequest,
@@ -16,10 +14,6 @@ import {
   CriterionInput,
   Offer,
 } from '@think-it-labs/edc-connector-client';
-
-function randomUid() {
-  return v4();
-}
 
 type ShareAssetInput = ShareFootprintInput & {
   providerClientId: string;
@@ -38,8 +32,9 @@ export function assetInput(dataInput: ShareAssetInput): AssetInput {
     azure: 'AzureStorage',
   };
 
+  const assetId = `${month}-${year}_$${+now}`;
   return {
-    '@id': `${month}-${year}_$${+now}`,
+    '@id': assetId,
     properties: {
       month: dataInput.month,
       year: dataInput.year,
@@ -98,7 +93,7 @@ export function contractDefinition(
   assetsSelector: CriterionInput[]
 ): ContractDefinitionInput {
   return {
-    '@id': `${assetId}-${randomUid()}`,
+    '@id': assetId,
     accessPolicyId: policyId,
     contractPolicyId: policyId,
     assetsSelector,

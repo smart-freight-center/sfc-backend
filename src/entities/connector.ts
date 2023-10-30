@@ -26,12 +26,25 @@ export enum DataAddressType {
   HttpType = 'HttpProxy',
 }
 
-export enum ContractNegotiationState {
-  ERROR = 'ERROR',
-  DECLINED = 'DECLINED',
-  CONFIRMED = 'CONFIRMED',
-  INITIAL = 'INITIAL',
-  REQUESTED = 'REQUESTED',
-  REQUESTING = 'REQUESTING',
-  PROVISIONING = 'PROVISIONING'
-}
+export type ContractNegotiationState =
+  | 'INITIAL'
+  | 'REQUESTING'
+  | 'REQUESTED'
+  | 'AGREEING'
+  | 'AGREED'
+  | 'TERMINATED'
+  | 'ERROR'
+  | 'FINALIZING'
+  | 'VERIFYING'
+  | 'FINALIZED'
+  | 'VERIFIED';
+
+export const NEGOTIATION_PENDING_STATES = new Set<ContractNegotiationState>([
+  'INITIAL',
+  'REQUESTING',
+  'REQUESTED',
+  'AGREEING',
+  'FINALIZING',
+  'AGREED',
+  'VERIFYING',
+]);

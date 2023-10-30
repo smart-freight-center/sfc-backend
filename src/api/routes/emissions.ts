@@ -29,16 +29,9 @@ export const emissionRoutes = new KoaRouter({ prefix: '/emissions' })
   )
   .post(
     'initiate file transfer on the connector',
-    '/:shipmentId/request',
+    '/initiate-transfer-by-month',
     AuthController.authMiddleware,
-    ConsumerController.initiateFileTransfer
-  )
-
-  .post(
-    'initiate file transfer on the connector',
-    '/inititate-batch-transfer',
-    AuthController.authMiddleware,
-    ConsumerController.initiateBatchTransfer
+    ConsumerController.initiateTransferByMonth
   )
 
   .get(
