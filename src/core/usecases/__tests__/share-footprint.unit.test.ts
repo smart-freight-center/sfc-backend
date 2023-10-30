@@ -27,8 +27,6 @@ const mockInput = {
   year: 2023,
   companyId: 'consumer-id',
   dateCreated: '2020-01-01',
-  shipmentId: 'shipment1',
-  unloadingDate: '2023-05-11',
   type: 's3',
   dataLocation: {},
 };
@@ -357,6 +355,24 @@ describe('ShareFootprintUsecase', () => {
                 co2_wtw: 42,
                 unloading_date: '2023-12-03',
               },
+              {
+                id_tce: 'tce_3',
+                id_consignment: '3006756',
+                id_shipment: 'shipmentid1',
+                transport_activity: '200',
+                mass: '1000',
+                mode_of_transport: 'Air',
+                asset_type: 'Airplane XYZ',
+                load_factor: '0.3',
+                empty_distance: '10',
+                energy_carrier_N: '<some string here>',
+                Feedstock_N: 'aviation fuel blend',
+                actual_distance: '300',
+                accreditation: false,
+                verification: false,
+                co2_wtw: 42,
+                unloading_date: '2023-12-31T13:00:00.000Z',
+              },
             ])
           )
         );
@@ -378,7 +394,7 @@ describe('ShareFootprintUsecase', () => {
         errors.should.be.eql({
           unloading_date: {
             msgs: [
-              'must be less than or equal to "2023-12-31T00:00:00.000Z"',
+              'must be less than or equal to "2023-12-31T23:59:59.999Z"',
               'must be greater than or equal to "2023-12-01T00:00:00.000Z"',
             ],
             rows: [1, 2],

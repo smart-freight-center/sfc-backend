@@ -1,11 +1,12 @@
 import joi from 'joi';
 
 const dataModelSchema = (month: number, year: number) => {
-  const firstDayOfMonth = new Date(`${year}-${month}-01`);
+  const monthStr = month.toString().padStart(2, '0');
+  const firstDayOfMonth = new Date(`${year}-${monthStr}-01`);
   const lastDayOfMonth = new Date(`${year}-${month}-01`);
 
   lastDayOfMonth.setMonth(lastDayOfMonth.getMonth() + 1);
-  lastDayOfMonth.setDate(lastDayOfMonth.getDate() - 1);
+  lastDayOfMonth.setMilliseconds(lastDayOfMonth.getMilliseconds() - 1);
   return joi.array().items(
     joi.object({
       id_tce: joi.string().required(),
