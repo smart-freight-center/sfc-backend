@@ -1,7 +1,13 @@
 import joi from 'joi';
 
-const dataModelSchema = () =>
-  joi.array().items(
+const dataModelSchema = (month: number, year: number) => {
+  const monthStr = month.toString().padStart(2, '0');
+  const firstDayOfMonth = new Date(`${year}-${monthStr}-01`);
+  const lastDayOfMonth = new Date(`${year}-${month}-01`);
+
+  lastDayOfMonth.setMonth(lastDayOfMonth.getMonth() + 1);
+  lastDayOfMonth.setMilliseconds(lastDayOfMonth.getMilliseconds() - 1);
+  return joi.array().items(
     joi.object({
       id_tce: joi.string().required(),
       id_consignment: joi.string().required(),
@@ -17,11 +23,16 @@ const dataModelSchema = () =>
       energy_carrier_N: joi.string().required(),
       Feedstock_N: joi.string().required(),
       loading_date: joi.date().optional(),
-      unloading_date: joi.date().required(),
+      unloading_date: joi
+        .date()
+        .min(firstDayOfMonth)
+        .max(lastDayOfMonth)
+        .required(),
       verification: joi.boolean().required(),
       accreditation: joi.boolean().required(),
     })
   );
+};
 
 export const joiHttpSchema = joi.object({
   dataLocation: {
@@ -55,7 +66,6 @@ const joiAzureSchema = joi.object({
   },
 });
 const sharedSchema = joi.object({
-  shipmentId: joi.string().required(),
   month: joi.number().integer().greater(0).less(13).required(),
   year: joi.number().required(),
   companyId: joi.string().required(),
