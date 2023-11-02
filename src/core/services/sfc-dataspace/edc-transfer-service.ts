@@ -1,5 +1,5 @@
 import * as builder from 'utils/edc-builder';
-import { NEGOTIATION_PENDING_STATES } from 'entities';
+import { COMPLETED_NEGOTIATION_STATES } from 'entities';
 import { TransferInitiationFailed } from 'utils/errors';
 import { sleep } from 'utils/helpers';
 import { AppLogger } from 'utils/logger';
@@ -61,7 +61,8 @@ export class EdcTransferService {
       negotiationId
     );
 
-    let negotiationIsPending = NEGOTIATION_PENDING_STATES.has(negotiationState);
+    let negotiationIsPending =
+      !COMPLETED_NEGOTIATION_STATES.has(negotiationState);
 
     while (negotiationIsPending) {
       logger.info('Negotation still pending. Waiting for another 1s...');
@@ -71,7 +72,8 @@ export class EdcTransferService {
         negotiationId
       );
 
-      negotiationIsPending = NEGOTIATION_PENDING_STATES.has(negotiationState);
+      negotiationIsPending =
+        !COMPLETED_NEGOTIATION_STATES.has(negotiationState);
     }
 
     logger.info('CURRENT negotiation state ...', {

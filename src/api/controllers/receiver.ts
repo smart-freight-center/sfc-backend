@@ -1,9 +1,12 @@
 import { RouterContext } from '@koa/router';
 import { authTokenCallbackUsecase } from 'core/usecases';
+import { TransferCallbackInput } from 'core/usecases/auth-token-callback';
 
 export class ReceiverController {
   static async receive(context: RouterContext) {
-    await authTokenCallbackUsecase.execute(context.request.body);
+    await authTokenCallbackUsecase.execute(
+      context.request.body as TransferCallbackInput
+    );
     context.status = 204;
   }
 }

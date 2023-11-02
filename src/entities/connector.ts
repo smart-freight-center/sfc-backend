@@ -39,12 +39,7 @@ export type ContractNegotiationState =
   | 'FINALIZED'
   | 'VERIFIED';
 
-export const NEGOTIATION_PENDING_STATES = new Set<ContractNegotiationState>([
-  'INITIAL',
-  'REQUESTING',
-  'REQUESTED',
-  'AGREEING',
-  'FINALIZING',
-  'AGREED',
-  'VERIFYING',
+export const COMPLETED_NEGOTIATION_STATES = new Set<ContractNegotiationState>([
+  'FINALIZED',
+  'TERMINATED',
 ]);

@@ -1,4 +1,3 @@
-import { AxiosInstance } from 'axios';
 import {
   AssetInput,
   CatalogRequest,
@@ -9,7 +8,6 @@ import {
   PolicyDefinitionInput,
   QuerySpec,
   TransferProcessInput,
-  TransferProcessResponse,
 } from '@think-it-labs/edc-connector-client';
 import { Connector, ContractNegotiationState } from 'entities';
 import { IEdcClient } from './interfaces';
@@ -18,7 +16,6 @@ export class EdcClient implements IEdcClient {
   readonly edcConnectorClient: EdcConnectorClient;
   edcClientContext: EdcConnectorClientContext;
   edcClientId: string;
-  managementAxiosInstance: AxiosInstance;
   constructor(myConnector: Connector, token: string) {
     const builder = new EdcConnectorClient.Builder();
 
@@ -90,10 +87,21 @@ export class EdcClient implements IEdcClient {
   async initiateTransfer(input: TransferProcessInput) {
     return this.edcConnectorClient.management.transferProcesses.initiate(input);
   }
-  async getTranferedData(input: TransferProcessResponse) {
+  async getTranferedData(authKey: string, authCode: string) {
     return this.edcConnectorClient.public.getTransferredData({
-      [input.authKey]: input.authCode,
+      [authKey]: authCode,
     });
+  }
+
+  async getTransferProcessById(transferProcessId: string) {
+    const transferProcesses =
+      await this.edcConnectorClient.management.transferProcesses.queryAll({
+        filterExpression: [
+          { operandLeft: 'id', operator: '=', operandRight: transferProcessId },
+        ],
+      });
+
+    return transferProcesses[0];
   }
   async getContractAgreement(input: string) {
     return this.edcConnectorClient.management.contractAgreements.get(input);
@@ -106,6 +114,7 @@ export class EdcClient implements IEdcClient {
       query
     );
   }
+
   async getNegotiationState(input: string) {
     const negotiation =
       await this.edcConnectorClient.management.contractNegotiations.getState(

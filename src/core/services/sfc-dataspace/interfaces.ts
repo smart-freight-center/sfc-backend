@@ -12,8 +12,8 @@ import {
   PolicyDefinition,
   PolicyDefinitionInput,
   QuerySpec,
+  TransferProcess,
   TransferProcessInput,
-  TransferProcessResponse,
 } from '@think-it-labs/edc-connector-client';
 import { ContractNegotiationState } from 'entities';
 
@@ -38,11 +38,15 @@ export interface IEdcClient {
     input: ContractNegotiationRequest
   ) => Promise<IdResponse>;
 
+  getTransferProcessById: (
+    transferProcessId: string
+  ) => Promise<TransferProcess>;
+
   getContractNegotiationResponse: (
     contracNegotiationId: string
   ) => Promise<ContractNegotiation>;
 
-  getTranferedData: (input: TransferProcessResponse) => Promise<Response>;
+  getTranferedData: (authKey: string, authCode: string) => Promise<Response>;
   getAgreementForNegotiation: (
     negotiationId: string
   ) => Promise<ContractAgreement>;

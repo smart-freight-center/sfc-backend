@@ -135,8 +135,9 @@ export class SfcDataSpace implements ISfcDataSpace {
     }
   }
 
-  public async fetchCarbonFootprint(input) {
-    const response = await this.edcClient.getTranferedData(input);
+  public async fetchCarbonFootprint(authKey: string, authCode: string) {
+    logger.info('Fetching Carbon Footprints', { authKey, authCode });
+    const response = await this.edcClient.getTranferedData(authKey, authCode);
 
     if (response.body) {
       const textData = await response.text();

@@ -4,6 +4,15 @@ import { ICacheService, ISfcDataSpace } from 'core/usecases/interfaces';
 import { TransferNotInitiated } from 'utils/errors';
 
 const logger = new AppLogger('GetEmissionsUsecase');
+
+type AssetCacheValue = {
+  authCode: string;
+  authKey: string;
+};
+
+type JobCacheValue = {
+  assetIds: string[];
+};
 export class GetEmissionsUsecase {
   readonly dataQueue = [];
 
@@ -14,7 +23,8 @@ export class GetEmissionsUsecase {
 
   async execute(jobId: string, aggregate: boolean) {
     logger.info('Pulling data for all assets...');
-    const { assetIds } = await this.getKeyFromCache(jobId);
+    const jobCacheValue = await this.getKeyFromCache(jobId);
+    const { assetIds } = jobCacheValue as JobCacheValue;
     const dataIsForShipmentId = !jobId.startsWith('batch_key:');
 
     const emissions = await this.getEmissions(assetIds);
@@ -63,15 +73,20 @@ export class GetEmissionsUsecase {
   }
 
   private async fetchData(assetId: string) {
-    const transferInput = await this.getKeyFromCache(assetId);
+    logger.info('Fetching emissions for asset...', { assetId });
 
-    return this.sfcDataSpace.fetchCarbonFootprint(transferInput);
+    console.log({ assetId }, '<-assetId');
+    const data = await this.getKeyFromCache(assetId);
+
+    const { authCode, authKey } = data as AssetCacheValue;
+    return this.sfcDataSpace.fetchCarbonFootprint(authKey, authCode);
   }
 
   private async getKeyFromCache(key: string) {
     const data = await this.cacheService.retrieve(key);
 
     if (!data) throw new TransferNotInitiated(key);
-    return data as { assetIds: string[] };
+
+    return data;
   }
 }
