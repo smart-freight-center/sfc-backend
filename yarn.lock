@@ -1431,7 +1431,7 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.1.0.tgz#96116f2a912e0c02817345b3c10751069920d553"
   integrity sha512-+9jVqKhRSpsc591z5vX+X5Yyw+he/HCB4iQ/RYxw35CEPaY1gnsNE43nf9n9AaYjAQrTiI/mOwKUKdUs9vf7Xg==
 
-"@think-it-labs/edc-connector-client@^0.2.0-beta-6":
+"@think-it-labs/edc-connector-client@0.2.0-beta-6":
   version "0.2.0-beta-6"
   resolved "https://registry.yarnpkg.com/@think-it-labs/edc-connector-client/-/edc-connector-client-0.2.0-beta-6.tgz#ea240d4ae12e62e298e71179542911b894a7d731"
   integrity sha512-6PQCyZ1iBVsYS1PNd4jVmSPzp6htHTJioG8DegIpM9tnkwGIBNSN4h2JtrXqC8UPrTPgvM/YS5vKaLXFxEy8/g==
