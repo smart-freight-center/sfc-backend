@@ -44,7 +44,7 @@ export class KeyCloackClient {
     const accessToken = authorization?.split(' ')[1];
 
     const data = await jwt.verify(accessToken, completeKey, {
-      algorithm: ['RS256'],
+      algorithms: ['RS256'],
     });
 
     return data;

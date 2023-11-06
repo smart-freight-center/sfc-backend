@@ -8,7 +8,6 @@ export async function verifyDataModel(
   rawData: string | object
 ) {
   const jsonData = convertRawDataToJSON(rawData);
-
   const { error, value } = shareFootprintInputSchema
     .dataModel(month, year)
     .validate(jsonData, {

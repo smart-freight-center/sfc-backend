@@ -19,6 +19,7 @@ import { InitiateDataTransferByMonthUsecase } from './initiate-data-transfer-by-
 export { TransferByMonthInput } from './initiate-data-transfer-by-month';
 
 import { ValidateDataModelUsecase } from './validate-data-model';
+import { RunValidationOnRawFileUsecase } from './run-validation-on-raw-file';
 
 export const provideFootprintUsecase = new ListSharedAssetsUsecsase(
   sfcDataSpace,
@@ -38,6 +39,9 @@ export const shareFootprintUsecase = new ShareFootprintUsecase(
 export const validateDataModelUsecase = new ValidateDataModelUsecase(
   dataSourceService
 );
+
+export const runValidationOnRawFileUsecase =
+  new RunValidationOnRawFileUsecase();
 
 export const retrieveFootprintsUsecase = new RetrieveFootprintMetaUsecase(
   edcClient,

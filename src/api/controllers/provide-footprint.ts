@@ -3,6 +3,7 @@ import { InvalidInput } from 'utils/errors';
 import {
   deleteFootprintUsecase,
   provideFootprintUsecase,
+  runValidationOnRawFileUsecase,
   shareFootprintUsecase,
   validateDataModelUsecase,
 } from 'core/usecases';
@@ -64,5 +65,23 @@ export class ProviderController {
 
     context.status = 200;
     context.body = { message: 'Successfully validated data model' };
+  }
+
+  static async validateDataModelFile(context: RouterContext) {
+    const request = context.request as any;
+    let rawData = '';
+    const file = request.files?.file[0];
+    if (file) {
+      rawData = file.buffer.toString().trim();
+    }
+
+    const metaData = await runValidationOnRawFileUsecase.execute({
+      month: request.body.month,
+      year: request.body.year,
+      rawData,
+    });
+
+    context.status = 200;
+    context.body = { message: 'The file is valid', meta: metaData };
   }
 }

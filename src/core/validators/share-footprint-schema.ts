@@ -82,6 +82,12 @@ const validatedSchema = joi.object({
   dataLocation: joi.object().required(),
 });
 
+export const rawDataValidationSchema = joi.object({
+  month: joi.number().integer().greater(0).less(13).required(),
+  year: joi.number().required(),
+  rawData: joi.string().required(),
+});
+
 export const shareFootprintInputSchema = {
   shared: sharedSchema,
   validated: validatedSchema,

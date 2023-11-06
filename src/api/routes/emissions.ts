@@ -1,6 +1,9 @@
 import KoaRouter from '@koa/router';
 import { AuthController } from 'api/controllers/auth';
 import { ConsumerController, ProviderController } from '../controllers';
+import multer from '@koa/multer';
+
+const upload = multer();
 
 export const emissionRoutes = new KoaRouter({ prefix: '/emissions' })
   .post(
@@ -46,4 +49,12 @@ export const emissionRoutes = new KoaRouter({ prefix: '/emissions' })
     '/validate',
     AuthController.authMiddleware,
     ProviderController.validateDataModel
+  )
+
+  .post(
+    'Validate data model',
+    '/validate-file',
+    upload.fields([{ name: 'file', maxCount: 1 }]),
+    AuthController.authMiddleware,
+    ProviderController.validateDataModelFile
   );

@@ -17,6 +17,12 @@ export type ValidateDataModelInput = {
   dataLocation: Omit<DataAddress, 'contentType'>;
 };
 
+export type ValidateRawDataModelInput = {
+  month: number;
+  year: number;
+  rawData: string;
+};
+
 export interface ListCatalogInput {
   companyId: string;
   shipmentId?: string;
