@@ -133,7 +133,7 @@ describe('Validate Data Model Usecase', () => {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
-          actual_distance: {
+          distance_actual: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
@@ -145,7 +145,7 @@ describe('Validate Data Model Usecase', () => {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
-          co2_wtw: {
+          co2e_wtw: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
@@ -194,8 +194,8 @@ describe('Validate Data Model Usecase', () => {
                 empty_distance: '50',
                 energy_carrier_N: '<some string here>',
                 Feedstock_N: 'biodiesel',
-                actual_distance: '100',
-                co2_wtw: '10',
+                distance_actual: '100',
+                co2e_wtw: '10',
               },
               {
                 id_tce: 'tce_2',
@@ -209,7 +209,7 @@ describe('Validate Data Model Usecase', () => {
                 empty_distance: '0',
                 energy_carrier_N: '<some string here>',
                 Feedstock_N: 'marine oil',
-                actual_distance: '200',
+                distance_actual: '200',
               },
               {
                 id_tce: 'tce_3',
@@ -223,7 +223,7 @@ describe('Validate Data Model Usecase', () => {
                 empty_distance: '10',
                 energy_carrier_N: '<some string here>',
                 Feedstock_N: 'aviation fuel blend',
-                actual_distance: '300',
+                distance_actual: '300',
                 unloading_date: '2023-12-25',
               },
             ])
@@ -249,7 +249,7 @@ describe('Validate Data Model Usecase', () => {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
-          co2_wtw: {
+          co2e_wtw: {
             msgs: ['is required'],
             rows: [2, 3],
           },
@@ -283,11 +283,11 @@ describe('Validate Data Model Usecase', () => {
                 empty_distance: '50',
                 energy_carrier_N: '<some string here>',
                 Feedstock_N: 'biodiesel',
-                actual_distance: '100',
+                distance_actual: '100',
                 unloading_date: '2024-01-01',
                 accreditation: false,
                 verification: false,
-                co2_wtw: 42,
+                co2e_wtw: 42,
               },
               {
                 id_tce: 'tce_2',
@@ -301,10 +301,10 @@ describe('Validate Data Model Usecase', () => {
                 empty_distance: '0',
                 energy_carrier_N: '<some string here>',
                 Feedstock_N: 'marine oil',
-                actual_distance: '200',
+                distance_actual: '200',
                 accreditation: false,
                 verification: false,
-                co2_wtw: 42,
+                co2e_wtw: 42,
                 unloading_date: '2023-11-01',
               },
               {
@@ -319,10 +319,10 @@ describe('Validate Data Model Usecase', () => {
                 empty_distance: '10',
                 energy_carrier_N: '<some string here>',
                 Feedstock_N: 'aviation fuel blend',
-                actual_distance: '300',
+                distance_actual: '300',
                 accreditation: false,
                 verification: false,
-                co2_wtw: 42,
+                co2e_wtw: 42,
                 unloading_date: '2023-12-25',
               },
               {
@@ -337,10 +337,10 @@ describe('Validate Data Model Usecase', () => {
                 empty_distance: '10',
                 energy_carrier_N: '<some string here>',
                 Feedstock_N: 'aviation fuel blend',
-                actual_distance: '300',
+                distance_actual: '300',
                 accreditation: false,
                 verification: false,
-                co2_wtw: 42,
+                co2e_wtw: 42,
                 unloading_date: '2023-12-03',
               },
               {
@@ -355,10 +355,10 @@ describe('Validate Data Model Usecase', () => {
                 empty_distance: '10',
                 energy_carrier_N: '<some string here>',
                 Feedstock_N: 'aviation fuel blend',
-                actual_distance: '300',
+                distance_actual: '300',
                 accreditation: false,
                 verification: false,
-                co2_wtw: 42,
+                co2e_wtw: 42,
                 unloading_date: '2023-12-31T13:00:00.000Z',
               },
             ])
