@@ -1,4 +1,4 @@
-import { ShareFootprintInput } from 'entities';
+import { ShareFootprintInput, ValidateDataModelInput } from 'entities';
 import { EmissionDataModel, Participant } from '../types';
 import { Offer } from '@think-it-labs/edc-connector-client';
 
@@ -49,6 +49,9 @@ export interface ISfcDataSpace {
 
 export interface IDataSourceFetcher {
   fetchFootprintData(input: ShareFootprintInput): Promise<string>;
+}
+export interface IDataModelValidator {
+  fetchFootprintData(input: ValidateDataModelInput): Promise<string>;
 }
 
 export interface ISFCAPIConnection {

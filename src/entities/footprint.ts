@@ -9,6 +9,14 @@ export type ShareFootprintInput = {
   dataLocation: Omit<DataAddress, 'contentType'>;
 };
 
+export type ValidateDataModelInput = {
+  month: number;
+  year: number;
+  dateCreated?: string;
+  type: 'azure' | 'http' | 's3' | string;
+  dataLocation: Omit<DataAddress, 'contentType'>;
+};
+
 export interface ListCatalogInput {
   companyId: string;
   shipmentId?: string;
