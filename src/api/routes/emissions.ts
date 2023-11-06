@@ -43,7 +43,7 @@ export const emissionRoutes = new KoaRouter({ prefix: '/emissions' })
 
   .post(
     'Validate data model',
-    '/emissions/validate',
+    '/validate',
     AuthController.authMiddleware,
     ProviderController.validateDataModel
   );
