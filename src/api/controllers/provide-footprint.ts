@@ -59,7 +59,6 @@ export class ProviderController {
   }
   static async validateDataModel(context: RouterContext) {
     await validateDataModelUsecase.execute(
-      // context.headers.authorization as string,
       context.request.body as ShareFootprintInput
     );
 
