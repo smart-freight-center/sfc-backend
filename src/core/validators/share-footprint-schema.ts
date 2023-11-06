@@ -74,8 +74,17 @@ const sharedSchema = joi.object({
   dataLocation: joi.object().required(),
 });
 
+const validatedSchema = joi.object({
+  month: joi.number().integer().greater(0).less(13).required(),
+  year: joi.number().required(),
+  contentType: joi.string().valid('application/json', 'text/csv'),
+  type: joi.string().required().lowercase().valid('azure', 'http', 's3'),
+  dataLocation: joi.object().required(),
+});
+
 export const shareFootprintInputSchema = {
   shared: sharedSchema,
+  validated: validatedSchema,
   azure: joiAzureSchema,
   http: joiHttpSchema,
   s3: joiS3Schema,

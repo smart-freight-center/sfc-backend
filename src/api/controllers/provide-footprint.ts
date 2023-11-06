@@ -4,6 +4,7 @@ import {
   deleteFootprintUsecase,
   provideFootprintUsecase,
   shareFootprintUsecase,
+  validateDataModelUsecase,
 } from 'core/usecases';
 import { RouterContext } from '@koa/router';
 import { EdcConnectorClientError } from '@think-it-labs/edc-connector-client';
@@ -55,5 +56,14 @@ export class ProviderController {
 
       context.status = 500;
     }
+  }
+  static async validateDataModel(context: RouterContext) {
+    await validateDataModelUsecase.execute(
+      // context.headers.authorization as string,
+      context.request.body as ShareFootprintInput
+    );
+
+    context.status = 200;
+    context.body = { message: 'Successfully validated data model' };
   }
 }

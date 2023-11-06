@@ -18,6 +18,8 @@ import { AuthTokenCallbackUsecase } from './auth-token-callback';
 import { InitiateDataTransferByMonthUsecase } from './initiate-data-transfer-by-month';
 export { TransferByMonthInput } from './initiate-data-transfer-by-month';
 
+import { ValidateDataModelUsecase } from './validate-data-model';
+
 export const provideFootprintUsecase = new ListSharedAssetsUsecsase(
   sfcDataSpace,
   sfcAPI
@@ -31,6 +33,10 @@ export const shareFootprintUsecase = new ShareFootprintUsecase(
   sfcDataSpace,
   dataSourceService,
   sfcAPI
+);
+
+export const validateDataModelUsecase = new ValidateDataModelUsecase(
+  dataSourceService
 );
 
 export const retrieveFootprintsUsecase = new RetrieveFootprintMetaUsecase(
