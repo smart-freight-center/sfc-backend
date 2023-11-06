@@ -148,9 +148,14 @@ export function transferProcessInput(
 ): TransferProcessInput {
   return {
     assetId,
-    connectorAddress: `${connector.addresses.protocol}/data`,
+    connectorAddress: `${connector.addresses.protocol}`,
     connectorId: connector.id,
     contractId: contractId,
     dataDestination: { type: DataAddressType.HttpType },
+    properties: {
+      receiverHttpEndpoint:
+        'https://webhook.site/5fc7d035-2c8b-4dec-9ceb-67e3aff5ef4f',
+      contractId,
+    },
   };
 }

@@ -9,7 +9,7 @@ export const mockEdcClient: SinonStubbedInstance<IEdcClient> = {
   deletePolicy: sinon.stub(),
   listPolicy: sinon.stub(),
   createContractDefinitions: sinon.stub(),
-
+  getTransferProcessById: sinon.stub(),
   deleteContractDefinition: sinon.stub(),
   queryAllContractDefinitions: sinon.stub(),
   listCatalog: sinon.stub(),

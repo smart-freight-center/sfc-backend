@@ -4,6 +4,13 @@ import { ICacheService } from './interfaces';
 import { EdcClient } from 'core/services/sfc-dataspace/edc-client';
 
 const logger = new AppLogger('AuthTokenCallbackUsecase');
+
+export type TransferCallbackInput = {
+  id: string;
+  endpoint: string;
+  authKey: 'Authorization';
+  authCode: string;
+};
 export class AuthTokenCallbackUsecase {
   readonly dataQueue = [];
 
@@ -12,20 +19,23 @@ export class AuthTokenCallbackUsecase {
     private cacheService: ICacheService
   ) {}
 
-  async execute(requestInput) {
+  async execute(input: TransferCallbackInput) {
     logger.info('Caching auth code and keys...');
-    const transferProcessResponse = {
-      ...requestInput,
-      endpoint: this.edcClient.edcClientContext.public,
-    };
 
-    const agreement = await this.edcClient.getContractAgreement(
-      transferProcessResponse.properties.cid
+    const cacheValue = {
+      authCode: input.authCode,
+      authKey: input.authKey,
+    };
+    const transferProcess = await this.edcClient.getTransferProcessById(
+      input.id
     );
+    if (!transferProcess) return;
+
+    const assetId: string = transferProcess.mandatoryValue('edc', 'assetId');
 
     await this.cacheService.storeItem(
-      agreement.assetId,
-      transferProcessResponse,
+      assetId,
+      cacheValue,
       TRANSFER_EXP_PROCESS_IN_SECONDS
     );
 

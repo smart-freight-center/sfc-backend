@@ -35,7 +35,10 @@ export interface ISfcDataSpace {
     providerId: string,
     assetToDelete: DeleteAssetInput
   ): Promise<void>;
-  fetchCarbonFootprint(input): Promise<EmissionDataModel[]>;
+  fetchCarbonFootprint(
+    authKey: string,
+    authCode: string
+  ): Promise<EmissionDataModel[]>;
   fetchFootprintsMetaData(provider: Participant): Promise<FootprintMetaData[]>;
   fetchDataThatProviderHasShared(
     providerUrl: string
