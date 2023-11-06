@@ -6,10 +6,10 @@ export type EmissionDataModel = {
   id_shipment: string;
   transport_activity: number;
   mass: number;
-  actual_distance: number;
+  distance_actual: number;
   mode_of_transport: string;
   asset_type: string;
-  co2_wtw: number;
+  co2e_wtw: number;
   load_factor: number;
   empty_distance: number;
   energy_carrier_N: string;

@@ -1,11 +1,12 @@
 import * as builder from 'utils/edc-builder';
-import { ContractNegotiationState } from 'entities';
+import { NEGOTIATION_PENDING_STATES } from 'entities';
 import { TransferInitiationFailed } from 'utils/errors';
 import { sleep } from 'utils/helpers';
 import { AppLogger } from 'utils/logger';
 import { Participant } from 'core/types';
 import { IEdcClient } from './interfaces';
 import { Offer } from '@think-it-labs/edc-connector-client';
+import { SingleAssetDetail } from 'core/usecases/interfaces';
 
 const logger = new AppLogger('EdcTransferService');
 
@@ -16,26 +17,26 @@ export class EdcTransferService {
     return this.edcClient;
   }
 
-  public async initiateTransferProcess(provider, contractOffer: Offer) {
-    logger.info('Initiating transfer...');
-    const assetId = contractOffer.asset?.id as string;
-    const contractAgreementId = await this.getContractAgreementId(assetId);
+  public async initiateTransferProcess(singleAsset: SingleAssetDetail) {
+    const { contractOffer, assetId, provider } = singleAsset;
+
+    logger.info('Initiating transfer...', { contractOffer });
+
+    let contractAgreementId = await this.getContractAgreementId(assetId);
 
     if (contractAgreementId) {
-      const response = await this.initiateTransfer(
-        provider,
-        assetId,
-        contractAgreementId
-      );
-      return response;
+      return this.initiateTransfer(provider, assetId, contractAgreementId);
     }
 
-    const contractAgreement = await this.negotiateContractAndWaitToComplete(
-      provider,
-      contractOffer
-    );
+    await this.negotiateContractAndWaitToComplete(provider, contractOffer);
 
-    return await this.initiateTransfer(provider, assetId, contractAgreement.id);
+    contractAgreementId = await this.getContractAgreementId(assetId);
+
+    return await this.initiateTransfer(
+      provider,
+      assetId,
+      contractAgreementId as string
+    );
   }
 
   private async negotiateContractAndWaitToComplete(
@@ -48,10 +49,6 @@ export class EdcTransferService {
     );
 
     await this.waitForContractNegotiationToComplete(negotiationResponse.id);
-
-    const agreementForNegotiation =
-      await this.edcClient.getAgreementForNegotiation(negotiationResponse.id);
-    return agreementForNegotiation;
   }
 
   private async waitForContractNegotiationToComplete(negotiationId: string) {
@@ -60,22 +57,29 @@ export class EdcTransferService {
       { negotiationId }
     );
 
-    let negotiation = await this.edcClient.getNegotiationState(negotiationId);
+    let negotiationState = await this.edcClient.getNegotiationState(
+      negotiationId
+    );
 
-    while (
-      negotiation.state === ContractNegotiationState.INITIAL ||
-      negotiation.state === ContractNegotiationState.REQUESTING ||
-      negotiation.state === ContractNegotiationState.PROVISIONING ||
-      negotiation.state === ContractNegotiationState.REQUESTED
-    ) {
+    let negotiationIsPending = NEGOTIATION_PENDING_STATES.has(negotiationState);
+
+    while (negotiationIsPending) {
       logger.info('Negotation still pending. Waiting for another 1s...');
       await sleep(1000);
 
-      negotiation = await this.edcClient.getNegotiationState(negotiationId);
+      negotiationState = await this.edcClient.getNegotiationState(
+        negotiationId
+      );
+
+      negotiationIsPending = NEGOTIATION_PENDING_STATES.has(negotiationState);
     }
-    if (negotiation.state !== ContractNegotiationState.CONFIRMED) {
+
+    logger.info('CURRENT negotiation state ...', {
+      state: negotiationState,
+    });
+    if (negotiationState !== 'FINALIZED') {
       logger.warn('The negotiation state is unknown...', {
-        state: negotiation.state,
+        state: negotiationState,
       });
       throw new TransferInitiationFailed();
     }
@@ -125,10 +129,15 @@ export class EdcTransferService {
 
   private async getContractAgreementId(assetId: string) {
     logger.info('Getting contractAgreement for asset...', { assetId });
-    const agreementsFilter = builder.shipmentFilter('assetId', assetId, '=');
-    const agreements = await this.edcClient.queryAllAgreements(
-      agreementsFilter
-    );
+    const agreements = await this.edcClient.queryAllAgreements({
+      filterExpression: [
+        {
+          operandLeft: 'assetId',
+          operator: '=',
+          operandRight: assetId,
+        },
+      ],
+    });
 
     if (!agreements.length) return;
 

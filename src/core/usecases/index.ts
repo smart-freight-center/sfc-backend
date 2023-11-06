@@ -10,12 +10,13 @@ import {
   edcClient,
   edcTransferService,
 } from 'core/services';
-import { InitiateFileTransferUsecase } from './initiate-file-transfer';
 import { GetEmissionsUsecase } from './get-emissions';
 import { ShareFootprintUsecase } from './share-footprint';
 import { DeleteFootprintUsecase } from './delete-fooprint';
 import { InitiateBatchRequestUsecase } from './initiate-batch-request';
 import { AuthTokenCallbackUsecase } from './auth-token-callback';
+import { InitiateDataTransferByMonthUsecase } from './initiate-data-transfer-by-month';
+export { TransferByMonthInput } from './initiate-data-transfer-by-month';
 
 export const provideFootprintUsecase = new ListSharedAssetsUsecsase(
   sfcDataSpace,
@@ -37,8 +38,8 @@ export const retrieveFootprintsUsecase = new RetrieveFootprintMetaUsecase(
   sfcAPI
 );
 export const generateTokenUsecase = new GenerateTokenUsecase(KeyCloackClient);
-export const initiateFileTransferUsecase = new InitiateFileTransferUsecase(
-  edcTransferService,
+
+export const initiateTransferByMonth = new InitiateDataTransferByMonthUsecase(
   sfcAPI,
   cacheService,
   sfcDataSpace

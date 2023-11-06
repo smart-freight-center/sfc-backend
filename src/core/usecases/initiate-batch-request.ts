@@ -125,13 +125,9 @@ export class InitiateBatchRequestUsecase {
   private async startTransferOnAllAssets(shipmentLegs: ProviderContract[]) {
     const assetIds: string[] = [];
     for (const shipmentLeg of shipmentLegs) {
-      const { provider, contractOffer, assetId } = shipmentLeg;
+      const { assetId } = shipmentLeg;
 
       assetIds.push(assetId);
-      await this.edcTransferService.initiateTransferProcess(
-        provider,
-        contractOffer
-      );
     }
     return assetIds;
   }

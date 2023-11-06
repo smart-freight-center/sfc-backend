@@ -50,14 +50,14 @@ export class GetEmissionsUsecase {
     const aggregated = {
       transport_activity: 0,
       mass: 0,
-      actual_distance: 0,
-      co2_wtw: 0,
+      distance_actual: 0,
+      co2e_wtw: 0,
     };
     for (const emission of emissions) {
       aggregated.transport_activity += +emission.transport_activity || 0;
       aggregated.mass += +emission.mass || 0;
-      aggregated.actual_distance += +emission.actual_distance || 0;
-      aggregated.co2_wtw += +emission.co2_wtw || 0;
+      aggregated.distance_actual += +emission.distance_actual || 0;
+      aggregated.co2e_wtw += +emission.co2e_wtw || 0;
     }
     return aggregated;
   }

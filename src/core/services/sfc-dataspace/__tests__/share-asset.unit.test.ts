@@ -1,4 +1,3 @@
-import { validate } from 'uuid';
 import { SfcDataSpace } from '../sfc-dataspace';
 import { mockEdcClient } from './stubs';
 import { expect } from 'chai';
@@ -167,10 +166,7 @@ describe('SfcDataspace', () => {
         ],
       });
 
-      contractArgument['@id'].startsWith('new-asset-id-').should.be.true;
-
-      validate(contractArgument['@id'].replace('new-asset-id-', '')).should.be
-        .true;
+      contractArgument['@id'].should.be.eql('new-asset-id');
     });
   });
 });

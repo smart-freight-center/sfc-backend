@@ -2,8 +2,8 @@ import { RouterContext } from '@koa/router';
 import {
   retrieveFootprintsUsecase,
   getEmissionsUsecase,
-  initiateBatchRequestUsecase,
-  initiateFileTransferUsecase,
+  initiateTransferByMonth,
+  TransferByMonthInput,
 } from 'core/usecases';
 
 export class ConsumerController {
@@ -21,26 +21,11 @@ export class ConsumerController {
     context.status = 200;
   }
 
-  static async initiateFileTransfer(context: RouterContext) {
-    const authorization = context.headers.authorization || '';
-    const { shipmentId } = context.params;
-    const inputData = {
-      shipmentId: shipmentId,
-    };
-    const jobId = await initiateFileTransferUsecase.execute(
-      inputData,
-      authorization
-    );
-
-    context.body = { jobId };
-    context.status = 201;
-  }
-
-  static async initiateBatchTransfer(context: RouterContext) {
+  static async initiateTransferByMonth(context: RouterContext) {
     const authorization = context.headers.authorization || '';
 
-    const jobId = await initiateBatchRequestUsecase.execute(
-      context.request.body as any,
+    const jobId = await initiateTransferByMonth.execute(
+      context.request.body as TransferByMonthInput,
       authorization
     );
 

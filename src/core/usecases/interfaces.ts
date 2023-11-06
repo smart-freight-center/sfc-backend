@@ -1,5 +1,6 @@
 import { ShareFootprintInput } from 'entities';
 import { EmissionDataModel, Participant } from '../types';
+import { Offer } from '@think-it-labs/edc-connector-client';
 
 export type ShareDataspaceAssetInput = ShareFootprintInput & {
   provider: Participant;
@@ -14,6 +15,13 @@ export type FootprintMetaData = {
   sharedWith: number;
   year: number;
   id: string;
+  offer?: Offer;
+};
+
+export type SingleAssetDetail = {
+  provider: Omit<Participant, 'connection'>;
+  assetId: string;
+  contractOffer: Offer;
 };
 
 export type DeleteAssetInput = {
@@ -29,11 +37,14 @@ export interface ISfcDataSpace {
   ): Promise<void>;
   fetchCarbonFootprint(input): Promise<EmissionDataModel[]>;
   fetchFootprintsMetaData(provider: Participant): Promise<FootprintMetaData[]>;
-
-  startTransferProcess(
-    provider: Omit<Participant, 'connection'>,
-    contractOffer
-  ): Promise<void>;
+  fetchDataThatProviderHasShared(
+    providerUrl: string
+  ): Promise<FootprintMetaData[]>;
+  startTransferProcess(SingleAssetDetail: SingleAssetDetail): Promise<void>;
+  fetchAssetsByMonth(
+    connections: Omit<Participant, 'connection'>[],
+    filters: { month: number; year: number }
+  ): Promise<SingleAssetDetail[]>;
 }
 
 export interface IDataSourceFetcher {
