@@ -25,7 +25,7 @@ export const emissionRoutes = new KoaRouter({ prefix: '/emissions' })
     'Request a data catalog from a connector',
     '/catalog',
     AuthController.authMiddleware,
-    ConsumerController.requestFootprintsCatalog
+    ConsumerController.fetchReceivedFootprintMeta
   )
   .post(
     'initiate file transfer on the connector',

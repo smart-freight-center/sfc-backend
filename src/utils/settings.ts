@@ -41,7 +41,7 @@ export const CLIENT_CONFIG = {
   },
 };
 
-export const TRANSFER_EXP_PROCESS_IN_SECONDS = 2 * 60 * 60; //2 hours
+export const TRANSFER_EXP_PROCESS_IN_SECONDS = 10 * 60; // 10 minutes
 
 // eslint-disable-next-line no-use-before-define
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';

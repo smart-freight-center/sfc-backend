@@ -19,7 +19,6 @@ export type ValidateDataModelInput = {
 
 export interface ListCatalogInput {
   companyId: string;
-  shipmentId?: string;
 }
 
 export type ContractNegotiationInput = {

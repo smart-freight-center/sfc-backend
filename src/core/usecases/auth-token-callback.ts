@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
 import { AppLogger } from 'utils/logger';
 import { ICacheService } from './interfaces';
@@ -33,11 +34,17 @@ export class AuthTokenCallbackUsecase {
 
     const assetId: string = transferProcess.mandatoryValue('edc', 'assetId');
 
-    await this.cacheService.storeItem(
-      assetId,
-      cacheValue,
-      TRANSFER_EXP_PROCESS_IN_SECONDS
-    );
+    const res = jwt.decode(cacheValue.authCode, { complete: true });
+    let expTimeInSeconds = TRANSFER_EXP_PROCESS_IN_SECONDS;
+
+    if (typeof res?.payload === 'object' && res?.payload.exp) {
+      const expTime = res.payload.exp;
+      const now = +new Date();
+      expTimeInSeconds = (expTime * 1000 - now) / 1000;
+      expTimeInSeconds = Math.round(expTimeInSeconds);
+    }
+
+    await this.cacheService.storeItem(assetId, cacheValue, expTimeInSeconds);
 
     logger.info('Successfully stored auth code in redis');
   }

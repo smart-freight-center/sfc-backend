@@ -7,15 +7,10 @@ import {
 } from 'core/usecases';
 
 export class ConsumerController {
-  static async requestFootprintsCatalog(context: RouterContext) {
-    const args = {
-      companyId: context.query.companyId as string,
-      shipmentId: context.query.shipmentId as string,
-    };
-
+  static async fetchReceivedFootprintMeta(context: RouterContext) {
     const catalogs = await retrieveFootprintsUsecase.execute(
       context.headers.authorization as string,
-      args
+      context.query
     );
     context.body = catalogs;
     context.status = 200;

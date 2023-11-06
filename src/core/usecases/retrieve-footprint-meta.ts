@@ -1,33 +1,62 @@
-import joi from 'joi';
-import { ListCatalogInput } from 'entities';
-import { validateData } from 'utils/helpers';
 import { EdcClient } from 'core/services/sfc-dataspace/edc-client';
 import { ISFCAPI } from './interfaces';
 import { AppLogger } from 'utils/logger';
+import { validatePaginationQuery } from 'utils/helpers';
+import { paginate } from 'utils/paginate';
 
-const listCatalogSchema = joi.object({
-  companyId: joi.string().required(),
-});
-
+type FootprintData = {
+  owner: string;
+  month: number;
+  year: number;
+  sharedWith: string;
+  id: string;
+};
 const logger = new AppLogger('RetrieveFootprintMetaUsecase');
 export class RetrieveFootprintMetaUsecase {
   constructor(private edcClient: EdcClient, private sfcAPI: ISFCAPI) {}
 
-  async execute(authorization: string, input: ListCatalogInput) {
+  async execute(authorization: string, query) {
     logger.info('Retrieving footprints that we have access to...');
-    const validInput = validateData(listCatalogSchema, input);
     const sfcAPISession = await this.sfcAPI.createConnection(authorization);
-    const provider = await sfcAPISession.getCompany(validInput.companyId);
-    const catalog = await this.edcClient.listCatalog({
-      providerUrl: provider.connector_data.addresses.protocol as string,
-    });
 
-    return catalog.datasets.map((dataset) => ({
-      owner: dataset.mandatoryValue('edc', 'owner'),
-      month: dataset.mandatoryValue('edc', 'month'),
-      sharedWith: dataset.mandatoryValue('edc', 'sharedWith'),
-      year: dataset.mandatoryValue('edc', 'year'),
-      id: dataset.mandatoryValue('edc', 'id'),
-    }));
+    const { page, perPage } = validatePaginationQuery(query);
+
+    const companies = await sfcAPISession.getCompanies();
+
+    const companyProtocols = companies.map(
+      (company) => company.connector_data.addresses.protocol as string
+    );
+
+    const items = await this.getItemsThatHasBeenSharedWithMe(companyProtocols);
+
+    return paginate(items, {
+      page,
+      perPage,
+      total: items.length,
+    });
+  }
+
+  private async getItemsThatHasBeenSharedWithMe(providerUrls: string[]) {
+    let receivedFootprints: FootprintData[] = [];
+    for (const providerUrl of providerUrls) {
+      const catalog = await this.edcClient.listCatalog({
+        providerUrl,
+      });
+      const dataReceivedFromThisProvider = catalog.datasets.map((dataset) => {
+        return {
+          owner: dataset.mandatoryValue('edc', 'owner'),
+          month: dataset.mandatoryValue('edc', 'month'),
+          sharedWith: dataset.mandatoryValue('edc', 'sharedWith'),
+          year: dataset.mandatoryValue('edc', 'year'),
+          id: dataset.mandatoryValue('edc', 'id'),
+        } as FootprintData;
+      });
+
+      receivedFootprints = receivedFootprints.concat(
+        dataReceivedFromThisProvider
+      );
+    }
+
+    return receivedFootprints;
   }
 }
