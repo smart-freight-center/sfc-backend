@@ -26,6 +26,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.321.1",
     "@koa/cors": "^4.0.0",
+    "@koa/multer": "^3.0.2",
     "@koa/router": "^12.0.0",
     "@think-it-labs/edc-connector-client": "0.2.0-beta-6",
     "@think-it-labs/typed-error": "^0.3.0",
@@ -36,8 +37,9 @@
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.2",
     "koa": "^2.14.1",
-    "koa-bodyparser": "^4.3.0",
+    "koa-bodyparser": "^4.4.1",
     "lodash": "^4.17.21",
+    "multer": "^1.4.5-lts.1",
     "pg": "^8.10.0",
     "redis": "^4.6.5",
     "reflect-metadata": "^0.1.13",
