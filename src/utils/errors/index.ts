@@ -24,6 +24,12 @@ export class InvalidTokenInSFCAPI extends NotImplemented {
   name = 'public_key_not_provided';
   message = 'Your infrastructure setup for Keycloak is incomplete';
 }
+
+export class InvalidToken extends Unauthorized {
+  name = 'invalid_token';
+  message = 'Invalid token';
+}
+
 export class TransferNotInitiated extends DataConflict {
   name = 'transfer_not_initiated';
   message = 'Transfer for this shipment is not yet initiated';

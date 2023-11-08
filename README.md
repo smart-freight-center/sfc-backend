@@ -45,12 +45,14 @@ Once redis is installed you can run it with:
  redis-server
 ```
 
-### Postman Docs
+### Postman Docs for V1
 
-View Postman Docs here [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/4208573-c278aa53-81d5-4511-839d-bb8b3b90dcad?action=collection%2Ffork&collection-url=entityId%3D4208573-c278aa53-81d5-4511-839d-bb8b3b90dcad%26entityType%3Dcollection%26workspaceId%3Dda069bda-ef41-4880-addf-f4e466564e79)
+View Postman Docs [here](https://documenter.getpostman.com/view/27072999/2s9YXia2Sj)
 
 ### Using docker for local development
+
 Running the `docker-compose up` command will start:
+
 - redis-server
 - keycloak-server
 - edc-manager
@@ -95,8 +97,7 @@ export CONSUMER_KEYCLOAK_PUBLIC_KEY='<get the public key from keycloak>'
 
 ## Abstract
 
-**The MVP version aims to ensure that all participants use a consistent and interoperable framework, allowing for seamless data exchange and collaboration.
-
+\*\*The MVP version aims to ensure that all participants use a consistent and interoperable framework, allowing for seamless data exchange and collaboration.
 
 ## Getting started
 
@@ -106,7 +107,7 @@ You need to retrieve the required environment variables from the project lead or
 
 ### Start development servers
 
-It is necessary to spin up all services to start the development process effectively. 
+It is necessary to spin up all services to start the development process effectively.
 
 Open **three** terminal windows and enter the following commands:
 

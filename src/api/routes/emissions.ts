@@ -28,6 +28,28 @@ export const emissionRoutes = new KoaRouter({ prefix: '/emissions' })
     'Request a data catalog from a connector',
     '/catalog',
     AuthController.authMiddleware,
+    ProviderController.unshareFootprint
+  )
+
+  .post(
+    'Validate data model',
+    '/validate-data-source',
+    AuthController.authMiddleware,
+    ProviderController.validateDataModalOnDataSource
+  )
+
+  .post(
+    'Validate data model',
+    '/validate-file',
+    upload.fields([{ name: 'rawData', maxCount: 1 }]),
+    AuthController.authMiddleware,
+    ProviderController.validateDataModelFile
+  )
+
+  .get(
+    'Request carbon footprints of emissions received',
+    '/received',
+    AuthController.authMiddleware,
     ConsumerController.fetchReceivedFootprintMeta
   )
   .post(
@@ -39,22 +61,7 @@ export const emissionRoutes = new KoaRouter({ prefix: '/emissions' })
 
   .get(
     'Get Footprint data by shipment',
-    '/:shipmentId',
+    '/:jobId',
     AuthController.authMiddleware,
     ConsumerController.getData
-  )
-
-  .post(
-    'Validate data model',
-    '/validate',
-    AuthController.authMiddleware,
-    ProviderController.validateDataModel
-  )
-
-  .post(
-    'Validate data model',
-    '/validate-file',
-    upload.fields([{ name: 'file', maxCount: 1 }]),
-    AuthController.authMiddleware,
-    ProviderController.validateDataModelFile
   );

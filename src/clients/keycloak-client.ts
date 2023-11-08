@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { KEYCLOAK_HOST, KEYCLOAK_REALM } from 'utils/settings';
 import {
   InvalidCredentials,
+  InvalidToken,
   KeyCloakCouldNotGenerateToken,
 } from 'utils/errors';
 import { AppLogger } from 'utils/logger';
@@ -43,15 +44,21 @@ export class KeyCloackClient {
   }
 
   static async verifyToken(publicKey: string, authorization: string) {
-    const completeKey =
-      '-----BEGIN PUBLIC KEY-----\n' + publicKey + '\n-----END PUBLIC KEY-----';
+    try {
+      const completeKey =
+        '-----BEGIN PUBLIC KEY-----\n' +
+        publicKey +
+        '\n-----END PUBLIC KEY-----';
 
-    const accessToken = authorization?.split(' ')[1];
+      const accessToken = authorization?.split(' ')[1];
 
-    const data = await jwt.verify(accessToken, completeKey, {
-      algorithms: ['RS256'],
-    });
+      const data = await jwt.verify(accessToken, completeKey, {
+        algorithms: ['RS256'],
+      });
 
-    return data;
+      return data;
+    } catch (error) {
+      throw new InvalidToken();
+    }
   }
 }

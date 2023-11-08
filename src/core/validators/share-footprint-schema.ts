@@ -69,7 +69,6 @@ const sharedSchema = joi.object({
   month: joi.number().integer().greater(0).less(13).required(),
   year: joi.number().required(),
   companyId: joi.string().required(),
-  contentType: joi.string().valid('application/json', 'text/csv'),
   type: joi.string().required().lowercase().valid('azure', 'http', 's3'),
   dataLocation: joi.object().required(),
 });
@@ -77,7 +76,6 @@ const sharedSchema = joi.object({
 const validatedSchema = joi.object({
   month: joi.number().integer().greater(0).less(13).required(),
   year: joi.number().required(),
-  contentType: joi.string().valid('application/json', 'text/csv'),
   type: joi.string().required().lowercase().valid('azure', 'http', 's3'),
   dataLocation: joi.object().required(),
 });
