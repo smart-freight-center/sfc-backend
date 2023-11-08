@@ -11,6 +11,12 @@ import {
   EdcConnectorClientErrorType,
 } from '@think-it-labs/edc-connector-client';
 import { ObjectSchema } from 'joi';
+import { paginationSchema } from 'core/validators';
+
+type PaginationQuery = {
+  page: number;
+  perPage: number;
+};
 
 export const validateSchema = (
   data: object,
@@ -35,6 +41,10 @@ export function validateData<T>(schema: ObjectSchema, data: T) {
   }
 
   return value as T;
+}
+
+export function validatePaginationQuery(query: Partial<PaginationQuery> = {}) {
+  return validateData(paginationSchema, query) as PaginationQuery;
 }
 
 export const sleep = (ms: number): Promise<void> => {

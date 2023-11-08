@@ -75,7 +75,6 @@ export class GetEmissionsUsecase {
   private async fetchData(assetId: string) {
     logger.info('Fetching emissions for asset...', { assetId });
 
-    console.log({ assetId }, '<-assetId');
     const data = await this.getKeyFromCache(assetId);
 
     const { authCode, authKey } = data as AssetCacheValue;

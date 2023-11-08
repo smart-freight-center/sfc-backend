@@ -1,5 +1,4 @@
 import { ShareFootprintInput } from 'entities';
-import { InvalidInput } from 'utils/errors';
 import {
   deleteFootprintUsecase,
   provideFootprintUsecase,
@@ -7,7 +6,6 @@ import {
   validateDataModelUsecase,
 } from 'core/usecases';
 import { RouterContext } from '@koa/router';
-import { EdcConnectorClientError } from '@think-it-labs/edc-connector-client';
 import { DeleteFootprintInput } from 'core/usecases/delete-fooprint';
 
 export class ProviderController {
@@ -35,28 +33,14 @@ export class ProviderController {
   }
 
   static async getSharedFootprints(context: RouterContext) {
-    try {
-      const assets = await provideFootprintUsecase.execute(
-        context.headers.authorization as string
-      );
-      context.body = assets;
-      context.status = 200;
-    } catch (error) {
-      if (error instanceof InvalidInput) {
-        context.status = 400;
-        context.body = { errors: error.errors };
-        return;
-      }
-
-      if (error instanceof EdcConnectorClientError) {
-        context.status = 503;
-        context.body = { error: 'Your connector is not healthy' };
-        return;
-      }
-
-      context.status = 500;
-    }
+    const responseData = await provideFootprintUsecase.execute(
+      context.headers.authorization as string,
+      context.query
+    );
+    context.body = responseData;
+    context.status = 200;
   }
+
   static async validateDataModel(context: RouterContext) {
     await validateDataModelUsecase.execute(
       context.request.body as ShareFootprintInput

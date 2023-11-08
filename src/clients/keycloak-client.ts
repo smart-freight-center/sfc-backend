@@ -6,10 +6,13 @@ import {
   InvalidCredentials,
   KeyCloakCouldNotGenerateToken,
 } from 'utils/errors';
+import { AppLogger } from 'utils/logger';
 
 const keyCloakClient = axios.create({
   baseURL: `${KEYCLOAK_HOST}/realms/${KEYCLOAK_REALM}`,
 });
+
+const logger = new AppLogger('KeyCloackClient');
 
 export class KeyCloackClient {
   static async generateToken(clientId: string, grantType, clientSecret) {
@@ -32,7 +35,9 @@ export class KeyCloackClient {
       if (axiosError.response?.status === 401) {
         throw new InvalidCredentials();
       }
-      console.log(error);
+      logger.error('Error occured while validating tokes in keycloak', {
+        error,
+      });
       throw new KeyCloakCouldNotGenerateToken();
     }
   }
@@ -44,7 +49,7 @@ export class KeyCloackClient {
     const accessToken = authorization?.split(' ')[1];
 
     const data = await jwt.verify(accessToken, completeKey, {
-      algorithm: ['RS256'],
+      algorithms: ['RS256'],
     });
 
     return data;

@@ -26,10 +26,10 @@ export class SfcDataSpace implements ISfcDataSpace {
   }
 
   public async fetchFootprintsMetaData(
-    provider: Participant
+    ownerId: string
   ): Promise<FootprintMetaData[]> {
     const assets = await this.edcClient.listAssets({
-      filterExpression: [builder.assetFilter('owner', '=', provider.client_id)],
+      filterExpression: [builder.assetFilter('owner', '=', ownerId)],
     });
 
     return assets.map((asset) => ({
@@ -136,7 +136,7 @@ export class SfcDataSpace implements ISfcDataSpace {
   }
 
   public async fetchCarbonFootprint(authKey: string, authCode: string) {
-    logger.info('Fetching Carbon Footprints', { authKey, authCode });
+    logger.info('Fetching Carbon Footprints');
     const response = await this.edcClient.getTranferedData(authKey, authCode);
 
     if (response.body) {

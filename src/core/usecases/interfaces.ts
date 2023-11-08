@@ -39,7 +39,7 @@ export interface ISfcDataSpace {
     authKey: string,
     authCode: string
   ): Promise<EmissionDataModel[]>;
-  fetchFootprintsMetaData(provider: Participant): Promise<FootprintMetaData[]>;
+  fetchFootprintsMetaData(providerId: string): Promise<FootprintMetaData[]>;
   fetchDataThatProviderHasShared(
     providerUrl: string
   ): Promise<FootprintMetaData[]>;
