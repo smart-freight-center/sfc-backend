@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
 import { AppLogger } from 'utils/logger';
-import { ICacheService } from './interfaces';
+import { ICacheService, ISfcDataSpace } from './interfaces';
 import { EdcClient } from 'core/services/sfc-dataspace/edc-client';
 
 const logger = new AppLogger('AuthTokenCallbackUsecase');
@@ -16,25 +16,38 @@ export class AuthTokenCallbackUsecase {
   readonly dataQueue = [];
 
   constructor(
-    private edcClient: EdcClient,
+    private sfcDataSpace: ISfcDataSpace,
     private cacheService: ICacheService
   ) {}
 
   async execute(input: TransferCallbackInput) {
     logger.info('Caching auth code and keys...');
 
-    const cacheValue = {
-      authCode: input.authCode,
-      authKey: input.authKey,
-    };
-    const transferProcess = await this.edcClient.getTransferProcessById(
+    const { authKey, authCode } = input;
+
+    const assetId = await this.sfcDataSpace.getAssetIdFromTransferProcess(
       input.id
     );
-    if (!transferProcess) return;
+    if (!assetId) return;
 
-    const assetId: string = transferProcess.mandatoryValue('edc', 'assetId');
+    const expTimeInSeconds = this.getExpTimeFromToken(input.authCode);
 
-    const res = jwt.decode(cacheValue.authCode, { complete: true });
+    const carbonFootprintData = await this.sfcDataSpace.fetchCarbonFootprint(
+      authKey,
+      authCode
+    );
+
+    await this.cacheService.storeItem(
+      assetId,
+      carbonFootprintData,
+      expTimeInSeconds
+    );
+
+    logger.info('Successfully stored auth code in redis');
+  }
+
+  private getExpTimeFromToken(authCode: string) {
+    const res = jwt.decode(authCode, { complete: true });
     let expTimeInSeconds = TRANSFER_EXP_PROCESS_IN_SECONDS;
 
     if (typeof res?.payload === 'object' && res?.payload.exp) {
@@ -43,9 +56,6 @@ export class AuthTokenCallbackUsecase {
       expTimeInSeconds = (expTime * 1000 - now) / 1000;
       expTimeInSeconds = Math.round(expTimeInSeconds);
     }
-
-    await this.cacheService.storeItem(assetId, cacheValue, expTimeInSeconds);
-
-    logger.info('Successfully stored auth code in redis');
+    return expTimeInSeconds;
   }
 }

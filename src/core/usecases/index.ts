@@ -67,6 +67,6 @@ export const getEmissionsUsecase = new GetEmissionsUsecase(
 );
 
 export const authTokenCallbackUsecase = new AuthTokenCallbackUsecase(
-  edcClient,
+  sfcDataSpace,
   cacheService
 );
