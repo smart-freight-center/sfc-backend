@@ -87,6 +87,37 @@ describe('Validate Data Model Usecase', () => {
     });
   });
   describe('Data Model Validation', () => {
+    const validDataModel = {
+      id_tce: 'tce_3',
+      id_consignment: '3006756',
+      id_shipment: 'shipmentid1',
+      transport_activity: '200',
+      mass: '1000',
+      mode_of_transport: 'Air',
+      load_factor: '0.3',
+      empty_distance: '10',
+      energy_carrier_N: '<some string here>',
+      Feedstock_N: 'aviation fuel blend',
+      accreditation: false,
+      verification: false,
+      co2e_wtw: 42,
+      co2e_ttw: 42,
+      transport_operator_name: 'rail',
+      temp_control: 'frozen',
+      co2e_intensity_wtw: 50,
+      co2e_intensity_wtw_unit: 'g/t-km',
+      loading_city: 'new york',
+      unloading_city: 'montreal',
+      loading_country: 'united states',
+      unloading_country: 'canada',
+      empty_distance_factor_add_information: 'test',
+      empty_distance_factor: 0.3,
+      id_tce_order: 'test',
+      energy_carrier_feedstock_N: 'test',
+      distance_activity: 4,
+      unloading_date: '2023-12-01',
+    };
+
     beforeEach(() => {
       mockDataSourceFetcher.fetchFootprintData.reset();
     });
@@ -133,7 +164,47 @@ describe('Validate Data Model Usecase', () => {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
-          distance_actual: {
+          distance_activity: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          empty_distance_factor: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          empty_distance_factor_add_information: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          energy_carrier_feedstock_N: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          id_tce_order: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          loading_city: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          loading_country: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          temp_control: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          transport_operator_name: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          unloading_city: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          unloading_country: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
@@ -145,7 +216,19 @@ describe('Validate Data Model Usecase', () => {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
+          co2e_intensity_wtw_unit: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          co2e_ttw: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
           co2e_wtw: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          co2e_intensity_wtw: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
@@ -178,56 +261,34 @@ describe('Validate Data Model Usecase', () => {
         );
       });
 
-      it('should throw an error if one or more element in the json array does not pass data model validation', async () => {
+      it('should pass when data model validation is satisfied', async () => {
         mockDataSourceFetcher.fetchFootprintData.returns(
           Promise.resolve(
-            JSON.stringify([
-              {
-                id_tce: 'tce_1',
-                id_consignment: '1050700',
-                id_shipment: 'shipmentid1',
-                transport_activity: '400',
-                mass: '1000',
-                mode_of_transport: 'Road',
-                asset_type: '40-ft truck',
-                load_factor: '0.8',
-                empty_distance: '50',
-                energy_carrier_N: '<some string here>',
-                Feedstock_N: 'biodiesel',
-                distance_actual: '100',
-                co2e_wtw: '10',
-              },
-              {
-                id_tce: 'tce_2',
-                id_consignment: '2008750',
-                id_shipment: 'shipmentid1',
-                transport_activity: '300',
-                mass: '1000',
-                mode_of_transport: 'Ocean',
-                asset_type: 'container ship X',
-                load_factor: '0.7',
-                empty_distance: '0',
-                energy_carrier_N: '<some string here>',
-                Feedstock_N: 'marine oil',
-                distance_actual: '200',
-              },
-              {
-                id_tce: 'tce_3',
-                id_consignment: '3006756',
-                id_shipment: 'shipmentid1',
-                transport_activity: '200',
-                mass: '1000',
-                mode_of_transport: 'Air',
-                asset_type: 'Airplane XYZ',
-                load_factor: '0.3',
-                empty_distance: '10',
-                energy_carrier_N: '<some string here>',
-                Feedstock_N: 'aviation fuel blend',
-                distance_actual: '300',
-                unloading_date: '2023-12-25',
-              },
-            ])
+            JSON.stringify([validDataModel, validDataModel, validDataModel])
           )
+        );
+
+        const validInput = {
+          ...mockInput,
+          type: 'http' as const,
+          month: 12,
+          year: 2023,
+          dataLocation: {
+            name: 'ShipmentId-1',
+            baseUrl: 'http://example.com/footprints.csv',
+          },
+        };
+        await expect(
+          validateDataModel.execute(validInput)
+        ).to.not.be.rejectedWith(DataModelValidationFailed);
+        mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
+          validInput
+        );
+      });
+
+      it('should fail when some required fields are missing', async () => {
+        mockDataSourceFetcher.fetchFootprintData.returns(
+          Promise.resolve(JSON.stringify([{}, {}, {}]))
         );
 
         const validInput = {
@@ -245,19 +306,115 @@ describe('Validate Data Model Usecase', () => {
         ).to.be.rejectedWith(DataModelValidationFailed);
 
         errors.should.be.eql({
+          Feedstock_N: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
           accreditation: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          distance_activity: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          empty_distance_factor: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          empty_distance_factor_add_information: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          energy_carrier_feedstock_N: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          id_tce_order: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          loading_city: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          loading_country: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          temp_control: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          transport_operator_name: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          unloading_city: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          unloading_country: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          unloading_date: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          verification: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          co2e_intensity_wtw_unit: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          co2e_intensity_wtw: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          co2e_ttw: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
           co2e_wtw: {
             msgs: ['is required'],
-            rows: [2, 3],
+            rows: [1, 2, 3],
           },
-          unloading_date: {
+          empty_distance: {
             msgs: ['is required'],
-            rows: [1, 2],
+            rows: [1, 2, 3],
           },
-          verification: {
+          energy_carrier_N: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          id_consignment: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          id_shipment: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          id_tce: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          load_factor: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          mass: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          mode_of_transport: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
+          transport_activity: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
@@ -272,93 +429,23 @@ describe('Validate Data Model Usecase', () => {
           Promise.resolve(
             JSON.stringify([
               {
-                id_tce: 'tce_1',
-                id_consignment: '1050700',
-                id_shipment: 'shipmentid1',
-                transport_activity: '400',
-                mass: '1000',
-                mode_of_transport: 'Road',
-                asset_type: '40-ft truck',
-                load_factor: '0.8',
-                empty_distance: '50',
-                energy_carrier_N: '<some string here>',
-                Feedstock_N: 'biodiesel',
-                distance_actual: '100',
+                ...validDataModel,
                 unloading_date: '2024-01-01',
-                accreditation: false,
-                verification: false,
-                co2e_wtw: 42,
               },
               {
-                id_tce: 'tce_2',
-                id_consignment: '2008750',
-                id_shipment: 'shipmentid1',
-                transport_activity: '300',
-                mass: '1000',
-                mode_of_transport: 'Ocean',
-                asset_type: 'container ship X',
-                load_factor: '0.7',
-                empty_distance: '0',
-                energy_carrier_N: '<some string here>',
-                Feedstock_N: 'marine oil',
-                distance_actual: '200',
-                accreditation: false,
-                verification: false,
-                co2e_wtw: 42,
+                ...validDataModel,
                 unloading_date: '2023-11-01',
               },
               {
-                id_tce: 'tce_3',
-                id_consignment: '3006756',
-                id_shipment: 'shipmentid1',
-                transport_activity: '200',
-                mass: '1000',
-                mode_of_transport: 'Air',
-                asset_type: 'Airplane XYZ',
-                load_factor: '0.3',
-                empty_distance: '10',
-                energy_carrier_N: '<some string here>',
-                Feedstock_N: 'aviation fuel blend',
-                distance_actual: '300',
-                accreditation: false,
-                verification: false,
-                co2e_wtw: 42,
+                ...validDataModel,
                 unloading_date: '2023-12-25',
               },
               {
-                id_tce: 'tce_3',
-                id_consignment: '3006756',
-                id_shipment: 'shipmentid1',
-                transport_activity: '200',
-                mass: '1000',
-                mode_of_transport: 'Air',
-                asset_type: 'Airplane XYZ',
-                load_factor: '0.3',
-                empty_distance: '10',
-                energy_carrier_N: '<some string here>',
-                Feedstock_N: 'aviation fuel blend',
-                distance_actual: '300',
-                accreditation: false,
-                verification: false,
-                co2e_wtw: 42,
+                ...validDataModel,
                 unloading_date: '2023-12-03',
               },
               {
-                id_tce: 'tce_3',
-                id_consignment: '3006756',
-                id_shipment: 'shipmentid1',
-                transport_activity: '200',
-                mass: '1000',
-                mode_of_transport: 'Air',
-                asset_type: 'Airplane XYZ',
-                load_factor: '0.3',
-                empty_distance: '10',
-                energy_carrier_N: '<some string here>',
-                Feedstock_N: 'aviation fuel blend',
-                distance_actual: '300',
-                accreditation: false,
-                verification: false,
-                co2e_wtw: 42,
+                ...validDataModel,
                 unloading_date: '2023-12-31T13:00:00.000Z',
               },
             ])
