@@ -11,7 +11,7 @@ export class RunValidationOnRawFileUsecase {
       input
     ) as ValidateRawDataModelInput;
 
-    const numberOfRows = await verifyDataModel({ month, year }, rawData);
-    return { numberOfRows };
+    const data = await verifyDataModel({ month, year }, rawData);
+    return { numberOfRows: data.length };
   }
 }

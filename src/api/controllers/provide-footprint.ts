@@ -43,12 +43,15 @@ export class ProviderController {
   }
 
   static async validateDataModel(context: RouterContext) {
-    await validateDataModelUsecase.execute(
+    const resData = await validateDataModelUsecase.execute(
       context.request.body as ShareFootprintInput
     );
 
     context.status = 200;
-    context.body = { message: 'Successfully validated data model' };
+    context.body = {
+      message: 'Successfully validated data model',
+      meta: resData,
+    };
   }
 
   static async validateDataModelFile(context: RouterContext) {
@@ -56,7 +59,7 @@ export class ProviderController {
     let rawData = '';
     const file = request.files?.file[0];
     if (file) {
-      rawData = file.buffer.toString().trim();
+      rawData = file.buffer.toString();
     }
 
     const metaData = await runValidationOnRawFileUsecase.execute({

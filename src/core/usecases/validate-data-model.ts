@@ -15,8 +15,8 @@ export class ValidateDataModelUsecase {
     );
 
     const { month, year } = validatedInput;
-    await verifyDataModel({ month, year }, rawData);
-    return;
+    const data = await verifyDataModel({ month, year }, rawData);
+    return { numberOfRows: data.length };
   }
 
   private validateInput(input: Partial<ValidateDataModelInput>) {
