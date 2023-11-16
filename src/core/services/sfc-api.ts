@@ -1,7 +1,11 @@
 import axios, { AxiosError } from 'axios';
 import { Participant } from 'core/types';
 import { ISFCAPIConnection, ISFCAPI } from 'core/usecases/interfaces';
-import { InvalidTokenInSFCAPI, ParticipantNotFound } from 'utils/errors';
+import {
+  InvalidToken,
+  InvalidTokenInSFCAPI,
+  ParticipantNotFound,
+} from 'utils/errors';
 import { SFCAPI_BASEURL } from 'utils/settings';
 
 const sfcAxios = axios.create({
@@ -50,7 +54,7 @@ export class SFCAPI implements ISFCAPIConnection {
         throw new InvalidTokenInSFCAPI();
       }
 
-      throw error;
+      throw new InvalidToken();
     }
   }
 

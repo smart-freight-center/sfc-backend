@@ -42,7 +42,7 @@ export class ProviderController {
     context.status = 200;
   }
 
-  static async validateDataModel(context: RouterContext) {
+  static async validateDataModalOnDataSource(context: RouterContext) {
     const resData = await validateDataModelUsecase.execute(
       context.request.body as ShareFootprintInput
     );
@@ -57,7 +57,7 @@ export class ProviderController {
   static async validateDataModelFile(context: RouterContext) {
     const request = context.request as any;
     let rawData = '';
-    const file = request.files?.file[0];
+    const file = request.files?.rawData?.[0];
     if (file) {
       rawData = file.buffer.toString();
     }

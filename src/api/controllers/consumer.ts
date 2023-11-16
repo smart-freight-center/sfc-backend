@@ -29,12 +29,9 @@ export class ConsumerController {
   }
 
   static async getData(context: RouterContext) {
-    const shipmentId = context.params.shipmentId as string;
+    const jobId = context.params.jobId as string;
     const aggregate = context.query.aggregate || 'false';
-    const data = await getEmissionsUsecase.execute(
-      shipmentId,
-      aggregate == 'true'
-    );
+    const data = await getEmissionsUsecase.execute(jobId, aggregate == 'true');
     context.body = data;
     context.status = 200;
   }

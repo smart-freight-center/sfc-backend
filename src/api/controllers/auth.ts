@@ -18,19 +18,11 @@ export class AuthController {
   static async authMiddleware(context: RouterContext, next) {
     const authorization = context.request.headers.authorization || '';
 
-    try {
-      const decoded = await KeyCloackClient.verifyToken(
-        KEYCLOAK_PUBLIC_KEY,
-        authorization
-      );
-      context.decoded = decoded;
-      return next();
-    } catch (error) {
-      context.body = {
-        error: 'invalid token',
-      };
-
-      context.status = 401;
-    }
+    const decoded = await KeyCloackClient.verifyToken(
+      KEYCLOAK_PUBLIC_KEY,
+      authorization
+    );
+    context.decoded = decoded;
+    return next();
   }
 }
