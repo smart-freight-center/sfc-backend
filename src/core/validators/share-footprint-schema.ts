@@ -10,15 +10,20 @@ const dataModelSchema = (month: number, year: number) => {
   return joi.array().items(
     joi.object({
       id_tce: joi.string().required(),
+      id_tce_order: joi.string().required(),
       id_consignment: joi.string().required(),
       id_shipment: joi.string().required(),
-      transport_activity: joi.number().required(),
-      mass: joi.number().required(),
-      distance_actual: joi.number().required(),
+      transport_activity: joi.number().positive().required(),
+      mass: joi.number().positive().required(),
+      distance_actual: joi.number().positive().optional(),
       mode_of_transport: joi.string().required(),
-      asset_type: joi.string().required(),
-      co2e_wtw: joi.number().required(),
-      load_factor: joi.number().required(),
+      asset_type: joi.string().optional(),
+      co2e_wtw: joi.number().min(0).required(),
+      co2e_ttw: joi.number().min(0).required(),
+      load_factor: joi.number().min(0).max(1).required(),
+      load_factor_add_information: joi.string().optional(),
+      empty_distance_factor: joi.number().min(0).max(1).required(),
+      empty_distance_factor_add_information: joi.string().required(),
       empty_distance: joi.number().required(),
       energy_carrier_N: joi.string().required(),
       Feedstock_N: joi.string().required(),
@@ -30,6 +35,25 @@ const dataModelSchema = (month: number, year: number) => {
         .required(),
       verification: joi.boolean().required(),
       accreditation: joi.boolean().required(),
+      transport_operator_name: joi
+        .string()
+        .lowercase()
+        .valid('rail', 'road', 'sea', 'air', 'inland waterway', 'hub')
+        .required(),
+      temp_control: joi
+        .string()
+        .lowercase()
+        .valid('frozen', 'refrigerated', 'ambient', 'high temp')
+        .required(),
+      energy_carrier_feedstock_N: joi.string().required(),
+      WTW_fuel_emission_factor: joi.number().optional(),
+      co2e_intensity_wtw: joi.number().required(),
+      distance_activity: joi.number().positive().required(),
+      loading_city: joi.string().required(),
+      loading_country: joi.string().required(),
+      unloading_country: joi.string().required(),
+      unloading_city: joi.string().required(),
+      co2e_intensity_wtw_unit: joi.string().required(),
     })
   );
 };
