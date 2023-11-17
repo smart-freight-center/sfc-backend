@@ -77,8 +77,7 @@ export class GetEmissionsUsecase {
 
     const data = await this.getKeyFromCache(assetId);
 
-    const { authCode, authKey } = data as AssetCacheValue;
-    return this.sfcDataSpace.fetchCarbonFootprint(authKey, authCode);
+    return data as EmissionDataModel[];
   }
 
   private async getKeyFromCache(key: string) {

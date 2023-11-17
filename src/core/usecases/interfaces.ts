@@ -31,6 +31,9 @@ export type DeleteAssetInput = {
 };
 export interface ISfcDataSpace {
   shareAsset(input: ShareDataspaceAssetInput): Promise<object>;
+  getAssetIdFromTransferProcess(
+    transferProcessId: string
+  ): Promise<string | null>;
   unshareFootprint(
     providerId: string,
     assetToDelete: DeleteAssetInput

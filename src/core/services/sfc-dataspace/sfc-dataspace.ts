@@ -158,6 +158,16 @@ export class SfcDataSpace implements ISfcDataSpace {
     }
   }
 
+  async getAssetIdFromTransferProcess(transferProcessId: string) {
+    const transferProcess = await this.edcClient.getTransferProcessById(
+      transferProcessId
+    );
+    if (!transferProcess) return null;
+
+    const assetId: string = transferProcess.mandatoryValue('edc', 'assetId');
+
+    return assetId;
+  }
   async shareAsset(input: ShareDataspaceAssetInput) {
     const { consumer, provider, numberOfRows, ...data } = input;
     await this.ensureFootprintHasNotBeenShared(input, consumer.client_id);
