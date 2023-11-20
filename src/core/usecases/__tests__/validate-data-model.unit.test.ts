@@ -232,6 +232,12 @@ describe('Validate Data Model Usecase', () => {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
+          mode_of_transport: {
+            msgs: [
+              'must be one of [rail, road, sea, air, inland waterway, hub]',
+            ],
+            rows: [2],
+          },
         });
         mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
           validInput
