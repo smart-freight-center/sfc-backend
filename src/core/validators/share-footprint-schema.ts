@@ -16,7 +16,11 @@ const dataModelSchema = (month: number, year: number) => {
       transport_activity: joi.number().positive().required(),
       mass: joi.number().positive().required(),
       distance_actual: joi.number().positive().optional(),
-      mode_of_transport: joi.string().required(),
+      mode_of_transport: joi
+        .string()
+        .lowercase()
+        .valid('rail', 'road', 'sea', 'air', 'inland waterway', 'hub')
+        .required(),
       asset_type: joi.string().optional(),
       co2e_wtw: joi.number().min(0).required(),
       co2e_ttw: joi.number().min(0).required(),
