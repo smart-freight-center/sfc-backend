@@ -45,6 +45,12 @@ export class InvalidCredentials extends Unauthorized {
   name = 'invalid_credentials';
   message = 'Invalid Credentials';
 }
+
+export class AccountNotSetup extends Unauthorized {
+  name = 'account_setup_error';
+  message =
+    'Either you have not reset the password of that user or some setup is incomplete';
+}
 export class ParticipantNotFound extends NotFound {
   name = 'participant_not_found';
   message = 'Participant not found';

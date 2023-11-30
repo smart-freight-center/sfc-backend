@@ -5,11 +5,6 @@ import { TransferNotInitiated } from 'utils/errors';
 
 const logger = new AppLogger('GetEmissionsUsecase');
 
-type AssetCacheValue = {
-  authCode: string;
-  authKey: string;
-};
-
 type JobCacheValue = {
   assetIds: string[];
 };
