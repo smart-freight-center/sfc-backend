@@ -4,6 +4,7 @@ import {
   DeleteAssetInput,
   FootprintMetaData,
   ISfcDataSpace,
+  MonthFilter,
   ShareDataspaceAssetInput,
   SingleAssetDetail,
 } from 'core/usecases/interfaces';
@@ -13,7 +14,7 @@ import { ShipmentAlreadyShared, ShipmentForMonthNotFound } from 'utils/errors';
 import { EdcTransferService } from './edc-transfer-service';
 import { IEdcClient } from './interfaces';
 import { Participant } from 'core/types';
-import { Offer } from '@think-it-labs/edc-connector-client';
+import { CriterionInput, Offer } from '@think-it-labs/edc-connector-client';
 import { AppLogger } from 'utils/logger';
 
 const logger = new AppLogger('SfcDataSpace');
@@ -25,7 +26,7 @@ export class SfcDataSpace implements ISfcDataSpace {
     await edcTransferService.initiateTransferProcess(singleAssetDetail);
   }
 
-  public async fetchFootprintsMetaData(
+  public async fetchSharedFootprintsMetaData(
     ownerId: string
   ): Promise<FootprintMetaData[]> {
     const assets = await this.edcClient.listAssets({
@@ -42,34 +43,21 @@ export class SfcDataSpace implements ISfcDataSpace {
     }));
   }
 
-  public async fetchDataThatProviderHasShared(providerUrl: string) {
-    const catalog = await this.edcClient.listCatalog({
-      providerUrl,
-    });
-
-    return catalog.datasets.map((dataset) => {
-      const footprintItem: FootprintMetaData = {
-        owner: dataset.mandatoryValue('edc', 'owner'),
-        month: dataset.mandatoryValue('edc', 'month'),
-        sharedWith: dataset.mandatoryValue('edc', 'sharedWith'),
-        numberOfRows: dataset.mandatoryValue('edc', 'numberOfRows'),
-        year: dataset.mandatoryValue('edc', 'year'),
-        id: dataset.mandatoryValue('edc', 'id'),
-      };
-      return footprintItem;
-    });
-  }
-
-  public async fetchAssetsByMonth(
+  public async fetchReceivedAssets(
     connections: Omit<Participant, 'connection'>[],
-    filters
+    currentParticipantClientId: string,
+    filters?: MonthFilter
   ) {
     logger.info('Fetching Assets by month...', filters);
     const footprintDataPromises: Promise<FootprintMetaData[]>[] = [];
     for (let index = 0; index < connections.length; index++) {
       const connection = connections[index];
       const protocol = connection.connector_data.addresses.protocol as string;
-      const dataPromise = this.retrieveCatalogByMonth(protocol, filters);
+      const dataPromise = this.retrieveCatalogByMonth(
+        protocol,
+        currentParticipantClientId,
+        filters
+      );
       footprintDataPromises.push(dataPromise);
     }
 
@@ -83,6 +71,7 @@ export class SfcDataSpace implements ISfcDataSpace {
           provider: connections[index],
           assetId: footprintData.id,
           contractOffer: footprintData.offer as Offer,
+          footprintData: footprintData,
         });
       }
     }
@@ -90,14 +79,25 @@ export class SfcDataSpace implements ISfcDataSpace {
     return assetDetails;
   }
 
-  private async retrieveCatalogByMonth(providerUrl: string, filters) {
+  private async retrieveCatalogByMonth(
+    providerUrl: string,
+    currentParticipantClientId: string,
+    filters?: MonthFilter
+  ) {
+    const filterExpression: CriterionInput[] = [
+      builder.assetFilter('sharedWith', '=', currentParticipantClientId),
+    ];
+    if (filters?.month) {
+      filterExpression.push(builder.assetFilter('month', '=', filters.month));
+    }
+    if (filters?.year) {
+      filterExpression.push(builder.assetFilter('year', '=', filters.year));
+    }
+
     const catalog = await this.edcClient.listCatalog({
       providerUrl,
       querySpec: {
-        filterExpression: [
-          builder.assetFilter('month', '=', filters.month),
-          builder.assetFilter('year', '=', filters.year),
-        ],
+        filterExpression: filterExpression,
       },
     });
 

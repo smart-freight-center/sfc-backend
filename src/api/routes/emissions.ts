@@ -38,7 +38,12 @@ export const emissionRoutes = new KoaRouter({ prefix: '/emissions' })
     AuthController.authMiddleware,
     ProviderController.validateDataModelFile
   )
-
+  .get(
+    'Get usage metrics',
+    '/metrics',
+    AuthController.authMiddleware,
+    ProviderController.retrieveMetrics
+  )
   .get(
     'Request carbon footprints of emissions received',
     '/received',

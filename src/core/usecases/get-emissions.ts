@@ -1,6 +1,6 @@
 import { AppLogger } from 'utils/logger';
 import { EmissionDataModel } from 'core/types';
-import { ICacheService, ISfcDataSpace } from 'core/usecases/interfaces';
+import { ICacheService } from 'core/usecases/interfaces';
 import { TransferNotInitiated } from 'utils/errors';
 
 const logger = new AppLogger('GetEmissionsUsecase');
@@ -11,10 +11,7 @@ type JobCacheValue = {
 export class GetEmissionsUsecase {
   readonly dataQueue = [];
 
-  constructor(
-    private sfcDataSpace: ISfcDataSpace,
-    private cacheService: ICacheService
-  ) {}
+  constructor(private cacheService: ICacheService) {}
 
   async execute(jobId: string, aggregate: boolean) {
     logger.info('Pulling data for all assets...');

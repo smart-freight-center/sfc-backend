@@ -2,6 +2,7 @@ import { ShareFootprintInput } from 'entities';
 import {
   deleteFootprintUsecase,
   provideFootprintUsecase,
+  retrieveMetricsUsecase,
   runValidationOnRawFileUsecase,
   shareFootprintUsecase,
   validateDataModelUsecase,
@@ -51,6 +52,17 @@ export class ProviderController {
     context.body = {
       message: 'Successfully validated data model',
       meta: resData,
+    };
+  }
+
+  static async retrieveMetrics(context: RouterContext) {
+    const resData = await retrieveMetricsUsecase.execute(
+      context.headers.authorization as string
+    );
+
+    context.status = 200;
+    context.body = {
+      data: resData,
     };
   }
 

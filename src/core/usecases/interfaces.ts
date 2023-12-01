@@ -18,10 +18,14 @@ export type FootprintMetaData = {
   offer?: Offer;
 };
 
-export type SingleAssetDetail = {
+type TransferProcessDetailInput = {
   provider: Omit<Participant, 'connection'>;
   assetId: string;
   contractOffer: Offer;
+};
+
+export type SingleAssetDetail = TransferProcessDetailInput & {
+  footprintData: FootprintMetaData;
 };
 
 export type DeleteAssetInput = {
@@ -29,6 +33,8 @@ export type DeleteAssetInput = {
   month: string;
   companyId: string;
 };
+
+export type MonthFilter = { month: number; year: number };
 export interface ISfcDataSpace {
   shareAsset(input: ShareDataspaceAssetInput): Promise<object>;
   getAssetIdFromTransferProcess(
@@ -42,14 +48,16 @@ export interface ISfcDataSpace {
     authKey: string,
     authCode: string
   ): Promise<EmissionDataModel[]>;
-  fetchFootprintsMetaData(providerId: string): Promise<FootprintMetaData[]>;
-  fetchDataThatProviderHasShared(
-    providerUrl: string
+  fetchSharedFootprintsMetaData(
+    providerId: string
   ): Promise<FootprintMetaData[]>;
-  startTransferProcess(SingleAssetDetail: SingleAssetDetail): Promise<void>;
-  fetchAssetsByMonth(
+  startTransferProcess(
+    SingleAssetDetail: Omit<SingleAssetDetail, 'footprintData'>
+  ): Promise<void>;
+  fetchReceivedAssets(
     connections: Omit<Participant, 'connection'>[],
-    filters: { month: number; year: number }
+    currentParticipantClientId: string,
+    filters?: MonthFilter
   ): Promise<SingleAssetDetail[]>;
 }
 
