@@ -24,13 +24,6 @@ export const emissionRoutes = new KoaRouter({ prefix: '/emissions' })
     ProviderController.unshareFootprint
   )
 
-  .get(
-    'Request a data catalog from a connector',
-    '/catalog',
-    AuthController.authMiddleware,
-    ProviderController.unshareFootprint
-  )
-
   .post(
     'Validate data model',
     '/validate-data-source',

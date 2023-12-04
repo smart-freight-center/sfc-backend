@@ -52,6 +52,9 @@ export const REDIS_DB = process.env.REDIS_DATABASE || '';
 export const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM;
 export const KEYCLOAK_HOST = process.env.KEYCLOAK_HOST;
 export const KEYCLOAK_PUBLIC_KEY = process.env.KEYCLOAK_PUBLIC_KEY || '';
+export const KEYCLOAK_CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || '';
+export const KEYCLOAK_CLIENT_SECRET = process.env.KEYCLOAK_CLIENT_SECRET || '';
+
 export const SFCAPI_BASEURL = process.env.SFCAPI_BASEURL;
 
 const SUPPORTED_EDC_FILTER_OPERATORS =
