@@ -10,6 +10,10 @@ const mockInCompleteFootprint = fs.readFileSync(
   path.join(__dirname, 'mock-incomplete.csv'),
   { encoding: 'utf-8' }
 );
+const mockCompleteFootprint = fs.readFileSync(
+  path.join(__dirname, 'mock-valid.csv'),
+  { encoding: 'utf-8' }
+);
 
 const validateDataModel = new ValidateDataModelUsecase(mockDataSourceFetcher);
 
@@ -116,6 +120,7 @@ describe('Validate Data Model Usecase', () => {
       energy_carrier_feedstock_N: 'test',
       distance_activity: 4,
       unloading_date: '2023-12-01',
+      loading_date: '2023-11-01',
     };
 
     beforeEach(() => {
@@ -160,6 +165,10 @@ describe('Validate Data Model Usecase', () => {
         ).to.be.rejectedWith(DataModelValidationFailed);
 
         errors.should.be.eql({
+          loading_date: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
           accreditation: {
             msgs: ['is required'],
             rows: [1, 2, 3],
@@ -239,6 +248,26 @@ describe('Validate Data Model Usecase', () => {
             rows: [2],
           },
         });
+        mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
+          validInput
+        );
+      });
+      it('should not throw an error for valid data model', async () => {
+        mockDataSourceFetcher.fetchFootprintData.returns(
+          Promise.resolve(mockCompleteFootprint.trim())
+        );
+
+        const validInput = {
+          ...mockInput,
+          type: 'http' as const,
+          month: 11,
+          year: 2023,
+          dataLocation: {
+            name: 'ShipmentId-1',
+            baseUrl: 'http://example.com/footprints.csv',
+          },
+        };
+        await expect(validateDataModel.execute(validInput)).to.not.be.rejected;
         mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
           validInput
         );
@@ -368,6 +397,10 @@ describe('Validate Data Model Usecase', () => {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
+          loading_date: {
+            msgs: ['is required'],
+            rows: [1, 2, 3],
+          },
           verification: {
             msgs: ['is required'],
             rows: [1, 2, 3],
@@ -385,10 +418,6 @@ describe('Validate Data Model Usecase', () => {
             rows: [1, 2, 3],
           },
           co2e_wtw: {
-            msgs: ['is required'],
-            rows: [1, 2, 3],
-          },
-          empty_distance: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
@@ -481,6 +510,77 @@ describe('Validate Data Model Usecase', () => {
             rows: [1, 2],
           },
         });
+        mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
+          validInput
+        );
+      });
+
+      it('should throw an error if unloading_date is before loading_date', async () => {
+        mockDataSourceFetcher.fetchFootprintData.returns(
+          Promise.resolve(
+            JSON.stringify([
+              {
+                ...validDataModel,
+                unloading_date: '2023-11-01',
+                loading_date: '2024-02-01',
+              },
+              {
+                ...validDataModel,
+                unloading_date: '2023-11-01',
+                loading_date: '2023-10-01',
+              },
+            ])
+          )
+        );
+
+        const validInput = {
+          ...mockInput,
+          type: 'http' as const,
+          month: 11,
+          year: 2023,
+          dataLocation: {
+            name: 'ShipmentId-1',
+            baseUrl: 'http://example.com/footprints.csv',
+          },
+        };
+        const { errors } = await expect(
+          validateDataModel.execute(validInput)
+        ).to.be.rejectedWith(DataModelValidationFailed);
+
+        errors.should.be.eql({
+          loading_date: {
+            msgs: ['must be less than or equal to "ref:unloading_date"'],
+            rows: [1],
+          },
+        });
+        mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
+          validInput
+        );
+      });
+
+      it('should not throw an error when only one of the optional rows is null', async () => {
+        mockDataSourceFetcher.fetchFootprintData.returns(
+          Promise.resolve(
+            JSON.stringify([
+              { ...validDataModel, WTW_fuel_emission_factor: 43 },
+            ])
+          )
+        );
+
+        const validInput = {
+          ...mockInput,
+          type: 'http' as const,
+          month: 12,
+          year: 2023,
+          dataLocation: {
+            name: 'ShipmentId-1',
+            baseUrl: 'http://example.com/footprints.csv',
+          },
+        };
+        await expect(
+          validateDataModel.execute(validInput)
+        ).to.not.be.rejectedWith(DataModelValidationFailed);
+
         mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
           validInput
         );

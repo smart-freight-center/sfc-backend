@@ -15,43 +15,38 @@ const dataModelSchema = (month: number, year: number) => {
       id_shipment: joi.string().required(),
       transport_activity: joi.number().positive().required(),
       mass: joi.number().positive().required(),
-      distance_actual: joi.number().positive().optional(),
+      distance_actual: joi.number().positive().optional().allow(null),
       mode_of_transport: joi
         .string()
         .lowercase()
         .valid('rail', 'road', 'sea', 'air', 'inland waterway', 'hub')
         .required(),
-      asset_type: joi.string().optional(),
+      asset_type: joi.string().allow(null),
       co2e_wtw: joi.number().min(0).required(),
       co2e_ttw: joi.number().min(0).required(),
-      load_factor: joi.number().min(0).max(1).required(),
-      load_factor_add_information: joi.string().optional(),
-      empty_distance_factor: joi.number().min(0).max(1).required(),
+      load_factor: joi.number().positive().max(1).required(),
+      load_factor_add_information: joi.string().optional().allow(null),
+      empty_distance_factor: joi.number().min(0).less(1).required(),
       empty_distance_factor_add_information: joi.string().required(),
-      empty_distance: joi.number().required(),
       energy_carrier_N: joi.string().required(),
       Feedstock_N: joi.string().required(),
-      loading_date: joi.date().optional(),
+      loading_date: joi.date().max(joi.ref('unloading_date')).required(),
       unloading_date: joi
         .date()
         .min(firstDayOfMonth)
         .max(lastDayOfMonth)
         .required(),
-      verification: joi.boolean().required(),
-      accreditation: joi.boolean().required(),
-      transport_operator_name: joi
-        .string()
-        .lowercase()
-        .valid('rail', 'road', 'sea', 'air', 'inland waterway', 'hub')
-        .required(),
+      verification: joi.boolean().falsy('0').truthy('1').required(),
+      accreditation: joi.boolean().falsy('0').truthy('1').required(),
+      transport_operator_name: joi.string().lowercase().required(),
       temp_control: joi
         .string()
         .lowercase()
         .valid('frozen', 'refrigerated', 'ambient', 'high temp')
         .required(),
       energy_carrier_feedstock_N: joi.string().required(),
-      WTW_fuel_emission_factor: joi.number().optional(),
-      co2e_intensity_wtw: joi.number().required(),
+      WTW_fuel_emission_factor: joi.number().min(0).allow(null).optional(),
+      co2e_intensity_wtw: joi.number().positive().required(),
       distance_activity: joi.number().positive().required(),
       loading_city: joi.string().required(),
       loading_country: joi.string().required(),
