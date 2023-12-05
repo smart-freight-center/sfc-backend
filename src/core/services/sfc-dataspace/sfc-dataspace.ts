@@ -8,7 +8,6 @@ import {
   ShareDataspaceAssetInput,
   SingleAssetDetail,
 } from 'core/usecases/interfaces';
-import { ContractDefinition } from 'entities';
 import { convertRawDataToJSON } from 'utils/data-converter';
 import { ShipmentAlreadyShared, ShipmentForMonthNotFound } from 'utils/errors';
 import { EdcTransferService } from './edc-transfer-service';
@@ -33,14 +32,25 @@ export class SfcDataSpace implements ISfcDataSpace {
       filterExpression: [builder.assetFilter('owner', '=', ownerId)],
     });
 
-    return assets.map((asset) => ({
-      owner: asset.properties.mandatoryValue('edc', 'owner'),
-      numberOfRows: asset.properties.mandatoryValue('edc', 'numberOfRows'),
-      month: asset.properties.mandatoryValue('edc', 'month'),
-      sharedWith: asset.properties.mandatoryValue('edc', 'sharedWith'),
-      year: asset.properties.mandatoryValue('edc', 'year'),
-      id: asset.properties.mandatoryValue('edc', 'id'),
-    }));
+    const contractDefinitions =
+      await this.edcClient.queryAllContractDefinitions({
+        filterExpression: [
+          ...builder.contractDefinitionFilter('owner', '=', ownerId),
+        ],
+      });
+
+    const assetIds = new Set(contractDefinitions.map((item) => item['@id']));
+
+    return assets
+      .filter((asset) => assetIds.has(asset['@id']))
+      .map((asset) => ({
+        owner: asset.properties.mandatoryValue('edc', 'owner'),
+        numberOfRows: asset.properties.mandatoryValue('edc', 'numberOfRows'),
+        month: asset.properties.mandatoryValue('edc', 'month'),
+        sharedWith: asset.properties.mandatoryValue('edc', 'sharedWith'),
+        year: asset.properties.mandatoryValue('edc', 'year'),
+        id: asset.properties.mandatoryValue('edc', 'id'),
+      }));
   }
 
   public async fetchReceivedAssets(
@@ -119,19 +129,21 @@ export class SfcDataSpace implements ISfcDataSpace {
     providerId: string,
     assetToDelete: DeleteAssetInput
   ) {
-    const assets = await this.edcClient.listAssets({
-      filterExpression: [
-        builder.assetFilter('owner', '=', providerId),
-        builder.assetFilter('sharedWith', '=', assetToDelete.companyId),
-        builder.assetFilter('month', '=', assetToDelete.month),
-        builder.assetFilter('year', '=', assetToDelete.year),
-      ],
-    });
+    const { companyId, month, year } = assetToDelete;
+    const contractDefinitions =
+      await this.edcClient.queryAllContractDefinitions({
+        filterExpression: [
+          ...builder.contractDefinitionFilter('owner', '=', providerId),
+          ...builder.contractDefinitionFilter('sharedWith', '=', companyId),
+          ...builder.contractDefinitionFilter('month', '=', month),
+          ...builder.contractDefinitionFilter('year', '=', year),
+        ],
+      });
 
-    if (!assets?.length) throw new ShipmentForMonthNotFound();
+    if (!contractDefinitions?.length) throw new ShipmentForMonthNotFound();
 
-    for (const asset of assets) {
-      await this.edcClient.deleteAsset(asset['@id']);
+    for (const contractDefinition of contractDefinitions) {
+      await this.edcClient.deleteContractDefinition(contractDefinition.id);
     }
   }
 
@@ -142,19 +154,6 @@ export class SfcDataSpace implements ISfcDataSpace {
     if (response.body) {
       const textData = await response.text();
       return convertRawDataToJSON(textData);
-    }
-  }
-
-  private async getContractDefintions(shipmentId: string, companyId: string) {
-    const assetId = companyId ? `${shipmentId}-${companyId}` : shipmentId;
-    const filter = builder.shipmentFilter('id', `${assetId}%`, 'LIKE');
-    const contracts = await this.edcClient.queryAllContractDefinitions(filter);
-    return contracts.filter((contract) => contract.id.startsWith(assetId));
-  }
-
-  private async deleteContractOffers(contracts: ContractDefinition[]) {
-    for (const contract of contracts) {
-      await this.edcClient.deleteContractDefinition(contract.id);
     }
   }
 
@@ -170,7 +169,11 @@ export class SfcDataSpace implements ISfcDataSpace {
   }
   async shareAsset(input: ShareDataspaceAssetInput) {
     const { consumer, provider, numberOfRows, ...data } = input;
-    await this.ensureFootprintHasNotBeenShared(input, consumer.client_id);
+    await this.ensureFootprintHasNotBeenShared(
+      input,
+      provider.client_id,
+      consumer.client_id
+    );
     const results = {
       newAssetId: '',
       newPolicyId: '',
@@ -216,17 +219,20 @@ export class SfcDataSpace implements ISfcDataSpace {
 
   private async ensureFootprintHasNotBeenShared(
     input: ShareDataspaceAssetInput,
+    owner: string,
     sharedWith: string
   ) {
-    const assets = await this.edcClient.listAssets({
-      filterExpression: [
-        builder.assetFilter('sharedWith', '=', sharedWith),
-        builder.assetFilter('year', '=', input.year),
-        builder.assetFilter('month', '=', input.month),
-      ],
-    });
+    const contractDefinitions =
+      await this.edcClient.queryAllContractDefinitions({
+        filterExpression: [
+          ...builder.contractDefinitionFilter('owner', '=', owner),
+          ...builder.contractDefinitionFilter('sharedWith', '=', sharedWith),
+          ...builder.contractDefinitionFilter('month', '=', input.month),
+          ...builder.contractDefinitionFilter('year', '=', input.year),
+        ],
+      });
 
-    if (assets.length) throw new ShipmentAlreadyShared();
+    if (contractDefinitions.length) throw new ShipmentAlreadyShared();
   }
 
   private async rollback(results) {

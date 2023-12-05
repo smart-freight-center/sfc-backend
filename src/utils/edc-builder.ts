@@ -22,7 +22,7 @@ type ShareAssetInput = ShareFootprintInput & {
 };
 
 export function assetInput(dataInput: ShareAssetInput): AssetInput {
-  const { month, year, dataLocation, type } = dataInput;
+  const { month, year, dataLocation, numberOfRows, type } = dataInput;
 
   const now = new Date();
 
@@ -36,11 +36,11 @@ export function assetInput(dataInput: ShareAssetInput): AssetInput {
   return {
     '@id': assetId,
     properties: {
-      month: dataInput.month,
-      year: dataInput.year,
+      month: Math.floor(month).toString(),
+      year: Math.floor(year).toString(),
       owner: dataInput.providerClientId,
       sharedWith: dataInput.sharedWith,
-      numberOfRows: dataInput.numberOfRows,
+      numberOfRows: Math.floor(numberOfRows).toString(),
     },
     privateProperties: {},
     dataAddress: {
@@ -107,9 +107,28 @@ export function assetFilter(
 ): CriterionInput {
   return {
     operandLeft: `https://w3id.org/edc/v0.0.1/ns/${operandLeft}`,
-    operandRight: operandRight,
+    operandRight: `${operandRight}`,
     operator: operator,
   };
+}
+
+export function contractDefinitionFilter(
+  operandLeft: string,
+  operator = '=',
+  operandRight: string | number | boolean
+): CriterionInput[] {
+  return [
+    {
+      operandLeft: 'assetsSelector.operandRight',
+      operator: operator,
+      operandRight: `${operandRight}`,
+    },
+    {
+      operandLeft: 'assetsSelector.operandLeft',
+      operator: operator,
+      operandRight: `https://w3id.org/edc/v0.0.1/ns/${operandLeft}`,
+    },
+  ];
 }
 
 export function shipmentFilter(

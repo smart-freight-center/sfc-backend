@@ -53,8 +53,8 @@ describe('SfcDataspace', () => {
       clock.restore();
     });
 
-    it('should throw error when asset has been created previously', async () => {
-      mockEdcClient.listAssets.returns(
+    it('should throw error when contract definitions has been created previously', async () => {
+      mockEdcClient.queryAllContractDefinitions.returns(
         Promise.resolve([
           {
             accessPolicyId: '',
@@ -69,7 +69,7 @@ describe('SfcDataspace', () => {
     });
 
     it('should create an asset on the connector', async () => {
-      mockEdcClient.listAssets.returns(Promise.resolve([]));
+      mockEdcClient.queryAllContractDefinitions.returns(Promise.resolve([]));
       const consumerId = mockConsumer.client_id;
       await sfcDataspace.shareAsset(mockShareAssetInput);
 
@@ -77,9 +77,9 @@ describe('SfcDataspace', () => {
 
       mockEdcClient.createAsset.firstCall.firstArg.should.containSubset({
         properties: {
-          month: mockShareAssetInput.month,
-          numberOfRows: mockShareAssetInput.numberOfRows,
-          year: mockShareAssetInput.year,
+          month: mockShareAssetInput.month.toString(),
+          numberOfRows: mockShareAssetInput.numberOfRows.toString(),
+          year: mockShareAssetInput.year.toString(),
           owner: mockProvider.client_id,
           sharedWith: consumerId,
         },
@@ -98,7 +98,7 @@ describe('SfcDataspace', () => {
     });
 
     it('should correctly create a policy using the companyBPN', async () => {
-      mockEdcClient.listAssets.returns(Promise.resolve([]));
+      mockEdcClient.queryAllContractDefinitions.returns(Promise.resolve([]));
       await sfcDataspace.shareAsset(mockShareAssetInput);
 
       mockEdcClient.createPolicy.should.have.been.calledOnceWithExactly({
@@ -130,7 +130,7 @@ describe('SfcDataspace', () => {
     });
 
     it('should correctly create a contract definitions using the companyBPN', async () => {
-      mockEdcClient.listAssets.returns(Promise.resolve([]));
+      mockEdcClient.queryAllContractDefinitions.returns(Promise.resolve([]));
 
       await sfcDataspace.shareAsset(mockShareAssetInput);
 
@@ -150,12 +150,12 @@ describe('SfcDataspace', () => {
           },
           {
             operandLeft: 'https://w3id.org/edc/v0.0.1/ns/month',
-            operandRight: 10,
+            operandRight: '10',
             operator: '=',
           },
           {
             operandLeft: 'https://w3id.org/edc/v0.0.1/ns/year',
-            operandRight: 2023,
+            operandRight: '2023',
             operator: '=',
           },
           {

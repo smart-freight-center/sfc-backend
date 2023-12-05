@@ -6,7 +6,10 @@ import { expect } from 'chai';
 import { DataValidationError } from 'utils/errors/base-errors';
 import { ShipmentForMonthNotFound } from 'utils/errors';
 import { mockProvider } from 'core/__tests__/mocks';
-import { Asset, expandArray } from '@think-it-labs/edc-connector-client';
+import {
+  ContractDefinition,
+  expandArray,
+} from '@think-it-labs/edc-connector-client';
 
 const { mockSfcAPI, mockSFCAPIConnection } = sfcConnectionStub();
 
@@ -20,6 +23,7 @@ const deleteFootprintUsecase = new DeleteFootprintUsecase(
 describe('Delete Footprint Tests', () => {
   beforeEach(() => {
     mockEdcClient.listAssets.reset();
+    mockEdcClient.queryAllContractDefinitions.reset();
   });
   it('should throw error when the values are wrong', async () => {
     const { errors } = await expect(
@@ -62,14 +66,35 @@ describe('Delete Footprint Tests', () => {
     const body = [
       {
         '@id': 'sample-asset-id',
-        '@type': 'edc:Asset',
-        'edc:properties': {
-          'edc:owner': 'provider-client',
-          'edc:numberOfRows': 3.0,
-          'edc:month': 12.0,
-          'edc:sharedWith': validInput.companyId,
-        },
-        'edc:dataAddress': {},
+        '@type': 'edc:ContractDefinition',
+        'edc:accessPolicyId': '47124592-34cc-44e7-b31f-778afa3ff5f3',
+        'edc:contractPolicyId': '47124592-34cc-44e7-b31f-778afa3ff5f3',
+        'edc:assetsSelector': [
+          {
+            '@type': 'edc:Criterion',
+            'edc:operandLeft': 'https://w3id.org/edc/v0.0.1/ns/owner',
+            'edc:operator': '=',
+            'edc:operandRight': 'provider-client',
+          },
+          {
+            '@type': 'edc:Criterion',
+            'edc:operandLeft': 'https://w3id.org/edc/v0.0.1/ns/month',
+            'edc:operator': '=',
+            'edc:operandRight': '12',
+          },
+          {
+            '@type': 'edc:Criterion',
+            'edc:operandLeft': 'https://w3id.org/edc/v0.0.1/ns/year',
+            'edc:operator': '=',
+            'edc:operandRight': '2023',
+          },
+          {
+            '@type': 'edc:Criterion',
+            'edc:operandLeft': 'https://w3id.org/edc/v0.0.1/ns/sharedWith',
+            'edc:operator': '=',
+            'edc:operandRight': validInput.companyId,
+          },
+        ],
         '@context': {
           dct: 'https://purl.org/dc/terms/',
           edc: 'https://w3id.org/edc/v0.0.1/ns/',
@@ -80,7 +105,9 @@ describe('Delete Footprint Tests', () => {
       },
     ];
 
-    mockEdcClient.listAssets.returns(expandArray(body, () => new Asset()));
+    mockEdcClient.queryAllContractDefinitions.returns(
+      expandArray(body, () => new ContractDefinition())
+    );
     await expect(
       deleteFootprintUsecase.execute('provider-auth', {
         month: '8',
@@ -89,31 +116,51 @@ describe('Delete Footprint Tests', () => {
       })
     ).to.not.be.rejected;
 
-    mockEdcClient.deleteAsset.should.have.been.calledOnceWith(
+    mockEdcClient.deleteContractDefinition.should.have.been.calledOnceWith(
       'sample-asset-id'
     );
 
-    mockEdcClient.listAssets.should.have.been.calledOnceWith({
+    mockEdcClient.queryAllContractDefinitions.should.have.been.calledOnceWith({
       filterExpression: [
         {
-          operandLeft: 'https://w3id.org/edc/v0.0.1/ns/owner',
+          operandLeft: 'assetsSelector.operandRight',
+          operator: '=',
           operandRight: 'provider-client',
-          operator: '=',
         },
         {
-          operandLeft: 'https://w3id.org/edc/v0.0.1/ns/sharedWith',
+          operandLeft: 'assetsSelector.operandLeft',
+          operator: '=',
+          operandRight: 'https://w3id.org/edc/v0.0.1/ns/owner',
+        },
+        {
+          operandLeft: 'assetsSelector.operandRight',
+          operator: '=',
           operandRight: 'consumer-id',
-          operator: '=',
         },
         {
-          operandLeft: 'https://w3id.org/edc/v0.0.1/ns/month',
-          operandRight: +validInput.month,
+          operandLeft: 'assetsSelector.operandLeft',
           operator: '=',
+          operandRight: 'https://w3id.org/edc/v0.0.1/ns/sharedWith',
         },
         {
-          operandLeft: 'https://w3id.org/edc/v0.0.1/ns/year',
-          operandRight: +validInput.year,
+          operandLeft: 'assetsSelector.operandRight',
           operator: '=',
+          operandRight: '8',
+        },
+        {
+          operandLeft: 'assetsSelector.operandLeft',
+          operator: '=',
+          operandRight: 'https://w3id.org/edc/v0.0.1/ns/month',
+        },
+        {
+          operandLeft: 'assetsSelector.operandRight',
+          operator: '=',
+          operandRight: '2021',
+        },
+        {
+          operandLeft: 'assetsSelector.operandLeft',
+          operator: '=',
+          operandRight: 'https://w3id.org/edc/v0.0.1/ns/year',
         },
       ],
     });
