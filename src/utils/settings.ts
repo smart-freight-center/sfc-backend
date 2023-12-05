@@ -1,6 +1,19 @@
 import 'dotenv/config';
+import fs from 'fs';
 
-const connectorJSONConfig = JSON.parse(process.env.CONNECTOR_CONFIG || '{}');
+const CONNECTOR_JSON_IN_DEV = process.env.CONNECTOR_JSON_IN_DEV || '';
+
+let connectorJSONConfig;
+
+if (
+  fs.existsSync(CONNECTOR_JSON_IN_DEV) &&
+  fs.lstatSync(CONNECTOR_JSON_IN_DEV).isFile()
+) {
+  const details = fs.readFileSync(CONNECTOR_JSON_IN_DEV, 'utf-8');
+  connectorJSONConfig = JSON.parse(details);
+} else {
+  connectorJSONConfig = JSON.parse(process.env.CONNECTOR_CONFIG || '{}');
+}
 
 export const CLIENT_CONFIG = {
   id: process.env.EDC_ID || connectorJSONConfig.id || 'urn:connector:consumer',
@@ -15,6 +28,7 @@ export const CLIENT_CONFIG = {
     connectorJSONConfig.description ||
     'The consumer connector for the EDC manager demo',
   region: process.env.EDC_REGION || connectorJSONConfig.region || 'eu-west-1',
+  token: process.env.EDC_TOKEN || connectorJSONConfig.token,
   addresses: {
     default: process.env.EDC_DEFAULT || 'http://localhost:19191/api',
     validation:
@@ -66,8 +80,6 @@ export const EDC_FILTER_OPERATOR_SET = new Set(
 export const AWS_REGION = process.env.AWS_REGION;
 export const AWS_ACCESS_ID = process.env.AWS_ACCESS_ID;
 export const AWS_SECRET = process.env.AWS_SECRET;
-
-export const CONNECTOR_TOKEN = process.env.CONNECTOR_TOKEN || 'test-token';
 
 export const PARTICIPANT_CONFIG_S3_BUCKET =
   process.env.PARTICIPANT_CONFIG_S3_BUCKET;

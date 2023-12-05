@@ -8,6 +8,7 @@ export interface Connector {
   curator?: string;
   catalogId?: string;
   region?: string;
+  token?: string;
   addresses: Addresses;
 }
 

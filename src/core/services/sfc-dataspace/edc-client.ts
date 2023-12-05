@@ -16,12 +16,14 @@ export class EdcClient implements IEdcClient {
   readonly edcConnectorClient: EdcConnectorClient;
   edcClientContext: EdcConnectorClientContext;
   edcClientId: string;
-  constructor(myConnector: Connector, token: string) {
+  constructor(myConnector: Connector) {
     const builder = new EdcConnectorClient.Builder();
 
     builder.managementUrl(myConnector.addresses.management as string);
     builder.publicUrl(myConnector.addresses.public as string);
-    builder.apiToken(token);
+    if (myConnector.token) {
+      builder.apiToken(myConnector.token);
+    }
     this.edcConnectorClient = builder.build();
     this.edcClientId = myConnector.id;
   }
