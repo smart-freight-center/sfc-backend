@@ -34,6 +34,7 @@
     "csv-to-js-parser": "^2.3.5",
     "date-and-time": "^3.0.0",
     "dotenv": "^16.0.3",
+    "i18n-iso-countries": "^7.7.0",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.2",
     "koa": "^2.14.1",
