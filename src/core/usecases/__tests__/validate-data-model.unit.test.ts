@@ -112,8 +112,8 @@ describe('Validate Data Model Usecase', () => {
       co2e_intensity_wtw_unit: 'g/t-km',
       loading_city: 'new york',
       unloading_city: 'montreal',
-      loading_country: 'united states',
-      unloading_country: 'canada',
+      loading_country: 'USA',
+      unloading_country: 'CA',
       empty_distance_factor_add_information: 'test',
       empty_distance_factor: 0.3,
       id_tce_order: 'test',
@@ -508,6 +508,56 @@ describe('Validate Data Model Usecase', () => {
               'must be greater than or equal to "2023-12-01T00:00:00.000Z"',
             ],
             rows: [1, 2],
+          },
+        });
+        mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
+          validInput
+        );
+      });
+
+      it('should throw an error when unloading_country or loading_country is not a valid iso country code', async () => {
+        mockDataSourceFetcher.fetchFootprintData.returns(
+          Promise.resolve(
+            JSON.stringify([
+              {
+                ...validDataModel,
+                unloading_country: 'UNKB',
+                loading_country: 'UK',
+              },
+              {
+                ...validDataModel,
+                unloading_country: 'KRQ',
+                loading_country: 'BM',
+              },
+            ])
+          )
+        );
+
+        const validInput = {
+          ...mockInput,
+          type: 'http' as const,
+          month: 12,
+          year: 2023,
+          dataLocation: {
+            name: 'ShipmentId-1',
+            baseUrl: 'http://example.com/footprints.csv',
+          },
+        };
+        const { errors } = await expect(
+          validateDataModel.execute(validInput)
+        ).to.be.rejectedWith(DataModelValidationFailed);
+
+        errors.should.be.eql({
+          unloading_country: {
+            msgs: [
+              'length must be less than or equal to 3 characters long',
+              'must be a valid iso2 or iso3 country code',
+            ],
+            rows: [1, 1, 2],
+          },
+          loading_country: {
+            msgs: ['must be a valid iso2 or iso3 country code'],
+            rows: [1],
           },
         });
         mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
