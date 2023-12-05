@@ -1,21 +1,18 @@
-import { Participant } from 'core/types';
 import { validateData } from 'utils/helpers';
 import { AppLogger } from 'utils/logger';
 import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
-import { ICacheService, ISFCAPI, ISfcDataSpace } from './interfaces';
-import { Offer } from '@think-it-labs/edc-connector-client';
+import {
+  ICacheService,
+  ISFCAPI,
+  ISfcDataSpace,
+  SingleAssetDetail,
+} from './interfaces';
 import { initiateDataTransferByMonth } from 'core/validators';
 import { ShipmentForMonthNotFound } from 'utils/errors';
 
 export type TransferByMonthInput = {
   month: number;
   year: number;
-};
-
-type SingleAssetDetail = {
-  provider: Omit<Participant, 'connection'>;
-  assetId: string;
-  contractOffer: Offer;
 };
 
 const logger = new AppLogger('InitiateFileTransferUsecase');
@@ -29,11 +26,18 @@ export class InitiateDataTransferByMonthUsecase {
 
   async execute(inputData: TransferByMonthInput, authorization: string) {
     logger.info('Initiating data  transfer by month...', { args: inputData });
+
     const validated = validateData(initiateDataTransferByMonth, inputData);
 
-    const connections = await this.getConnections(authorization);
-    const assetDetails = await this.sfcDataSpace.fetchAssetsByMonth(
+    const sfcConnection = await this.sfcAPI.createConnection(
+      authorization || ''
+    );
+
+    const connections = await sfcConnection.getCompanies();
+    const myProfile = await sfcConnection.getMyProfile();
+    const assetDetails = await this.sfcDataSpace.fetchReceivedAssets(
       connections,
+      myProfile.client_id,
       validated
     );
     this.throwErrorIfThereAreNoAssets(assetDetails);
@@ -49,15 +53,6 @@ export class InitiateDataTransferByMonthUsecase {
     return jobId;
   }
 
-  private async getConnections(authorization: string) {
-    const sfcConnection = await this.sfcAPI.createConnection(
-      authorization || ''
-    );
-
-    const connections = await sfcConnection.getCompanies();
-    return connections;
-  }
-
   private throwErrorIfThereAreNoAssets(assetDetails: SingleAssetDetail[]) {
     if (assetDetails.length === 0) throw new ShipmentForMonthNotFound();
   }
@@ -66,7 +61,11 @@ export class InitiateDataTransferByMonthUsecase {
     const assetIds: string[] = [];
     for (const assetDetail of assetDetails) {
       assetIds.push(assetDetail.assetId);
-      await this.sfcDataSpace.startTransferProcess(assetDetail);
+      await this.sfcDataSpace.startTransferProcess({
+        assetId: assetDetail.assetId,
+        provider: assetDetail.provider,
+        contractOffer: assetDetail.contractOffer,
+      });
     }
     return assetIds;
   }

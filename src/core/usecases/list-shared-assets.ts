@@ -15,7 +15,7 @@ export class ListSharedAssetsUsecsase {
       .getMyProfile();
 
     const { page, perPage } = validatePaginationQuery(query);
-    const items = await this.sfcDataspace.fetchFootprintsMetaData(
+    const items = await this.sfcDataspace.fetchSharedFootprintsMetaData(
       provider.client_id
     );
 

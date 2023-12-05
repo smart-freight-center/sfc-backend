@@ -20,11 +20,18 @@ export { TransferByMonthInput } from './initiate-data-transfer-by-month';
 
 import { ValidateDataModelUsecase } from './validate-data-model';
 import { RunValidationOnRawFileUsecase } from './run-validation-on-raw-file';
+import { RetrieveUsageMetricsUsecase } from './retrieve-usage-metrics';
 
 export const provideFootprintUsecase = new ListSharedAssetsUsecsase(
   sfcDataSpace,
   sfcAPI
 );
+
+export const retrieveMetricsUsecase = new RetrieveUsageMetricsUsecase(
+  sfcDataSpace,
+  sfcAPI
+);
+
 export const deleteFootprintUsecase = new DeleteFootprintUsecase(
   sfcAPI,
   sfcDataSpace
@@ -61,10 +68,7 @@ export const initiateBatchRequestUsecase = new InitiateBatchRequestUsecase(
   cacheService
 );
 
-export const getEmissionsUsecase = new GetEmissionsUsecase(
-  sfcDataSpace,
-  cacheService
-);
+export const getEmissionsUsecase = new GetEmissionsUsecase(cacheService);
 
 export const authTokenCallbackUsecase = new AuthTokenCallbackUsecase(
   sfcDataSpace,
