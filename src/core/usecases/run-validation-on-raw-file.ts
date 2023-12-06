@@ -1,7 +1,7 @@
 import { validateData } from 'utils/helpers';
 import { rawDataValidationSchema } from 'core/validators/';
 
-import { verifyDataModel } from 'utils/data-model-verifier';
+import { validateDataModelAndWarning } from 'utils/data-model-verifier';
 import { ValidateRawDataModelInput } from 'entities';
 
 export class RunValidationOnRawFileUsecase {
@@ -11,7 +11,10 @@ export class RunValidationOnRawFileUsecase {
       input
     ) as ValidateRawDataModelInput;
 
-    const data = await verifyDataModel({ month, year }, rawData);
-    return { numberOfRows: data.length };
+    const { data, warning } = await validateDataModelAndWarning(
+      { month, year },
+      rawData
+    );
+    return { numberOfRows: data.length, warning };
   }
 }

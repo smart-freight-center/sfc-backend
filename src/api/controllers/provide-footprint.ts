@@ -44,13 +44,18 @@ export class ProviderController {
   }
 
   static async validateDataModalOnDataSource(context: RouterContext) {
-    const resData = await validateDataModelUsecase.execute(
+    const { warning, ...resData } = await validateDataModelUsecase.execute(
       context.request.body as ShareFootprintInput
     );
-
+    let message = 'Successfully validated data model.';
+    if (warning) {
+      message +=
+        ' However, there are some unknown fields in your data. These would be ignored';
+    }
     context.status = 200;
     context.body = {
-      message: 'Successfully validated data model',
+      unknownFields: warning,
+      message,
       meta: resData,
     };
   }
@@ -74,13 +79,20 @@ export class ProviderController {
       rawData = file.buffer.toString();
     }
 
-    const metaData = await runValidationOnRawFileUsecase.execute({
-      month: request.body.month,
-      year: request.body.year,
-      rawData,
-    });
+    const { warning, ...metaData } =
+      await runValidationOnRawFileUsecase.execute({
+        month: request.body.month,
+        year: request.body.year,
+        rawData,
+      });
+
+    let message = 'The file is valid.';
+    if (warning) {
+      message +=
+        ' However, there are some unknown fields in your data. These would be ignored';
+    }
 
     context.status = 200;
-    context.body = { message: 'The file is valid', meta: metaData };
+    context.body = { message, unknownFields: warning, meta: metaData };
   }
 }
