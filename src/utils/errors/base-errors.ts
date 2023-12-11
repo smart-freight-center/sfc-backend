@@ -30,6 +30,12 @@ export class NotImplemented extends CustomError {
   status = 501;
 }
 
+export class InternalServerError extends CustomError {
+  name = 'internal_server_error';
+  message = 'Something terrible happened';
+  status = 500;
+}
+
 export class DataConflict extends CustomError {
   message = 'Cannot create duplicate';
   status = 409;

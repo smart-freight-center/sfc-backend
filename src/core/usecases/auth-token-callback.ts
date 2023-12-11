@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import { TRANSFER_EXP_PROCESS_IN_SECONDS } from 'utils/settings';
 import { AppLogger } from 'utils/logger';
 import { ICacheService, ISfcDataSpace } from './interfaces';
-import { EdcClient } from 'core/services/sfc-dataspace/edc-client';
 
 const logger = new AppLogger('AuthTokenCallbackUsecase');
 

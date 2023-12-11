@@ -42,7 +42,7 @@ export const CLIENT_CONFIG = {
     protocol:
       process.env.EDC_PROTOCOL ||
       connectorJSONConfig?.addresses?.protocol ||
-      'http://consumer-connector:9194/api/v1/ids',
+      'http://consumer-connector:9194/protocol',
     dataplane: process.env.EDC_DATAPLANE || 'http://localhost:19195',
     public:
       process.env.EDC_PUBLIC ||

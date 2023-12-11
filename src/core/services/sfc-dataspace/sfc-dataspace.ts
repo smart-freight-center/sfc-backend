@@ -9,10 +9,14 @@ import {
   SingleAssetDetail,
 } from 'core/usecases/interfaces';
 import { convertRawDataToJSON } from 'utils/data-converter';
-import { ShipmentAlreadyShared, ShipmentForMonthNotFound } from 'utils/errors';
+import {
+  NoDataInAssetDataAddress,
+  ShipmentAlreadyShared,
+  ShipmentForMonthNotFound,
+} from 'utils/errors';
 import { EdcTransferService } from './edc-transfer-service';
 import { IEdcClient } from './interfaces';
-import { Participant } from 'core/types';
+import { EmissionDataModel, Participant } from 'core/types';
 import { CriterionInput, Offer } from '@think-it-labs/edc-connector-client';
 import { AppLogger } from 'utils/logger';
 
@@ -153,8 +157,85 @@ export class SfcDataSpace implements ISfcDataSpace {
 
     if (response.body) {
       const textData = await response.text();
-      return convertRawDataToJSON(textData);
+      const jsonData = convertRawDataToJSON(textData);
+      return this.parseRawData(jsonData);
     }
+    logger.error(
+      'Error occured while fetching carbon footprint. No data in the data source'
+    );
+    throw new NoDataInAssetDataAddress();
+  }
+
+  private parseRawData(rawFootprintData): EmissionDataModel[] {
+    const parsedDataModel: EmissionDataModel[] = [];
+
+    for (const item of rawFootprintData) {
+      const singleRowOfData: EmissionDataModel = {
+        id_tce: item.id_tce,
+        id_tce_order: item.id_tce_order,
+        id_consignment: item.id_consignment,
+        id_shipment: item.id_shipment,
+        transport_activity: Number(item.transport_activity),
+        mass: Number(item.mass),
+        empty_distance_factor: Number(item.empty_distance_factor),
+        empty_distance_factor_add_information:
+          item.empty_distance_factor_add_information,
+        co2e_ttw: Number(item.co2e_ttw),
+        co2e_wtw: Number(item.co2e_wtw),
+        co2e_intensity_wtw_unit: item.co2e_intensity_wtw_unit,
+        co2e_intensity_wtw: Number(item.co2e_intensity_wtw),
+        energy_carrier_feedstock_N: item.energy_carrier_feedstock_N,
+        temp_control: item.temp_control,
+        transport_operator_name: item.transport_operator_name,
+        distance_activity: Number(item.distance_activity),
+        mode_of_transport: item.mode_of_transport,
+        load_factor: Number(item.load_factor),
+        empty_distance: Number(item.empty_distance),
+        energy_carrier_N: item.energy_carrier_N,
+        Feedstock_N: item.Feedstock_N,
+        unloading_city: item.unloading_city,
+        unloading_country: item.unloading_country,
+        loading_country: item.loading_country,
+        loading_city: item.loading_city,
+        loading_date: item.loading_date,
+        unloading_date: item.unloading_date,
+        verification:
+          item.verification?.toUpperCase() === 'TRUE' ||
+          Number(item.verification) === 1 ||
+          Boolean(item.verification),
+        accreditation:
+          item.accreditation?.toUpperCase() === 'TRUE' ||
+          Number(item.accreditation) === 1 ||
+          Boolean(item.accreditation),
+      };
+
+      if (item.load_factor_add_information) {
+        singleRowOfData.load_factor_add_information =
+          item.load_factor_add_information;
+      }
+
+      if (item.load_factor_add_information) {
+        singleRowOfData.load_factor_add_information =
+          item.load_factor_add_information;
+      }
+      if (Number.isFinite(+item.distance_actual)) {
+        singleRowOfData.distance_actual = Number(item.distance_actual);
+      }
+
+      if (Number.isFinite(+item.WTW_fuel_emission_factor)) {
+        singleRowOfData.WTW_fuel_emission_factor = Number(
+          item.WTW_fuel_emission_factor
+        );
+      }
+
+      if (item.asset_type) {
+        singleRowOfData.asset_type = item.asset_type;
+      }
+
+      parsedDataModel.push(singleRowOfData);
+    }
+
+    return parsedDataModel;
   }
 
   async getAssetIdFromTransferProcess(transferProcessId: string) {

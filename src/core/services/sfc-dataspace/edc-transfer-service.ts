@@ -64,10 +64,18 @@ export class EdcTransferService {
     let negotiationIsPending =
       !COMPLETED_NEGOTIATION_STATES.has(negotiationState);
 
-    while (negotiationIsPending) {
-      logger.info('Negotation still pending. Waiting for another 1s...');
+    const MAX_WAIT_TIME_IN_SECONDS = 30;
+    let totalSecondsWaited = 0;
+    while (
+      negotiationIsPending &&
+      totalSecondsWaited < MAX_WAIT_TIME_IN_SECONDS
+    ) {
+      logger.info('Negotation still pending. Waiting for another 1s...', {
+        negotiationState,
+        totalSecondsWaited,
+      });
       await sleep(1000);
-
+      totalSecondsWaited++;
       negotiationState = await this.edcClient.getNegotiationState(
         negotiationId
       );
@@ -82,6 +90,7 @@ export class EdcTransferService {
     if (negotiationState !== 'FINALIZED') {
       logger.warn('The negotiation state is unknown...', {
         state: negotiationState,
+        totalSecondsWaited,
       });
       throw new TransferInitiationFailed();
     }
@@ -108,6 +117,7 @@ export class EdcTransferService {
       contractOffer,
       provider.connector_data
     );
+
     const contractNegotiationCreationResult =
       await this.edcClient.starContracttNegotiation(contractNegotitionInput);
     return contractNegotiationCreationResult;

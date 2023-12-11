@@ -24,6 +24,7 @@ export class EdcClient implements IEdcClient {
     if (myConnector.token) {
       builder.apiToken(myConnector.token);
     }
+    builder.protocolUrl(myConnector.addresses.protocol as string);
     this.edcConnectorClient = builder.build();
     this.edcClientId = myConnector.id;
   }
