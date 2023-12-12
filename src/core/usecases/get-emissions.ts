@@ -58,7 +58,7 @@ export class GetEmissionsUsecase {
     for (const emission of emissions) {
       aggregated.transport_activity += +emission.transport_activity || 0;
       aggregated.mass += +emission.mass || 0;
-      aggregated.distance_actual += +emission.distance_actual || 0;
+      aggregated.distance_actual += Number(emission.distance_actual) || 0;
       aggregated.co2e_wtw += +emission.co2e_wtw || 0;
     }
     return aggregated;

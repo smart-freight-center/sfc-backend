@@ -8,12 +8,10 @@ import {
   dataSourceService,
   sfcDataSpace,
   edcClient,
-  edcTransferService,
 } from 'core/services';
 import { GetEmissionsUsecase } from './get-emissions';
 import { ShareFootprintUsecase } from './share-footprint';
 import { DeleteFootprintUsecase } from './delete-fooprint';
-import { InitiateBatchRequestUsecase } from './initiate-batch-request';
 import { AuthTokenCallbackUsecase } from './auth-token-callback';
 import { InitiateDataTransferByMonthUsecase } from './initiate-data-transfer-by-month';
 export { TransferByMonthInput } from './initiate-data-transfer-by-month';
@@ -60,12 +58,6 @@ export const initiateTransferByMonth = new InitiateDataTransferByMonthUsecase(
   sfcAPI,
   cacheService,
   sfcDataSpace
-);
-
-export const initiateBatchRequestUsecase = new InitiateBatchRequestUsecase(
-  edcTransferService,
-  sfcAPI,
-  cacheService
 );
 
 export const getEmissionsUsecase = new GetEmissionsUsecase(cacheService);

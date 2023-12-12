@@ -2,6 +2,7 @@ import { TypedError } from '@think-it-labs/typed-error';
 import { ValidationError } from 'joi';
 import {
   DataConflict,
+  InternalServerError,
   InvalidUserInput,
   NotFound,
   NotImplemented,
@@ -60,7 +61,11 @@ export class ShipmentAlreadyShared extends DataConflict {
     'The carbon footprint for that month has already been shared with that company.';
   name = 'shipment_already_shared';
 }
-export class TransferInitiationFailed {}
+export class TransferInitiationFailed extends ServiceUnavailable {
+  name = 'transfer_initiation_failed';
+  message =
+    'The transfer initiation Failed. It is possible that your deployment setup is incomplete';
+}
 export class CouldntFetchDataInSource extends InvalidUserInput {
   name = 'no_data_in_datasource';
   message = "Couldn't fetch data in the specified source";
@@ -79,6 +84,11 @@ export class ShipmentForMonthNotFound extends NotFound {
 export class EmptyDataSource extends InvalidUserInput {
   name = 'empty_datasource';
   message = 'The datasource is empty or has only the header';
+}
+
+export class NoDataInAssetDataAddress extends InternalServerError {
+  name = 'no_data_in_asset_data_address';
+  message = 'The data address the user specified is currently empty';
 }
 export class InvalidShipmentIdFormat extends InvalidUserInput {
   message = 'The shipment Id should not containt `-`, `:`, `?` or `_`';
