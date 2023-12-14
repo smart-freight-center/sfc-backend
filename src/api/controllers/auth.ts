@@ -1,7 +1,6 @@
 import { RouterContext } from '@koa/router';
 
 import { KeyCloackClient } from 'clients/keycloak-client';
-import { KEYCLOAK_PUBLIC_KEY } from 'utils/settings';
 import { generateTokenUsecase } from 'core/usecases';
 
 import { TokenInput } from 'clients/interfaces';
@@ -19,7 +18,6 @@ export class AuthController {
     const authorization = context.request.headers.authorization || '';
 
     const decoded = await KeyCloackClient.verifyToken(
-      KEYCLOAK_PUBLIC_KEY,
       authorization
     );
     context.decoded = decoded;

@@ -14,12 +14,16 @@ import {
   KeyCloakCouldNotGenerateToken,
 } from 'utils/errors';
 import { AppLogger } from 'utils/logger';
+import { KeycloakAdmin } from './keycloak-admin-client';
 
 const keyCloakClient = axios.create({
   baseURL: `${KEYCLOAK_HOST}/realms/${KEYCLOAK_REALM}`,
 });
 
 const logger = new AppLogger('KeyCloackClient');
+
+// Initialize keycloakAdmin client to get public key for token verification
+const kcAdminClient = KeycloakAdmin.getInstance();
 
 export class KeyCloackClient {
   static async generateToken(clientId: string, grantType, clientSecret) {
@@ -85,12 +89,12 @@ export class KeyCloackClient {
     }
   }
 
-  static async verifyToken(publicKey: string, authorization: string) {
+  static async verifyToken(authorization: string) {
     try {
       const completeKey =
-        '-----BEGIN PUBLIC KEY-----\n' +
-        publicKey +
-        '\n-----END PUBLIC KEY-----';
+      '-----BEGIN PUBLIC KEY-----\n' +
+      kcAdminClient.getPublicKey() +
+      '\n-----END PUBLIC KEY-----';
 
       const accessToken = authorization?.split(' ')[1];
 
