@@ -25,10 +25,15 @@ export class EdcTransferService {
     let contractAgreementId = await this.getContractAgreementId(assetId);
 
     if (contractAgreementId) {
+      logger.info('Reusing existing contract agreement...');
       return this.initiateTransfer(provider, assetId, contractAgreementId);
     }
 
-    await this.negotiateContractAndWaitToComplete(provider, contractOffer);
+    await this.negotiateContractAndWaitToComplete(
+      provider,
+      contractOffer,
+      assetId
+    );
 
     contractAgreementId = await this.getContractAgreementId(assetId);
 
@@ -41,11 +46,13 @@ export class EdcTransferService {
 
   private async negotiateContractAndWaitToComplete(
     provider,
-    contractOffer: Offer
+    contractOffer: Offer,
+    assetId: string
   ) {
     const negotiationResponse = await this.startContractNegotiation(
       provider,
-      contractOffer
+      contractOffer,
+      assetId
     );
 
     await this.waitForContractNegotiationToComplete(negotiationResponse.id);
@@ -98,11 +105,16 @@ export class EdcTransferService {
 
   private async startContractNegotiation(
     provider: Omit<Participant, 'connection'>,
-    contractOffer: Offer
+    contractOffer: Offer,
+    assetId: string
   ) {
     logger.info('Starting contract negotiation...');
 
-    const result = await this.negotiateContract(contractOffer, provider);
+    const result = await this.negotiateContract(
+      contractOffer,
+      provider,
+      assetId
+    );
 
     logger.info('Contract negotation successful');
 
@@ -111,12 +123,14 @@ export class EdcTransferService {
 
   private async negotiateContract(
     contractOffer: Offer,
-    provider: Omit<Participant, 'connection'>
+    provider: Omit<Participant, 'connection'>,
+    assetId: string
   ) {
     const contractNegotitionInput = builder.contractNegotiationInput(
       contractOffer,
       provider.connector_data
     );
+    contractNegotitionInput.offer.assetId = assetId;
 
     const contractNegotiationCreationResult =
       await this.edcClient.starContracttNegotiation(contractNegotitionInput);
@@ -128,11 +142,13 @@ export class EdcTransferService {
     assetId: string,
     contractAgreementId: string
   ) {
+    logger.info('Initiating Transfer...', { contractAgreementId });
     const transferProcessInput = builder.transferProcessInput(
       assetId,
       provider.connector_data,
       contractAgreementId
     );
+
     const response = await this.edcClient.initiateTransfer(
       transferProcessInput
     );

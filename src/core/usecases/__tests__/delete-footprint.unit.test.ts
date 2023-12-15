@@ -90,6 +90,12 @@ describe('Delete Footprint Tests', () => {
           },
           {
             '@type': 'edc:Criterion',
+            'edc:operandLeft': 'https://w3id.org/edc/v0.0.1/ns/query',
+            'edc:operator': '=',
+            'edc:operandRight': '2023',
+          },
+          {
+            '@type': 'edc:Criterion',
             'edc:operandLeft': 'https://w3id.org/edc/v0.0.1/ns/sharedWith',
             'edc:operator': '=',
             'edc:operandRight': validInput.companyId,
@@ -120,47 +126,36 @@ describe('Delete Footprint Tests', () => {
       'sample-asset-id'
     );
 
+    mockEdcClient.deleteAsset.should.have.been.calledOnceWithExactly(
+      'sample-asset-id'
+    );
+
     mockEdcClient.queryAllContractDefinitions.should.have.been.calledOnceWith({
       filterExpression: [
         {
-          operandLeft: 'assetsSelector.operandRight',
-          operator: '=',
-          operandRight: 'provider-client',
-        },
-        {
           operandLeft: 'assetsSelector.operandLeft',
           operator: '=',
-          operandRight: 'https://w3id.org/edc/v0.0.1/ns/owner',
+          operandRight: 'https://w3id.org/edc/v0.0.1/ns/query',
         },
         {
           operandLeft: 'assetsSelector.operandRight',
-          operator: '=',
-          operandRight: 'consumer-id',
-        },
-        {
-          operandLeft: 'assetsSelector.operandLeft',
-          operator: '=',
-          operandRight: 'https://w3id.org/edc/v0.0.1/ns/sharedWith',
+          operator: 'LIKE',
+          operandRight: '%ownerSFCEQEQprovider-client%',
         },
         {
           operandLeft: 'assetsSelector.operandRight',
-          operator: '=',
-          operandRight: '8',
-        },
-        {
-          operandLeft: 'assetsSelector.operandLeft',
-          operator: '=',
-          operandRight: 'https://w3id.org/edc/v0.0.1/ns/month',
+          operator: 'LIKE',
+          operandRight: '%sharedWithSFCEQEQconsumer-id%',
         },
         {
           operandLeft: 'assetsSelector.operandRight',
-          operator: '=',
-          operandRight: '2021',
+          operator: 'LIKE',
+          operandRight: '%monthSFCEQEQ8%',
         },
         {
-          operandLeft: 'assetsSelector.operandLeft',
-          operator: '=',
-          operandRight: 'https://w3id.org/edc/v0.0.1/ns/year',
+          operandLeft: 'assetsSelector.operandRight',
+          operator: 'LIKE',
+          operandRight: '%yearSFCEQEQ2021%',
         },
       ],
     });

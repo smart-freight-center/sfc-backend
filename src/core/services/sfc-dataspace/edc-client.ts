@@ -33,6 +33,14 @@ export class EdcClient implements IEdcClient {
     return this.edcConnectorClient.management.assets.create(input);
   }
   async deleteAsset(assetId: string) {
+    await this.edcConnectorClient.management.assets.update({
+      '@id': assetId,
+      properties: {},
+      dataAddress: {
+        type: 'HttpData',
+        baseUrl: '',
+      },
+    });
     return this.edcConnectorClient.management.assets.delete(assetId);
   }
   async listAssets(query?: QuerySpec) {

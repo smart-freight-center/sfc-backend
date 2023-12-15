@@ -34,6 +34,13 @@ export type DeleteAssetInput = {
   companyId: string;
 };
 
+export type TransferCallbackInput = {
+  id: string;
+  endpoint: string;
+  authKey: 'Authorization';
+  authCode: string;
+};
+
 export type MonthFilter = { month: number; year: number };
 export interface ISfcDataSpace {
   shareAsset(input: ShareDataspaceAssetInput): Promise<object>;
@@ -45,8 +52,7 @@ export interface ISfcDataSpace {
     assetToDelete: DeleteAssetInput
   ): Promise<void>;
   fetchCarbonFootprint(
-    authKey: string,
-    authCode: string
+    input: TransferCallbackInput
   ): Promise<EmissionDataModel[]>;
   fetchSharedFootprintsMetaData(
     providerId: string
