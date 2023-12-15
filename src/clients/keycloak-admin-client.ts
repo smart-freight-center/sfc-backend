@@ -1,7 +1,7 @@
 import {
     KEYCLOAK_HOST,
-    KEYCLOAK_USERNAME,
-    KEYCLOAK_PASSWORD,
+    KEYCLOAK_ADMIN_USERNAME,
+    KEYCLOAK_ADMIN_PASSWORD,
     KEYCLOAK_REALM
 } from 'utils/settings';
 import KcAdminClient from '@keycloak/keycloak-admin-client';
@@ -31,8 +31,8 @@ export class KeycloakAdmin{
             });
 
             await this.adminClient.auth({
-                username: KEYCLOAK_USERNAME,
-                password: KEYCLOAK_PASSWORD,
+                username: KEYCLOAK_ADMIN_USERNAME,
+                password: KEYCLOAK_ADMIN_PASSWORD,
                 grantType: 'password',
                 clientId: 'admin-cli'
             });
