@@ -50,6 +50,7 @@ export const runValidationOnRawFileUsecase =
 
 export const retrieveFootprintsUsecase = new RetrieveFootprintMetaUsecase(
   edcClient,
+  sfcDataSpace,
   sfcAPI
 );
 export const generateTokenUsecase = new GenerateTokenUsecase(KeyCloackClient);

@@ -1,0 +1,1999 @@
+{
+	"info": {
+		"_postman_id": "aa00d9db-6bda-4c8d-93c2-878dccae066c",
+		"name": "SFC Data Exchange API V1",
+		"description": "This documentation shows how you can use the SFC Date Exchange API V1.\n\nYou can learn more about the goals of the SFC Exchange Network [here.](https://www.smartfreightcentre.org/en/projects/ongoing-projects/sfc-data-exchange-network/)\n\n## Features in this Version\n\n- Data providers now share carbon footprint data aggregated for an entire month, rather than on a per-shipment basis.\n- Introduction of an endpoint that runs data validation on individual files which should improve data preparation.\n- Implementation of an endpoint runs data validation on a data source(HTTP endpoint or S3 bucket file).\n- Data consumers retrieve shipments for a month.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27072999",
+		"_collection_link": "https://cloudy-meteor-557664.postman.co/workspace/SfC-API~a2fe7ead-7c1f-4fe3-b841-b8be01a7a05f/collection/27072999-aa00d9db-6bda-4c8d-93c2-878dccae066c?action=share&source=collection_link&creator=27072999"
+	},
+	"item": [
+		{
+			"name": "Data model Documentation",
+			"item": [],
+			"description": "The API enforces a data model that would be used to share carbon footprint data in the network.\n\nWhen preparing the CSV or JSON file for exchange, please consider the following guidelines:\n\n1. The data source must include carbon footprint data specific to a particular month.\n2. Grouping within the file should be based on the \"Arrival Date\" or unloading date of the shipments.\n3. Ensure that the contents of the data source adhere to the data model validation rules outlined in the table below.\n    \n\nThe table below shows the currently supported fields and what we expect ach to have:\n\n| Parameter | Key/Identifier | Constraints | **Description** |\n| --- | --- | --- | --- |\n| Shipment ID | id_shipment | `required` **string** | Identifier of the shipment |\n| Consignment ID | id_consignment | `required` **string** | Identifier of the consignment |\n| Transport chain element ID | id_tce | `required` **string** | Identifier of the transport chain element |\n| TCE Order ID | id_tce_order | `required` **string** | Consecutive number of TCE for the consignment, in case of multiple TCEs for one consignment/shipment |\n| Verification | verification | `required` **boolean**(accepts 1, 0, true and false) | Statement of external verification of the input dataÏ |\n| Accreditation | accreditation | `required` **boolean**(accepts 1, 0, true and false) | Statement of accreditation of the calculation methodology |\n| Energy Carrier | energy_carrier_n | `required` **string** | Category of primary energy carrier, such as Diesel, HVO, petrol, CNG, LNG, LPG, HFO, MGO, Aviation fuel, Hydrogen, Methanol, Electric, etc |\n| Freight Mass | mass | `required` **numeric > 0** | Mass of the transported freight (gross mass) |\n| Actual Distance | distance_actual | `optional` **numeric > 0** | Distance between the origin and the destination of a consignment of freight or a vehicle, along a specified route (or from telematics) |\n| Activity Distance | distance_activity | `required` **numeric > 0** | Distance between the origin and the destination of a consignment SFD or GCD (found in the past publications as planned distance)1 |\n| Transport Activity | transport_activity | `required` **numeric >= 0** | Amount of freight multiplied by the transport activity distance |\n| Transport operator Name | transport_operator_name | `required` **string** | Identification name of the organization submitting/reporting |\n| Mode of transport | mode_of_transport | `required` **categorical:** _'rail', 'road', 'sea', 'air', inland waterway', 'hub'_ | Means of transport or type of transport |\n| Mode specific asset type | asset_type | `optional` **string** | Categories per mode of transport (Specific category of vehicle, such as 40t truck, 3,5t van, or container vessel or bulk vessel) |\n| Load factor | load_factor | `required` **numeric (0-1\\]** | Ratio of the mass of the actual load to the maximum legally authorized load of a particular vehicle on a TOC level |\n| Load Factor Info | load_factor_add_information | `optional` string | Description of derivation of the load factor |\n| Empty distance factor | empty_distance_factor | `required` **numeric \\[0-1)** | Ratio of the section of the route of a vehicle during which no freight is transported over the total distance (loaded plus empty distance) of a vehicle on a TOC level |\n| Description of Empty distance factor | empty_distance_factor_add_information | `required` **string** | Description of derivation of the empty running |\n| Temperature control | temp_control | `required` - **categorical**: _'frozen’, ‘refrigerated', 'ambient', 'high temp'_ | Status of freight being non-ambient |\n| Feedstock | Feedstock_N | `required`**\\- string** | Primary feedstock of energy carrier N (e.g. fossil, natural gas, grid, renewable electricity, waste) |\n| Feedstock share of the blend | energy_carrier_feedstock_N | `required`**\\- string** | Secondary feedstock of energy carrier N (e.g. bio-waste, soy, legislated biofuel mix, etc). In case there is no secondary feedstock, write N/A. |\n| WTW fuel emission factor (certified) | WTW_fuel_emission_factor | `optional` **\\- numeric** > = 0 | WTW fuel emission factor (certified) |\n| Emission Intensity | co2e_intensity_wtw_unit | `required` **\\- string** | Unit options for the emission intensity |\n|  | co2e_intensity_wtw | `required` - **numeric > 0** | Coefficient relating specified transport activity with GHG emissions |\n| CO2e WTW | co2e_wtw | `required` - **numeric >= 0** | GHG released to atmosphere during the process of producing, storing, processing and distributing an energy carrier for vehicle operation + GHG released to atmosphere as a result of vehicle operation |\n| CO2e TTW | co2e_ttw | `required` - **numeric >= 0** | GHG released to atmosphere as a result of vehicle operation |\n| Origin City | loading_city | `required` - **string** | Origin City |\n| Destination city | unloading_city | `required` - **string** | Destination city |\n| Origin Country | loading_country | `required` - **string** (_must be a valid_ [iso2-code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Current_codes) or [iso3-code](https://www.iban.com/country-codes)) | Origin Country |\n| Destination city | unloading_country | `required` - **string** (_must be a valid_ [iso2-code ](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Current_codes) or [iso3-code](https://www.iban.com/country-codes)) | Destination city |\n| Time of Loading | loading_date | `required` - **datetime/date** (must be a valid iso datetime or date format) | Departure date |\n| Time of arrival | unloading_date | `required` - **datetime/date** (must be a valid iso datetime or date format) | Arrival date |"
+		},
+		{
+			"name": "Provider",
+			"item": [
+				{
+					"name": "Generate Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{provider-username}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{provider-password}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{provider-host}}/api/auth/token/",
+							"host": [
+								"{{provider-host}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"token",
+								""
+							]
+						},
+						"description": "This endpoint allows you to log into the application using the client that you generated from keycloak.\n\nIt follows the standard [Oauth2](https://datatracker.ietf.org/doc/html/rfc6749#section-4.4) spec for `password` login.\n\n#### Request Inputs\n\nContent-Type: `form-data`\n\n##### Body:\n\n| **Key** | **Allowed Values** | Description |\n| --- | --- | --- |\n| grant_type  <br>_required_ | password | \\- |\n| username  <br>_required_ | `string` | The username can be obtained from your KeyCloak instance |\n| password  <br>_required_ | `string` | You would need to reset your password from your keycloak instance |"
+					},
+					"response": [
+						{
+							"name": "Login Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "text"
+										},
+										{
+											"key": "client_id",
+											"value": "{{provider-client_id}}",
+											"type": "text"
+										},
+										{
+											"key": "client_secret",
+											"value": "{{client_secret}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{provider-host}}/auth/token/",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"auth",
+										"token",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1315"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 08 Nov 2023 11:27:36 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIzdTRVM0xOOEh4eV9nMlNzSWlrdEZSOENuc0pTNEdrNzBNM3lKZmFRVDJjIn0.eyJleHAiOjE2OTk0Nzg4NTYsImlhdCI6MTY5OTQ0Mjg1NiwianRpIjoiMzFkZjcyNDQtNDFlMC00ZmI4LWI0NWMtNmNmNjBlODE1MzVjIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9wcm92aWRlciIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiI2ZWY3ODk3NC1mOTFlLTQzMTMtOTY1Ni1kMTU5ODk0Y2U5ZTkiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJpbnRlbGNvbSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiLyoiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtcHJvdmlkZXIiLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJjbGllbnRJZCI6ImludGVsY29tIiwiY2xpZW50SG9zdCI6IjE5Mi4xNjguNjUuMSIsInByZWZlcnJlZF91c2VybmFtZSI6InNlcnZpY2UtYWNjb3VudC1pbnRlbGNvbSIsImNsaWVudEFkZHJlc3MiOiIxOTIuMTY4LjY1LjEifQ.BjM01jxZ9fOrJ4LH3rGcPD9O0fyDct-tPxqExnIiAs9so7SOOq3yDioE9uCjSxGUGPeyUfMQfzk8BfHff1Ac26fuf6-JnJMp6vg4JqTo5OMsP1ZN5pJ4ptUfD-ndXVPfedxjvZxTk94k5UOwzlpprMqpplvnL6JtVhfmqRxzEmqpglmWgoT4S0cjtI_ZeK6JlEJ5OmG9oDiXndCfIdcQJaXCPMmEWn8dxrjHYmrJ1YS0cyzgDVarXYduSH8VcZrOdu3J6hz8PJ8lsqaJiWpvZe-T04aTygb2icpWpN13RA5q2EBfeoQk1CyAeBMdHpC4CrUDviaORKpETeGKuAAQjg\",\n    \"expires_in\": 36000\n}"
+						},
+						{
+							"name": "Invalid Credentials",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "text"
+										},
+										{
+											"key": "client_id",
+											"value": "{{provider-client_id}}",
+											"type": "text"
+										},
+										{
+											"key": "client_secret",
+											"value": "{{client_secret}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{provider-host}}/auth/token/",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"auth",
+										"token",
+										""
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 08 Nov 2023 11:27:54 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Invalid Credentials\",\n    \"code\": \"invalid_credentials\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Share Carbon Emission Data",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"month\": 11,\n    \"year\": 2023,\n    \"companyId\": \"{{consumer_client_id}}\",\n    \"dataLocation\": {\n        \"name\": \"Test asset\",\n        \"baseUrl\": \"https://dummy-carbon-data-for-testing.s3.eu-west-1.amazonaws.com/2023-november-valid-country-codes.csv\"\n    },\n    \"type\": \"http\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{provider-host}}/api/v1/emissions",
+							"host": [
+								"{{provider-host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"emissions"
+							]
+						},
+						"description": "This endpoint allows Data providers to share emissions data for a particular month.\n\nThe endpoint accepts the location of the emission data(which can either be in a file in an S3 bucket or a HTTP endpiont). Note that the accepted formats are `CSV` or `JSON`.\n\nWhile sharing the location data source you must take note of the following:\n\n- The data source must contain carbon footprint data for a particular month\n- The grouping should be done by the unloading_date(\"Arrival Date\") of the shipments\n- Contents of the data source must match the data model validation rules shown in the first section.\n    \n\n### Request Inputs\n\n`Content-Type`: `application/json`\n\n| **Key** | **Allowed Values** | Description |\n| --- | --- | --- |\n| `month`  <br>_required_ | `number` between 1 to 12 | Represents the `month` that this data would be grouped by. |\n| `year`  <br>_required_ | `number` | Represents the `year` that this data would be grouped by. |\n| `companyId`  <br>_required_ | `string` | The id of the company you want to share the data with |\n| `dataLocation`  <br>_required_ | `object` (more details below) | This contains details of where the data is shared |\n| type  <br>_required_ | HTTP, S3 | This indicates whether the data is stored in an `S3` bucket or if it is accessible via an `HTTP` URL |\n\nThe expected keys in `dataLocation` vary based on the `type` that is specified.\n\n##### HTTP\n\n| **Key** | **Allowed Values** | Description |\n| --- | --- | --- |\n| name  <br>_required_ | `string` | The name of the asset. This is a way of adding a kind of description/title |\n| `baseUrl`  <br>_required_ | `string` | The URL location of the CSV or JSON |\n| `authKey`  <br>_optional_ | `string` | If the URL is protected, this is the key in your headers used to authenticate the URL. |\n| `authCode`  <br>_optional_ | `string` | If the URL is protected you must specify the authCode. It would be added to the headers |\n\n##### S3\n\n| **Key** | **Allowed Values** | Description |\n| --- | --- | --- |\n| `name`  <br>_required_ | `string` | The name of the asset. This is a way of adding a kind of description/title |\n| `bucketName`  <br>_required_ | `string` | The name of the bucket in the user's account |\n| `region`  <br>_required_ | `string` | The AWS region of the S3 bucket |\n| `keyName`  <br>required | `string` | This is the file path on AWS for the bucket |"
+					},
+					"response": [
+						{
+							"name": "Successfully share s3",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"month\": 11,\n    \"year\": 2023,\n    \"data\": {\n        \"name\": \"Test asset\",\n        \"region\": \"eu-west-2\",\n        \"bucketName\": \"some-bucket\"\n    },\n    \"contentType\": \"application/json\",\n    \"type\": \"s3\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "44"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 18 Apr 2023 12:17:47 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Successfully shared a shipment\"\n}"
+						},
+						{
+							"name": "Successfully shared data via http",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"month\": 11,\n    \"year\": 2023,\n    \"companyId\": \"{{consumer_client_id}}\",\n    \"dataLocation\": {\n        \"name\": \"Test asset\",\n        \"baseUrl\": \"https://dummy-carbon-data-for-testing.s3.eu-west-1.amazonaws.com/november-2023-carbon-footprint.csv\"\n    },\n    \"contentType\": \"application/json\",\n    \"type\": \"http\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "44"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 15:40:50 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Successfully shared a shipment\"\n}"
+						},
+						{
+							"name": "When token is not available",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"month\": 11,\n    \"year\": 2023,\n    \"companyId\": \"{{consumer_client_id}}\",\n    \"dataLocation\": {\n        \"name\": \"Test asset\",\n        \"baseUrl\": \"https://dummy-carbon-data-for-testing.s3.eu-west-1.amazonaws.com/mock-data-valid.csv\"\n    },\n    \"contentType\": \"application/json\",\n    \"type\": \"http\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "25"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 15:26:46 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"invalid token\"\n}"
+						},
+						{
+							"name": "When the data in the datasource is invalid",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"month\": 11,\n    \"year\": 2023,\n    \"companyId\": \"{{consumer_client_id}}\",\n    \"dataLocation\": {\n        \"name\": \"Test asset\",\n        \"baseUrl\": \"https://dummy-carbon-data-for-testing.s3.eu-west-1.amazonaws.com/mock-data-valid.csv\"\n    },\n    \"contentType\": \"application/json\",\n    \"type\": \"http\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "342"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 15:28:07 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"errors\": {\n        \"unloading_date\": {\n            \"rows\": [\n                1,\n                2,\n                3\n            ],\n            \"msgs\": [\n                \"must be greater than or equal to \\\"2023-11-01T00:00:00.000Z\\\"\"\n            ]\n        },\n        \"verification\": {\n            \"rows\": [\n                1,\n                2,\n                3\n            ],\n            \"msgs\": [\n                \"is required\"\n            ]\n        },\n        \"accreditation\": {\n            \"rows\": [\n                1,\n                2,\n                3\n            ],\n            \"msgs\": [\n                \"is required\"\n            ]\n        }\n    },\n    \"message\": \"The footprint data you specified does not meet the data model\",\n    \"code\": \"data_model_validation_failed\"\n}"
+						},
+						{
+							"name": "Throws an error when you have already shared the footprint for that month with a particular company",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"month\": 11,\n    \"year\": 2023,\n    \"companyId\": \"{{consumer_client_id}}\",\n    \"dataLocation\": {\n        \"name\": \"Test asset\",\n        \"baseUrl\": \"https://dummy-carbon-data-for-testing.s3.eu-west-1.amazonaws.com/november-2023-carbon-footprint.csv\"\n    },\n    \"contentType\": \"application/json\",\n    \"type\": \"http\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions"
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "125"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 15:31:00 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"The carbon footprint for that month has already been shared with that company.\",\n    \"code\": \"shipment_already_shared\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Run validation on data source",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"month\": 11,\n    \"year\": 2023,\n    \"dataLocation\": {\n        \"name\": \"Test asset\",\n          \"baseUrl\": \"https://dummy-carbon-data-for-testing.s3.eu-west-1.amazonaws.com/2023-november-valid-country-codes.csv\"\n    },\n    \"type\": \"http\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{provider-host}}/api/v1/emissions/validate-data-source",
+							"host": [
+								"{{provider-host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"emissions",
+								"validate-data-source"
+							]
+						},
+						"description": "This endpoint runs the data model validation on a particular data source\n\n### Request Inputs\n\n`Content-Type`: `application/json`\n\n| **Key** | **Allowed Values** | Description |\n| --- | --- | --- |\n| `month`  <br>_required_ | `number` between 1 to 12 | The month that would be used to validate the carbon footprint data |\n| `year` | `number` | The year that would be used to validate the carbon footprint data. |\n| `dataLocation`  <br>_required_ | `object` (more details below) | This contains details of where the data is shared |\n| type  <br>required | HTTP, S3 | This indicates whether the data is stored in an `S3` bucket or if it is accessible via an `HTTP` URL |\n\nThe expected keys in `dataLocation` vary based on the `type` that is specified.\n\n##### HTTP\n\n| **Key** | **Allowed Values** | Description |\n| --- | --- | --- |\n| name  <br>_required_ | `string` | The name of the asset. This is a way of adding a kind of description/title |\n| baseUrl  <br>_required_ | `string` | The URL location of the CSV or JSON |\n| `authKey`  <br>_optional_ | `string` | If the URL is protected, this is the key in your headers used to authenticate the URL. |\n| `authCode`  <br>_optional_ | `string` | If the URL is protected you must specify the authCode. It would be added to the headers |\n\n##### S3\n\n| **Key** | **Allowed Values** | Description |\n| --- | --- | --- |\n| `name`  <br>_required_ | `string` | The name of the asset. This is a way of adding a kind of description/title |\n| `bucketName`  <br>_required_ | `string` | The name of the bucket in the user's account |\n| `region`  <br>_required_ | `string` | The AWS region of the S3 bucket |\n| `keyName`  <br>_required_ | `string` | This is the file path on AWS for the bucket |"
+					},
+					"response": [
+						{
+							"name": "When token is not available",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"month\": 11,\n    \"year\": 2023,\n    \"companyId\": \"{{consumer_client_id}}\",\n    \"dataLocation\": {\n        \"name\": \"Test asset\",\n        \"baseUrl\": \"https://dummy-carbon-data-for-testing.s3.eu-west-1.amazonaws.com/mock-data-valid.csv\"\n    },\n    \"contentType\": \"application/json\",\n    \"type\": \"http\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions/validate-data-source",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"validate-data-source"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "25"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 15:26:46 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"invalid token\"\n}"
+						},
+						{
+							"name": "When the data in the datasource is invalid",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"month\": 11,\n    \"year\": 2023,\n    \"companyId\": \"{{consumer_client_id}}\",\n    \"dataLocation\": {\n        \"name\": \"Test asset\",\n        \"baseUrl\": \"https://dummy-carbon-data-for-testing.s3.eu-west-1.amazonaws.com/mock-data-valid.csv\"\n    },\n    \"contentType\": \"application/json\",\n    \"type\": \"http\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions/validate-data-source",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"validate-data-source"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "342"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 15:28:07 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"errors\": {\n        \"unloading_date\": {\n            \"rows\": [\n                1,\n                2,\n                3\n            ],\n            \"msgs\": [\n                \"must be greater than or equal to \\\"2023-11-01T00:00:00.000Z\\\"\"\n            ]\n        },\n        \"verification\": {\n            \"rows\": [\n                1,\n                2,\n                3\n            ],\n            \"msgs\": [\n                \"is required\"\n            ]\n        },\n        \"accreditation\": {\n            \"rows\": [\n                1,\n                2,\n                3\n            ],\n            \"msgs\": [\n                \"is required\"\n            ]\n        }\n    },\n    \"message\": \"The footprint data you specified does not meet the data model\",\n    \"code\": \"data_model_validation_failed\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Run data model validation on a file",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "month",
+									"value": "11",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "2023",
+									"type": "text"
+								},
+								{
+									"key": "rawData",
+									"type": "file",
+									"src": "/Users/prof/Downloads/valid-data-model-for-sfc.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{provider-host}}/api/v1/emissions/validate-file",
+							"host": [
+								"{{provider-host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"emissions",
+								"validate-file"
+							]
+						},
+						"description": "This endpoint can be used to run data model validation on a particular file. Data providers can use this endpiont to validate a file before uploading to their data source during data preparation.\n\nThe file can be either in CSV or JSON format.\n\n### Request Inputs\n\n`Content-Type`: `form-data`\n\n| **Key** | **Allowed Values** | Description |\n| --- | --- | --- |\n| `month`  <br>_required_ | `number` | The month that would be used to validate the `unloading_date`. |\n| `year`  <br>_required_ | `number` | The `year` that would be used to validate the `unloading_date`. |\n| `file`  <br>_required_ | `object` (more details below) | A CSV or JSON file that the validation would be run against |"
+					},
+					"response": [
+						{
+							"name": "Returns successful reponse when data is vlaid",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "month",
+											"value": "11",
+											"type": "text"
+										},
+										{
+											"key": "year",
+											"value": "2023",
+											"type": "text"
+										},
+										{
+											"key": "rawData",
+											"type": "file",
+											"src": "/Users/prof/Downloads/mock-value.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions/validate-file",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"validate-file"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "57"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 16:00:30 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"The file is valid\",\n    \"meta\": {\n        \"numberOfRows\": 3\n    }\n}"
+						},
+						{
+							"name": "Throws an error when some rows are invalid",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "month",
+											"value": "11",
+											"type": "text"
+										},
+										{
+											"key": "year",
+											"value": "2023",
+											"type": "text"
+										},
+										{
+											"key": "rawData",
+											"type": "file",
+											"src": "/Users/prof/Downloads/mock-value.csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions/validate-file",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"validate-file"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "239"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 16:02:03 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"errors\": {\n        \"id_consignment\": {\n            \"rows\": [\n                1,\n                2,\n                3\n            ],\n            \"msgs\": [\n                \"is required\"\n            ]\n        },\n        \"accreditation\": {\n            \"rows\": [\n                2\n            ],\n            \"msgs\": [\n                \"must be a boolean\"\n            ]\n        }\n    },\n    \"message\": \"The footprint data you specified does not meet the data model\",\n    \"code\": \"data_model_validation_failed\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Revoke Access",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"companyId\": \"{{consumer_client_id}}\",\n    \"month\": 11,\n    \"year\": 2023\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{provider-host}}/api/v1/emissions/sent/",
+							"host": [
+								"{{provider-host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"emissions",
+								"sent",
+								""
+							]
+						},
+						"description": "This allows you to revoke access to a shipment that you have shared previously\n\n### Request Inputs\n\n`Content-Type`: application/json\n\n| **Key** | **Allowed Values** | Description |\n| --- | --- | --- |\n| `companyId`  <br>_required_ | `number` | The company you want to revoke access |\n| `year`  <br>_required_ | `number` |  |\n| `month`  <br>_required_ | `number` |  |"
+					},
+					"response": [
+						{
+							"name": "Successfully revoked access",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"companyId\": \"{{consumer_client_id}}\",\n    \"month\": 11,\n    \"year\": 2023\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions/sent/",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"sent",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "64"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 16:03:30 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"We have successfully revoked access for that asset\"\n}"
+						},
+						{
+							"name": "Throws eror when shipment for that month has not yet been shared",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"companyId\": \"{{consumer_client_id}}\",\n    \"month\": 11,\n    \"year\": 2023\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions/sent/",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"sent",
+										""
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "75"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 16:04:12 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"No Shipment for that month exists\",\n    \"code\": \"shipment_not_found\"\n}"
+						},
+						{
+							"name": "Throws error when token is invalid",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"companyId\": \"{{consumer_client_id}}\",\n    \"month\": 11,\n    \"year\": 2023\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions/sent/",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"sent",
+										""
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "25"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 16:21:44 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": \"invalid token\"\n}"
+						}
+					]
+				},
+				{
+					"name": "List emissions that you have previously shared",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{provider-host}}/api/v1/emissions/sent/",
+							"host": [
+								"{{provider-host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"emissions",
+								"sent",
+								""
+							]
+						},
+						"description": "This returns assets that this provider has previously shared."
+					},
+					"response": [
+						{
+							"name": "List shared emissions",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions/sent",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"sent"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "186"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 16:37:11 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"owner\": \"moon\",\n            \"numberOfRows\": 3,\n            \"month\": 11,\n            \"sharedWith\": \"earth\",\n            \"year\": 2023,\n            \"id\": \"11-2023_$1699547828522\"\n        }\n    ],\n    \"meta\": {\n        \"currentPage\": 1,\n        \"perPage\": 10,\n        \"totalPages\": 1,\n        \"totalItems\": 1\n    }\n}"
+						},
+						{
+							"name": "(401) When token is invalid",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions/sent/",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"sent",
+										""
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "50"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 16:37:46 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Invalid token\",\n    \"code\": \"invalid_token\"\n}"
+						}
+					]
+				}
+			],
+			"description": "This section shows endpoints that allows the data providers to share carbon emission footprint with a particular user in the network."
+		},
+		{
+			"name": "Consumer",
+			"item": [
+				{
+					"name": "Generate Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{consumer_username}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{consumer_password}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{consumer-host}}/api/auth/token/",
+							"host": [
+								"{{consumer-host}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"token",
+								""
+							]
+						},
+						"description": "This endpoint allows you to log into the application using the client that you generated from keycloak.\n\nIt follows the standard [Oauth2](https://datatracker.ietf.org/doc/html/rfc6749#section-4.4) spec for `password` login.\n\n#### Request Inputs\n\nContent-Type: `form-data`\n\n##### Body:\n\n| **Key** | **Allowed Values** | Description |\n| --- | --- | --- |\n| grant_type  <br>_required_ | password | \\- |\n| username  <br>_required_ | `string` | The username can be obtained from your KeyCloak instance |\n| password  <br>_required_ | `string` | You would need to reset your password from your keycloak instance |"
+					},
+					"response": [
+						{
+							"name": "Successfully logged in",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "text"
+										},
+										{
+											"key": "client_id",
+											"value": "{{client_id}}",
+											"type": "text"
+										},
+										{
+											"key": "client_secret",
+											"value": "{{client_secret}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{consumer-host}}/auth/token/",
+									"host": [
+										"{{consumer-host}}"
+									],
+									"path": [
+										"auth",
+										"token",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1299"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 05 Apr 2023 08:40:25 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"access_token\": \"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJlVExtRHR4MFFqOGJXM1ktRkNvTTRVR0xod1ZYWXJ5M2dVRmVzMjNJdjV3In0.eyJleHAiOjE2ODA2ODQzMjUsImlhdCI6MTY4MDY4NDAyNSwianRpIjoiNjc5NWRkMDYtZDE3NS00ZTlmLTllNWQtMGU5ZGU0ZjJiNDQzIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9wcm92aWRlciIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiI4ZjY5NmYzYi1jNDEyLTQ1ZWYtYjljMC1hOWQ5OTAwY2I1ODciLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhbWF6b24iLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbIi8qIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJkZWZhdWx0LXJvbGVzLXByb3ZpZGVyIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoiZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SG9zdCI6IjE3Mi4xNy4wLjEiLCJjbGllbnRJZCI6ImFtYXpvbiIsInByZWZlcnJlZF91c2VybmFtZSI6InNlcnZpY2UtYWNjb3VudC1hbWF6b24iLCJjbGllbnRBZGRyZXNzIjoiMTcyLjE3LjAuMSJ9.YYM8FAZKqqsxllmvLjRTNx0kAPUjwWLeh3Dd8vhJdB5RW6hOGl93b4MDpQIF0cYPe3kPpqFeo3UBqULSMMZhTyDD6Jp2Ks-sSNVldjQI3AiQBdIli2psYXph1osZCreDYFjVdnbsQdqVzSF3jlINvitjMOpd7P554Jkt8ug_Iv73BNhKU_11ZQNBJyJaet2g0_GB9LuM8uCQwbOpcfNmhM6tftwzY4A6tZPyKlyIAS_BRbb7C9DFFaIh_gKPWqb8GuFL7_VcXUWxGMFux5Fmw9P6oaaQbS8q9aSkEaZhXcGpLnEabZ6so-CbENV1JR6akcK-cHYKWzV5XMZASLWeLg\",\n    \"expires_in\": 300\n}"
+						}
+					]
+				},
+				{
+					"name": "List shipments that you can access",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{consumer_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{consumer-host}}/api/v1/emissions/received",
+							"host": [
+								"{{consumer-host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"emissions",
+								"received"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": null,
+									"description": "Pagination value that specifies the current page",
+									"disabled": true
+								},
+								{
+									"key": "perPage",
+									"value": null,
+									"description": "Specifies how many items you would like to get per page",
+									"disabled": true
+								}
+							]
+						},
+						"description": "This endpoint returns a list of emissions that a provider has previously shared with us."
+					},
+					"response": [
+						{
+							"name": "Successfully retrieved emissions you have access to",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{consumer-host}}/api/v1/emissions/received",
+									"host": [
+										"{{consumer-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"received"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": null,
+											"description": "Pagination value that specifies the current page",
+											"disabled": true
+										},
+										{
+											"key": "perPage",
+											"value": null,
+											"description": "Specifies how many items you would like to get per page",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "169"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 16:54:56 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"owner\": \"moon\",\n            \"month\": 11,\n            \"sharedWith\": \"earth\",\n            \"year\": 2023,\n            \"id\": \"11-2023_$1699548889995\"\n        }\n    ],\n    \"meta\": {\n        \"currentPage\": 1,\n        \"perPage\": 10,\n        \"totalPages\": 1,\n        \"totalItems\": 1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Initiate Emission Transfer By Month",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{consumer_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"month\": 11,\n    \"year\": 2023\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{consumer-host}}/api/v1/emissions/initiate-transfer-by-month",
+							"host": [
+								"{{consumer-host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"emissions",
+								"initiate-transfer-by-month"
+							]
+						},
+						"description": "This endpoint initiates a file transfer for all the carbon footprints a data consumer has received in a particular month\n\nOn success it returns a `jobId` that can the used in the `Get Footprint Data` endpiont to get the actual data."
+					},
+					"response": [
+						{
+							"name": "Initiate Emission Transfer By Month",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"month\": 11,\n    \"year\": 2023\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{consumer-host}}/api/v1/emissions/initiate-transfer-by-month",
+									"host": [
+										"{{consumer-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"initiate-transfer-by-month"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "19"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 16:56:54 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"jobId\": \"2023-11\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Emissions Data",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{consumer_access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{consumer-host}}/api/v1/emissions/:jobId?aggregate=true",
+							"host": [
+								"{{consumer-host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"emissions",
+								":jobId"
+							],
+							"query": [
+								{
+									"key": "aggregate",
+									"value": "true",
+									"description": "When this value is `true` the API would add cell that aggregates the `transport_activity`, `mass`, `actual_distance` and `co2_wtw`. By default this value is `true`. Note that this feautre is EXPERIMENTAL"
+								}
+							],
+							"variable": [
+								{
+									"key": "jobId",
+									"value": "2023-11"
+								}
+							]
+						},
+						"description": "This returns the actual emissions data that was shared once the `jobId` is available"
+					},
+					"response": [
+						{
+							"name": "(200) Successfully retrieved data",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "{{consumer-host}}/emissions/:jobId?aggregate=true",
+									"host": [
+										"{{consumer-host}}"
+									],
+									"path": [
+										"emissions",
+										":jobId"
+									],
+									"query": [
+										{
+											"key": "aggregate",
+											"value": "true",
+											"description": "When this value is `true` the API would add cell that aggregates the `transport_activity`, `mass`, `actual_distance` and `co2_wtw`. By default this value is `true`"
+										}
+									],
+									"variable": [
+										{
+											"key": "jobId",
+											"value": "1234567"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2848"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 18 May 2023 20:47:03 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"id_tce\": \"tce_1\",\n            \"id_consignment\": \"1050700\",\n            \"id_shipment\": \"1234567\",\n            \"transport_activity\": \"400\",\n            \"mass\": \"1000\",\n            \"actual_distance\": \"100\",\n            \"mode_of_transport\": \"Road\",\n            \"asset_type\": \"40-ft truck\",\n            \"co2_wtw\": \"100\",\n            \"load_factor\": \"0.8\",\n            \"empty_distance\": \"50\",\n            \"energy_carrier_N\": \"<some string here>\",\n            \"Feedstock_N\": \"biodiesel\"\n        },\n        {\n            \"id_tce\": \"tce_2\",\n            \"id_consignment\": \"2008750\",\n            \"id_shipment\": \"1234567\",\n            \"transport_activity\": \"300\",\n            \"mass\": \"1000\",\n            \"actual_distance\": \"200\",\n            \"mode_of_transport\": \"Ocean\",\n            \"asset_type\": \"container ship X\",\n            \"co2_wtw\": \"3000\",\n            \"load_factor\": \"0.7\",\n            \"empty_distance\": \"0\",\n            \"energy_carrier_N\": \"<some string here>\",\n            \"Feedstock_N\": \"marine oil\"\n        },\n        {\n            \"id_tce\": \"tce_3\",\n            \"id_consignment\": \"3006756\",\n            \"id_shipment\": \"1234567\",\n            \"transport_activity\": \"200\",\n            \"mass\": \"1000\",\n            \"actual_distance\": \"45\",\n            \"mode_of_transport\": \"Air\",\n            \"asset_type\": \"Airplane XYZ\",\n            \"co2_wtw\": \"5000\",\n            \"load_factor\": \"0.3\",\n            \"empty_distance\": \"10\",\n            \"energy_carrier_N\": \"<some string here>\",\n            \"Feedstock_N\": \"aviation fuel blend\"\n        },\n        {\n            \"id_tce\": \"tce_1\",\n            \"id_consignment\": \"1050700\",\n            \"id_shipment\": \"1234567\",\n            \"transport_activity\": \"400\",\n            \"mass\": \"1000\",\n            \"mode_of_transport\": \"Road\",\n            \"asset_type\": \"40-ft truck\",\n            \"load_factor\": \"0.8\",\n            \"empty_distance\": \"50\",\n            \"energy_carrier_N\": \"<some string here>\",\n            \"Feedstock_N\": \"biodiesel\"\n        },\n        {\n            \"id_tce\": \"tce_2\",\n            \"id_consignment\": \"2008750\",\n            \"id_shipment\": \"1234567\",\n            \"transport_activity\": \"300\",\n            \"mass\": \"1000\",\n            \"mode_of_transport\": \"Ocean\",\n            \"asset_type\": \"container ship X\",\n            \"load_factor\": \"0.7\",\n            \"empty_distance\": \"0\",\n            \"energy_carrier_N\": \"<some string here>\",\n            \"Feedstock_N\": \"marine oil\"\n        },\n        {\n            \"id_tce\": \"tce_3\",\n            \"id_consignment\": \"3006756\",\n            \"id_shipment\": \"1234567\",\n            \"transport_activity\": \"200\",\n            \"mass\": \"1000\",\n            \"mode_of_transport\": \"Air\",\n            \"asset_type\": \"Airplane XYZ\",\n            \"load_factor\": \"0.3\",\n            \"empty_distance\": \"10\",\n            \"energy_carrier_N\": \"<some string here>\",\n            \"Feedstock_N\": \"aviation fuel blend\"\n        },\n        {\n            \"id_tce\": \"tce_1\",\n            \"id_consignment\": \"1050700\",\n            \"id_shipment\": \"1234567\",\n            \"transport_activity\": \"400\",\n            \"mass\": \"1000\",\n            \"actual_distance\": \"100\",\n            \"mode_of_transport\": \"Road\",\n            \"asset_type\": \"40-ft truck\",\n            \"co2_wtw\": \"100\",\n            \"load_factor\": \"0.8\",\n            \"empty_distance\": \"50\",\n            \"energy_carrier_N\": \"<some string here>\",\n            \"Feedstock_N\": \"biodiesel\"\n        },\n        {\n            \"id_tce\": \"tce_2\",\n            \"id_consignment\": \"2008750\",\n            \"id_shipment\": \"1234567\",\n            \"transport_activity\": \"300\",\n            \"mass\": \"1000\",\n            \"actual_distance\": \"200\",\n            \"mode_of_transport\": \"Ocean\",\n            \"asset_type\": \"container ship X\",\n            \"co2_wtw\": \"3000\",\n            \"load_factor\": \"0.7\",\n            \"empty_distance\": \"0\",\n            \"energy_carrier_N\": \"<some string here>\",\n            \"Feedstock_N\": \"marine oil\"\n        },\n        {\n            \"id_tce\": \"tce_3\",\n            \"id_consignment\": \"3006756\",\n            \"id_shipment\": \"1234567\",\n            \"transport_activity\": \"200\",\n            \"mass\": \"1000\",\n            \"actual_distance\": \"45\",\n            \"mode_of_transport\": \"Air\",\n            \"asset_type\": \"Airplane XYZ\",\n            \"co2_wtw\": \"5000\",\n            \"load_factor\": \"0.3\",\n            \"empty_distance\": \"10\",\n            \"energy_carrier_N\": \"<some string here>\",\n            \"Feedstock_N\": \"aviation fuel blend\"\n        }\n    ],\n    \"aggregated\": {\n        \"transport_activity\": 2700,\n        \"mass\": 9000,\n        \"actual_distance\": 690,\n        \"co2_wtw\": 16200\n    }\n}"
+						},
+						{
+							"name": "Throws error when the file transfer has not yet been inititated",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "{{consumer-host}}/api/v1/emissions/:jobId",
+									"host": [
+										"{{consumer-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										":jobId"
+									],
+									"query": [
+										{
+											"key": "aggregate",
+											"value": "false",
+											"description": "When this value is `true` the API would add cell that aggregates the `transport_activity`, `mass`, `actual_distance` and `co2_wtw`. By default this value is `true`. Note that this feautre is EXPERIMENTAL",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "jobId",
+											"value": "2023-11"
+										}
+									]
+								}
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "93"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 09 Nov 2023 17:00:27 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Transfer for this shipment is not yet initiated\",\n    \"code\": \"transfer_not_initiated\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Shared Features",
+			"item": [
+				{
+					"name": "Metrics",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{provider-host}}/api/v1/emissions/metrics",
+							"host": [
+								"{{provider-host}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"emissions",
+								"metrics"
+							]
+						},
+						"description": "This endpoint allows you to retrieve stats on how you are using the API at the moment.\n\nThe stats it returns can be thought of a Consumer Relevant or Provider Relevant\n\n#### Provider Relevant Metrics\n\n- `totalNumberOfRowsShared`: This field is the sum of the total number of rows in all the shared monthly emission data that you have shared\n- `totalFootprintsShared`: The is total number of shared monthly emission data that you have shared.\n- `totalCompaniesYouHaveSharedFootprintsWith`: Represents how many unique companies you have shared data with.\n    \n\n#### Consumer Relevant Metrics\n\n- `totalNumberOfRowsReceived` : Shows the total number of rows that have been shared with you\n- `totalFootprintsReceived`: Shows the total number of shared monthly emission data that have been shared with you\n- `totalCompaniesYouHaveReceivedFootprintsFrom`: Shows how many unique companies have shared monthly emission data with you\n    \n\n#### Example Response\n\n``` json\n{\n        \"totalNumberOfRowsShared\": 3,\n        \"totalFootprintsShared\": 1,\n        \"totalCompaniesYouHaveSharedFootprintsWith\": 1,\n        \"totalNumberOfRowsReceived\": 0,\n        \"totalFootprintsReceived\": 0,\n        \"totalCompaniesYouHaveReceivedFootprintsFrom\": 0\n    }\n\n ```"
+					},
+					"response": [
+						{
+							"name": "Metrics",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{provider-host}}/api/v1/emissions/metrics",
+									"host": [
+										"{{provider-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"emissions",
+										"metrics"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": ""
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "216"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 08 Dec 2023 14:15:58 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"totalNumberOfRowsShared\": 3,\n        \"totalFootprintsShared\": 1,\n        \"totalCompaniesYouHaveSharedFootprintsWith\": 1,\n        \"totalNumberOfRowsReceived\": 0,\n        \"totalFootprintsReceived\": 0,\n        \"totalCompaniesYouHaveReceivedFootprintsFrom\": 0\n    }\n}"
+						}
+					]
+				}
+			],
+			"description": "Now let's take a look at endpoints that are relevant to both data providers and data consumers."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

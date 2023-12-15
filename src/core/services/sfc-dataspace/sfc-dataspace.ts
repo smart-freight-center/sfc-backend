@@ -19,6 +19,7 @@ import { IEdcClient } from './interfaces';
 import { EmissionDataModel, Participant } from 'core/types';
 import { CriterionInput, Offer } from '@think-it-labs/edc-connector-client';
 import { AppLogger } from 'utils/logger';
+import { CONTRACT_DEFINITION_QUERY_FILTER } from 'utils/edc-builder';
 
 const logger = new AppLogger('SfcDataSpace');
 export class SfcDataSpace implements ISfcDataSpace {
@@ -39,7 +40,8 @@ export class SfcDataSpace implements ISfcDataSpace {
     const contractDefinitions =
       await this.edcClient.queryAllContractDefinitions({
         filterExpression: [
-          ...builder.contractDefinitionFilter('owner', '=', ownerId),
+          CONTRACT_DEFINITION_QUERY_FILTER,
+          builder.filterByContractDefinitionQuery('owner', ownerId),
         ],
       });
 
@@ -49,10 +51,12 @@ export class SfcDataSpace implements ISfcDataSpace {
       .filter((asset) => assetIds.has(asset['@id']))
       .map((asset) => ({
         owner: asset.properties.mandatoryValue('edc', 'owner'),
-        numberOfRows: asset.properties.mandatoryValue('edc', 'numberOfRows'),
-        month: asset.properties.mandatoryValue('edc', 'month'),
+        numberOfRows: Number(
+          asset.properties.mandatoryValue('edc', 'numberOfRows')
+        ),
+        month: Number(asset.properties.mandatoryValue('edc', 'month')),
         sharedWith: asset.properties.mandatoryValue('edc', 'sharedWith'),
-        year: asset.properties.mandatoryValue('edc', 'year'),
+        year: Number(asset.properties.mandatoryValue('edc', 'year')),
         id: asset.properties.mandatoryValue('edc', 'id'),
       }));
   }
@@ -107,14 +111,12 @@ export class SfcDataSpace implements ISfcDataSpace {
     if (filters?.year) {
       filterExpression.push(builder.assetFilter('year', '=', filters.year));
     }
-
     const catalog = await this.edcClient.listCatalog({
       providerUrl,
       querySpec: {
         filterExpression: filterExpression,
       },
     });
-
     return catalog.datasets.map((dataset) => {
       const footprintItem: FootprintMetaData = {
         owner: dataset.mandatoryValue('edc', 'owner'),
@@ -134,14 +136,18 @@ export class SfcDataSpace implements ISfcDataSpace {
     assetToDelete: DeleteAssetInput
   ) {
     const { companyId, month, year } = assetToDelete;
+
+    const filterExpression = [
+      CONTRACT_DEFINITION_QUERY_FILTER,
+      builder.filterByContractDefinitionQuery('owner', providerId),
+      builder.filterByContractDefinitionQuery('sharedWith', companyId),
+      builder.filterByContractDefinitionQuery('month', month),
+      builder.filterByContractDefinitionQuery('year', year),
+    ];
+
     const contractDefinitions =
       await this.edcClient.queryAllContractDefinitions({
-        filterExpression: [
-          ...builder.contractDefinitionFilter('owner', '=', providerId),
-          ...builder.contractDefinitionFilter('sharedWith', '=', companyId),
-          ...builder.contractDefinitionFilter('month', '=', month),
-          ...builder.contractDefinitionFilter('year', '=', year),
-        ],
+        filterExpression,
       });
 
     if (!contractDefinitions?.length) throw new ShipmentForMonthNotFound();
@@ -248,6 +254,9 @@ export class SfcDataSpace implements ISfcDataSpace {
 
     return assetId;
   }
+  private buildContractQuery(left: string, operator: string, right: string) {
+    return `${left}${operator}${right}`;
+  }
   async shareAsset(input: ShareDataspaceAssetInput) {
     const { consumer, provider, numberOfRows, ...data } = input;
     await this.ensureFootprintHasNotBeenShared(
@@ -272,14 +281,18 @@ export class SfcDataSpace implements ISfcDataSpace {
       results.newAssetId = newAsset.id;
 
       const policyInput = builder.policyInput(consumer.company_BNP);
+
       const newPolicy = await this.edcClient.createPolicy(policyInput);
       results.newPolicyId = newPolicy.id;
 
+      const query = [
+        this.buildContractQuery('owner', '=', assetInput.properties.owner),
+        this.buildContractQuery('month', '=', assetInput.properties.month),
+        this.buildContractQuery('year', '=', assetInput.properties.year),
+        this.buildContractQuery('sharedWith', '=', consumer.client_id),
+      ].join(',');
       const assetSelectorForContract = [
-        builder.assetFilter('owner', '=', assetInput.properties.owner),
-        builder.assetFilter('month', '=', assetInput.properties.month),
-        builder.assetFilter('year', '=', assetInput.properties.year),
-        builder.assetFilter('sharedWith', '=', consumer.client_id),
+        builder.assetFilter('query', '=', query),
       ];
 
       const contractDefinitionInput = builder.contractDefinition(
@@ -306,10 +319,11 @@ export class SfcDataSpace implements ISfcDataSpace {
     const contractDefinitions =
       await this.edcClient.queryAllContractDefinitions({
         filterExpression: [
-          ...builder.contractDefinitionFilter('owner', '=', owner),
-          ...builder.contractDefinitionFilter('sharedWith', '=', sharedWith),
-          ...builder.contractDefinitionFilter('month', '=', input.month),
-          ...builder.contractDefinitionFilter('year', '=', input.year),
+          CONTRACT_DEFINITION_QUERY_FILTER,
+          builder.filterByContractDefinitionQuery('owner', owner),
+          builder.filterByContractDefinitionQuery('sharedWith', sharedWith),
+          builder.filterByContractDefinitionQuery('month', input.month),
+          builder.filterByContractDefinitionQuery('year', input.year),
         ],
       });
 

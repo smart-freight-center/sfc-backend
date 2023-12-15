@@ -37,6 +37,10 @@ export class SFCAPI implements ISFCAPIConnection {
         throw new InvalidTokenInSFCAPI();
       }
 
+      if (axiosError.response?.status === 404) {
+        throw new ParticipantNotFound();
+      }
+
       throw error;
     }
   }

@@ -51,38 +51,36 @@ export function assetInput(dataInput: ShareAssetInput): AssetInput {
   };
 }
 export function policyInput(consumerPolicyBPN: string): PolicyDefinitionInput {
-  const constraints = BPNPolicyConstraint(consumerPolicyBPN);
-  const permissions = [
+  const constraint = BPNPolicyConstraint(consumerPolicyBPN);
+  const permission = [
     {
-      constraints: constraints,
-      action: {
-        type: 'USE',
-      },
-      edctype: 'dataspaceconnector:permission',
+      constraint,
+      action: 'use',
     },
   ];
 
   return {
     policy: {
-      permission: permissions,
+      '@type': 'set',
+      '@context': 'http://www.w3.org/ns/odrl.jsonld',
+      permission,
     },
   };
 }
 
 function BPNPolicyConstraint(policyBPN: string): Constraint[] {
   if (!policyBPN) return [];
+
   return [
     {
-      edctype: 'AtomicConstraint',
-      leftExpression: {
-        edctype: 'dataspaceconnector:literalexpression',
-        value: 'BusinessPartnerNumber',
-      },
-      rightExpression: {
-        edctype: 'dataspaceconnector:literalexpression',
-        value: policyBPN,
-      },
-      operator: 'EQ',
+      and: [
+        {
+          '@type': 'Constraint',
+          leftOperand: 'BusinessPartnerNumber',
+          rightOperand: policyBPN,
+          operator: 'eq',
+        },
+      ],
     },
   ];
 }
@@ -112,6 +110,11 @@ export function assetFilter(
   };
 }
 
+export const CONTRACT_DEFINITION_QUERY_FILTER = {
+  operandLeft: 'assetsSelector.operandLeft',
+  operator: '=',
+  operandRight: 'https://w3id.org/edc/v0.0.1/ns/query',
+};
 export function contractDefinitionFilter(
   operandLeft: string,
   operator = '=',
@@ -129,6 +132,17 @@ export function contractDefinitionFilter(
       operandRight: `https://w3id.org/edc/v0.0.1/ns/${operandLeft}`,
     },
   ];
+}
+
+export function filterByContractDefinitionQuery(
+  left: string,
+  right: string | number | boolean
+): CriterionInput {
+  return {
+    operandLeft: 'assetsSelector.operandRight',
+    operator: 'LIKE',
+    operandRight: `%${left}=${right}%`,
+  };
 }
 
 export function shipmentFilter(
