@@ -50,20 +50,39 @@ export function assetInput(dataInput: ShareAssetInput): AssetInput {
     },
   };
 }
+// export function policyInput(consumerPolicyBPN: string): PolicyDefinitionInput {
+//   const constraint = BPNPolicyConstraint(consumerPolicyBPN);
+//   const permission = [
+//     {
+//       constraint,
+//       action: 'use',
+//     },
+//   ];
+
+//   return {
+//     policy: {
+//       // '@type': 'set',
+//       // '@context': 'http://www.w3.org/ns/odrl.jsonld',
+//       permission: [],
+//     },
+//   };
+// }
+
 export function policyInput(consumerPolicyBPN: string): PolicyDefinitionInput {
-  const constraint = BPNPolicyConstraint(consumerPolicyBPN);
-  const permission = [
+  const constraints = BPNPolicyConstraint(consumerPolicyBPN);
+  const permissions = [
     {
-      constraint,
-      action: 'use',
+      constraints: [],
+      action: {
+        type: 'USE',
+      },
+      edctype: 'dataspaceconnector:permission',
     },
   ];
 
   return {
     policy: {
-      '@type': 'set',
-      '@context': 'http://www.w3.org/ns/odrl.jsonld',
-      permission,
+      permission: permissions,
     },
   };
 }

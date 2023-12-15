@@ -28,15 +28,15 @@ export class RetrieveFootprintMetaUsecase {
     const companies = await sfcAPISession.getCompanies();
     const myProfile = await sfcAPISession.getMyProfile();
 
-    const items = await this.sfcDataSpace.fetchReceivedAssets(
-      companies,
-      myProfile.client_id
-    );
-    // const companyProtocols = companies.map(
-    //   (company) => company.connector_data.addresses.protocol as string
+    // const items = await this.sfcDataSpace.fetchReceivedAssets(
+    //   companies,
+    //   myProfile.client_id
     // );
+    const companyProtocols = companies.map(
+      (company) => company.connector_data.addresses.protocol as string
+    );
 
-    // const items = await this.getItemsThatHasBeenSharedWithMe(companyProtocols);
+    const items = await this.getItemsThatHasBeenSharedWithMe(companyProtocols);
 
     return paginate(items, {
       page,
