@@ -92,9 +92,9 @@ export class KeyCloackClient {
   static async verifyToken(authorization: string) {
     try {
       const completeKey =
-      '-----BEGIN PUBLIC KEY-----\n' +
-      kcAdminClient.getPublicKey() +
-      '\n-----END PUBLIC KEY-----';
+        '-----BEGIN PUBLIC KEY-----\n' +
+        kcAdminClient.getPublicKey() +
+        '\n-----END PUBLIC KEY-----';
 
       const accessToken = authorization?.split(' ')[1];
 
