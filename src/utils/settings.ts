@@ -64,9 +64,14 @@ export const REDIS_PASSWORD = process.env.REDIS_PASSWORD || '';
 export const REDIS_DB = process.env.REDIS_DATABASE || '';
 
 export const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'master';
-export const KEYCLOAK_HOST = process.env.KEYCLOAK_HOST || 'localhost:8080';
-export const KEYCLOAK_ADMIN_USERNAME = process.env.KEYCLOAK_ADMIN_USERNAME || 'user';
-export const KEYCLOAK_ADMIN_PASSWORD = process.env.KEYCLOAK_ADMIN_PASSWORD || '';
+export const KEYCLOAK_ADMIN_REALM =
+  process.env.KEYCLOAK_ADMIN_REALM || KEYCLOAK_REALM || 'master';
+export const KEYCLOAK_HOST =
+  process.env.KEYCLOAK_HOST || 'http://localhost:8080';
+export const KEYCLOAK_ADMIN_USERNAME =
+  process.env.KEYCLOAK_ADMIN_USERNAME || 'user';
+export const KEYCLOAK_ADMIN_PASSWORD =
+  process.env.KEYCLOAK_ADMIN_PASSWORD || '';
 export const KEYCLOAK_CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || '';
 export const KEYCLOAK_CLIENT_SECRET = process.env.KEYCLOAK_CLIENT_SECRET || '';
 
