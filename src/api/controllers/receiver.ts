@@ -1,6 +1,6 @@
 import { RouterContext } from '@koa/router';
 import { authTokenCallbackUsecase } from 'core/usecases';
-import { TransferCallbackInput } from 'core/usecases/auth-token-callback';
+import { TransferCallbackInput } from 'core/usecases/interfaces';
 
 export class ReceiverController {
   static async receive(context: RouterContext) {

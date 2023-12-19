@@ -7,7 +7,6 @@ import {
   cacheService,
   dataSourceService,
   sfcDataSpace,
-  edcClient,
 } from 'core/services';
 import { GetEmissionsUsecase } from './get-emissions';
 import { ShareFootprintUsecase } from './share-footprint';
@@ -49,7 +48,7 @@ export const runValidationOnRawFileUsecase =
   new RunValidationOnRawFileUsecase();
 
 export const retrieveFootprintsUsecase = new RetrieveFootprintMetaUsecase(
-  edcClient,
+  sfcDataSpace,
   sfcAPI
 );
 export const generateTokenUsecase = new GenerateTokenUsecase(KeyCloackClient);

@@ -7,11 +7,6 @@ import {
 } from 'utils/settings';
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 
-console.log({
-  KEYCLOAK_HOST,
-  KEYCLOAK_ADMIN_USERNAME,
-  KEYCLOAK_ADMIN_PASSWORD,
-});
 export class KeycloakAdmin {
   static instance: KeycloakAdmin;
   initialized = false;

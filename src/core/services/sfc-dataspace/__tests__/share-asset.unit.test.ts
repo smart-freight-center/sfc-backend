@@ -105,24 +105,19 @@ describe('SfcDataspace', () => {
         policy: {
           permission: [
             {
-              constraints: [
+              constraint: [
                 {
-                  edctype: 'AtomicConstraint',
-                  leftExpression: {
-                    edctype: 'dataspaceconnector:literalexpression',
-                    value: 'BusinessPartnerNumber',
-                  },
-                  rightExpression: {
-                    edctype: 'dataspaceconnector:literalexpression',
-                    value: mockConsumer.company_BNP,
-                  },
-                  operator: 'EQ',
+                  and: [
+                    {
+                      '@type': 'Constraint',
+                      leftOperand: 'BusinessPartnerNumber',
+                      rightOperand: mockConsumer.company_BNP,
+                      operator: 'eq',
+                    },
+                  ],
                 },
               ],
-              action: {
-                type: 'USE',
-              },
-              edctype: 'dataspaceconnector:permission',
+              action: 'use',
             },
           ],
         },

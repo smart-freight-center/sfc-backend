@@ -8,7 +8,6 @@ import {
   Connector,
   ContractDefinitionInput,
 } from 'entities';
-import { EDC_FILTER_OPERATOR_SET } from 'utils/settings';
 import {
   Constraint,
   CriterionInput,
@@ -19,10 +18,11 @@ type ShareAssetInput = ShareFootprintInput & {
   providerClientId: string;
   sharedWith: string;
   numberOfRows: number;
+  query: string;
 };
 
 export function assetInput(dataInput: ShareAssetInput): AssetInput {
-  const { month, year, dataLocation, numberOfRows, type } = dataInput;
+  const { month, year, dataLocation, numberOfRows, type, query } = dataInput;
 
   const now = new Date();
 
@@ -41,6 +41,7 @@ export function assetInput(dataInput: ShareAssetInput): AssetInput {
       owner: dataInput.providerClientId,
       sharedWith: dataInput.sharedWith,
       numberOfRows: Math.floor(numberOfRows).toString(),
+      query,
     },
     privateProperties: {},
     dataAddress: {
@@ -50,39 +51,35 @@ export function assetInput(dataInput: ShareAssetInput): AssetInput {
     },
   };
 }
+
 export function policyInput(consumerPolicyBPN: string): PolicyDefinitionInput {
-  const constraints = BPNPolicyConstraint(consumerPolicyBPN);
-  const permissions = [
+  const constraint = BPNPolicyConstraint(consumerPolicyBPN);
+  const permission = [
     {
-      constraints: constraints,
-      action: {
-        type: 'USE',
-      },
-      edctype: 'dataspaceconnector:permission',
+      constraint,
+      action: 'use',
     },
   ];
-
   return {
     policy: {
-      permission: permissions,
+      permission,
     },
   };
 }
 
 function BPNPolicyConstraint(policyBPN: string): Constraint[] {
   if (!policyBPN) return [];
+
   return [
     {
-      edctype: 'AtomicConstraint',
-      leftExpression: {
-        edctype: 'dataspaceconnector:literalexpression',
-        value: 'BusinessPartnerNumber',
-      },
-      rightExpression: {
-        edctype: 'dataspaceconnector:literalexpression',
-        value: policyBPN,
-      },
-      operator: 'EQ',
+      and: [
+        {
+          '@type': 'Constraint',
+          leftOperand: 'BusinessPartnerNumber',
+          rightOperand: policyBPN,
+          operator: 'eq',
+        },
+      ],
     },
   ];
 }
@@ -112,38 +109,27 @@ export function assetFilter(
   };
 }
 
-export function contractDefinitionFilter(
-  operandLeft: string,
-  operator = '=',
-  operandRight: string | number | boolean
-): CriterionInput[] {
-  return [
-    {
-      operandLeft: 'assetsSelector.operandRight',
-      operator: operator,
-      operandRight: `${operandRight}`,
-    },
-    {
-      operandLeft: 'assetsSelector.operandLeft',
-      operator: operator,
-      operandRight: `https://w3id.org/edc/v0.0.1/ns/${operandLeft}`,
-    },
-  ];
+export const CONTRACT_DEFINITION_QUERY_FILTER = {
+  operandLeft: 'assetsSelector.operandLeft',
+  operator: '=',
+  operandRight: 'https://w3id.org/edc/v0.0.1/ns/query',
+};
+
+// This was used as a walkaround to fix the bug that existed when filtering contract definitions
+// It fixes a bug that ensures that the filter works in both upstream and local connectors
+export const CONTRACT_QUERY_EQ_OPERATOR = 'SFCEQEQ';
+
+export function filterByContractDefinitionByQuery(
+  left: string,
+  right: string | number | boolean
+): CriterionInput {
+  return {
+    operandLeft: 'assetsSelector.operandRight',
+    operator: 'LIKE',
+    operandRight: `%${left}${CONTRACT_QUERY_EQ_OPERATOR}${right}%`,
+  };
 }
 
-export function shipmentFilter(
-  operandLeft: string,
-  operandRight: string,
-  operator: 'LIKE' | '=' = '='
-) {
-  if (EDC_FILTER_OPERATOR_SET.has(operator)) {
-    return {
-      filterExpression: [assetFilter(operandLeft, operandRight, operator)],
-    };
-  }
-
-  return;
-}
 export function contractNegotiationInput(
   contractOffer: Offer,
   connector: Connector
@@ -171,10 +157,5 @@ export function transferProcessInput(
     connectorId: connector.id,
     contractId: contractId,
     dataDestination: { type: DataAddressType.HttpType },
-    properties: {
-      receiverHttpEndpoint:
-        'https://webhook.site/5fc7d035-2c8b-4dec-9ceb-67e3aff5ef4f',
-      contractId,
-    },
   };
 }
