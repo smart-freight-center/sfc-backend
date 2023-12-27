@@ -6,10 +6,10 @@ import {
   InvalidTokenInSFCAPI,
   ParticipantNotFound,
 } from 'utils/errors';
-import { SFCAPI_BASEURL } from 'utils/settings';
+import { SFC_UNIT_BASEURL } from 'utils/settings';
 
 const sfcAxios = axios.create({
-  baseURL: `${SFCAPI_BASEURL}/api`,
+  baseURL: `${SFC_UNIT_BASEURL}/api`,
 });
 
 class SfcAPI implements ISFCAPI {

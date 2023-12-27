@@ -28,7 +28,7 @@ export class KeycloakAdmin {
     if (!this.initialized) {
       this.adminClient = new KcAdminClient({
         baseUrl: `${KEYCLOAK_HOST}`,
-        realmName: KEYCLOAK_ADMIN_REALM,
+        realmName: 'master',
       });
 
       await this.adminClient.auth({
