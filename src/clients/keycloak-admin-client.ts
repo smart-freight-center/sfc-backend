@@ -3,7 +3,6 @@ import {
   KEYCLOAK_ADMIN_USERNAME,
   KEYCLOAK_ADMIN_PASSWORD,
   KEYCLOAK_REALM,
-  KEYCLOAK_ADMIN_REALM,
 } from 'utils/settings';
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 

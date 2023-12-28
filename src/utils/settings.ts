@@ -66,8 +66,6 @@ export const REDIS_PROTOCOL = process.env.REDIS_PROTOCOL || 'redis';
 
 
 export const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'master';
-export const KEYCLOAK_ADMIN_REALM =
-  process.env.KEYCLOAK_ADMIN_REALM || KEYCLOAK_REALM || 'master';
 export const KEYCLOAK_HOST =
   process.env.KEYCLOAK_HOST || 'http://localhost:8080';
 export const KEYCLOAK_ADMIN_USERNAME =
