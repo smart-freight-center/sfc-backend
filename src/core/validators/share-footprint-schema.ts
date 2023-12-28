@@ -33,7 +33,7 @@ const dataModelSchema = (month: number, year: number) => {
         co2e_ttw: joi.number().min(0).allow(null).optional(),
         load_factor: joi.number().greater(0).max(1).required(),
         load_factor_add_information: joi.string().optional().allow(null),
-        empty_distance_factor: joi.number().greater(0).less(1).required(),
+        empty_distance_factor: joi.number().min(0).less(1).required(),
         empty_distance_factor_add_information: joi
           .string()
           .allow(null)
