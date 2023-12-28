@@ -169,19 +169,11 @@ describe('Validate Data Model Usecase', () => {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
-          accreditation: {
-            msgs: ['is required'],
-            rows: [1, 2, 3],
-          },
           distance_activity: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
           empty_distance_factor: {
-            msgs: ['is required'],
-            rows: [1, 2, 3],
-          },
-          empty_distance_factor_add_information: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
@@ -226,14 +218,6 @@ describe('Validate Data Model Usecase', () => {
             rows: [1, 2, 3],
           },
           co2e_intensity_wtw_unit: {
-            msgs: ['is required'],
-            rows: [1, 2, 3],
-          },
-          co2e_ttw: {
-            msgs: ['is required'],
-            rows: [1, 2, 3],
-          },
-          co2e_wtw: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
@@ -345,19 +329,11 @@ describe('Validate Data Model Usecase', () => {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
-          accreditation: {
-            msgs: ['is required'],
-            rows: [1, 2, 3],
-          },
           distance_activity: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
           empty_distance_factor: {
-            msgs: ['is required'],
-            rows: [1, 2, 3],
-          },
-          empty_distance_factor_add_information: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
@@ -410,14 +386,6 @@ describe('Validate Data Model Usecase', () => {
             rows: [1, 2, 3],
           },
           co2e_intensity_wtw: {
-            msgs: ['is required'],
-            rows: [1, 2, 3],
-          },
-          co2e_ttw: {
-            msgs: ['is required'],
-            rows: [1, 2, 3],
-          },
-          co2e_wtw: {
             msgs: ['is required'],
             rows: [1, 2, 3],
           },
@@ -631,6 +599,37 @@ describe('Validate Data Model Usecase', () => {
           validateDataModel.execute(validInput)
         ).to.not.be.rejectedWith(DataModelValidationFailed);
 
+        mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
+          validInput
+        );
+      });
+      it('should fail when empty_distance_factor is equal to 0', async () => {
+        mockDataSourceFetcher.fetchFootprintData.returns(
+          Promise.resolve(
+            JSON.stringify([{ ...validDataModel, empty_distance_factor: 0 }])
+          )
+        );
+
+        const validInput = {
+          ...mockInput,
+          type: 'http' as const,
+          month: 12,
+          year: 2023,
+          dataLocation: {
+            name: 'ShipmentId-1',
+            baseUrl: 'http://example.com/footprints.csv',
+          },
+        };
+        const { errors } = await expect(
+          validateDataModel.execute(validInput)
+        ).to.be.rejectedWith(DataModelValidationFailed);
+
+        errors.should.be.eql({
+          empty_distance_factor: {
+            msgs: ['must be greater than 0'],
+            rows: [1],
+          },
+        });
         mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
           validInput
         );

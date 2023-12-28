@@ -29,12 +29,15 @@ const dataModelSchema = (month: number, year: number) => {
           .valid('rail', 'road', 'sea', 'air', 'inland waterway', 'hub')
           .required(),
         asset_type: joi.string().allow(null),
-        co2e_wtw: joi.number().min(0).required(),
-        co2e_ttw: joi.number().min(0).required(),
-        load_factor: joi.number().positive().max(1).required(),
+        co2e_wtw: joi.number().min(0).allow(null).optional(),
+        co2e_ttw: joi.number().min(0).allow(null).optional(),
+        load_factor: joi.number().greater(0).max(1).required(),
         load_factor_add_information: joi.string().optional().allow(null),
-        empty_distance_factor: joi.number().min(0).less(1).required(),
-        empty_distance_factor_add_information: joi.string().required(),
+        empty_distance_factor: joi.number().greater(0).less(1).required(),
+        empty_distance_factor_add_information: joi
+          .string()
+          .allow(null)
+          .optional(),
         energy_carrier_N: joi.string().required(),
         Feedstock_N: joi.string().required(),
         loading_date: joi
@@ -49,7 +52,12 @@ const dataModelSchema = (month: number, year: number) => {
           .max(lastDayOfMonth)
           .required(),
         verification: joi.boolean().falsy('0').truthy('1').required(),
-        accreditation: joi.boolean().falsy('0').truthy('1').required(),
+        accreditation: joi
+          .boolean()
+          .falsy('0')
+          .truthy('1')
+          .allow(null)
+          .optional(),
         transport_operator_name: joi.string().lowercase().required(),
         temp_control: joi
           .string()
