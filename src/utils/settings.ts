@@ -62,10 +62,10 @@ export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 export const REDIS_PORT = process.env.REDIS_PORT || '6379';
 export const REDIS_PASSWORD = process.env.REDIS_PASSWORD || '';
 export const REDIS_DB = process.env.REDIS_DATABASE || '';
+export const REDIS_PROTOCOL = process.env.REDIS_PROTOCOL || 'redis';
+
 
 export const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'master';
-export const KEYCLOAK_ADMIN_REALM =
-  process.env.KEYCLOAK_ADMIN_REALM || KEYCLOAK_REALM || 'master';
 export const KEYCLOAK_HOST =
   process.env.KEYCLOAK_HOST || 'http://localhost:8080';
 export const KEYCLOAK_ADMIN_USERNAME =
@@ -75,12 +75,8 @@ export const KEYCLOAK_ADMIN_PASSWORD =
 export const KEYCLOAK_CLIENT_ID = process.env.KEYCLOAK_CLIENT_ID || '';
 export const KEYCLOAK_CLIENT_SECRET = process.env.KEYCLOAK_CLIENT_SECRET || '';
 
-export const SFCAPI_BASEURL = process.env.SFCAPI_BASEURL;
+export const SFC_UNIT_BASEURL = process.env.SFC_UNIT_BASEURL;
 
 export const AWS_REGION = process.env.AWS_REGION;
 export const AWS_ACCESS_ID = process.env.AWS_ACCESS_ID;
 export const AWS_SECRET = process.env.AWS_SECRET;
-
-export const PARTICIPANT_CONFIG_S3_BUCKET =
-  process.env.PARTICIPANT_CONFIG_S3_BUCKET;
-export const PARTICIPANT_CONFIG_KEY = process.env.PARTICIPANT_CONFIG_KEY;

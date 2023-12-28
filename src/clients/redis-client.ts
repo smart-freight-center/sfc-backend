@@ -5,11 +5,12 @@ import {
   REDIS_PORT,
   REDIS_PASSWORD,
   REDIS_DB,
+  REDIS_PROTOCOL
 } from 'utils/settings';
 
 const redisCredentials = REDIS_PASSWORD ? `:${REDIS_PASSWORD}@` : '';
 
-const redisConnectionString = `redis://${redisCredentials}${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}`;
+const redisConnectionString = `${REDIS_PROTOCOL}://${redisCredentials}${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}`;
 
 const redisClient = createClient({
   url: redisConnectionString,
