@@ -603,10 +603,10 @@ describe('Validate Data Model Usecase', () => {
           validInput
         );
       });
-      it('should fail when empty_distance_factor is equal to 0', async () => {
+      it('should fail when load_factor is equal to 0', async () => {
         mockDataSourceFetcher.fetchFootprintData.returns(
           Promise.resolve(
-            JSON.stringify([{ ...validDataModel, empty_distance_factor: 0 }])
+            JSON.stringify([{ ...validDataModel, load_factor: 0 }])
           )
         );
 
@@ -625,7 +625,7 @@ describe('Validate Data Model Usecase', () => {
         ).to.be.rejectedWith(DataModelValidationFailed);
 
         errors.should.be.eql({
-          empty_distance_factor: {
+          load_factor: {
             msgs: ['must be greater than 0'],
             rows: [1],
           },
