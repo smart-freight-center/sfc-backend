@@ -14,31 +14,25 @@ export async function verifyDataModel(
 ) {
   const CHUNK_SIZE = 9000;
 
-  const { month, year, allowUnknown = true } = input;
   const jsonData = convertRawDataToJSON(rawData);
   const size = jsonData.length;
 
   const combinedErrors: DataModelValidationFailed[] = [];
   const combinedValues: EmissionDataModel[] = [];
+  const chunkActions: Promise<void>[] = [];
   for (let i = 0; i < Math.ceil(size / CHUNK_SIZE); i++) {
-    const data = jsonData.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-    const { error, value } = shareFootprintInputSchema
-      .dataModel(month, year)
-      .validate(data, {
-        abortEarly: false,
-        allowUnknown,
-      });
-
-    if (!error?.details) combinedValues.push(...value);
-    else {
-      const validationError = new DataModelValidationFailed(
-        error,
-        i * CHUNK_SIZE + 1
-      );
-      combinedErrors.push(validationError);
-    }
+    const dataChunk = jsonData.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+    const firstRowNumber = i * CHUNK_SIZE + 1;
+    chunkActions.push(
+      _runValidationAsync(input, dataChunk, {
+        combinedErrors,
+        combinedValues,
+        firstRowNumber,
+      })
+    );
   }
 
+  await Promise.all(chunkActions);
   if (combinedErrors.length) {
     throw new CombinedDataModelValidationError(combinedErrors);
   }
@@ -68,3 +62,40 @@ export const validateDataModelAndWarning = async (
 
   return { data: value, warning };
 };
+
+type RunValidationOptions = {
+  combinedValues: EmissionDataModel[];
+  combinedErrors: DataModelValidationFailed[];
+  firstRowNumber: number;
+};
+
+/**
+ * This runs the validation on a particular data input asynchronously
+ * Running it async helps increase the speed and performance of the program
+ * @param input
+ * @param data the data we want to validate
+ * @param options the options
+ */
+async function _runValidationAsync(
+  input: DataModelInput,
+  data: object,
+  options: RunValidationOptions
+) {
+  const { month, year, allowUnknown = true } = input;
+  const { combinedErrors, combinedValues, firstRowNumber } = options;
+  const { error, value } = shareFootprintInputSchema
+    .dataModel(month, year)
+    .validate(data, {
+      abortEarly: false,
+      allowUnknown,
+    });
+
+  if (!error?.details) combinedValues.push(...value);
+  else {
+    const validationError = new DataModelValidationFailed(
+      error,
+      firstRowNumber
+    );
+    combinedErrors.push(validationError);
+  }
+}
