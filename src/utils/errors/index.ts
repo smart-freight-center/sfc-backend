@@ -152,47 +152,41 @@ export class CombinedDataModelValidationError extends InvalidUserInput {
   message = 'The footprint data you specified does not meet the data model';
 
   public readonly errors: object;
-  constructor(errorsList: DataModelValidationFailed[]) {
+  constructor(errorChunks: DataModelValidationFailed[]) {
     super();
 
-    let currentError = new DataModelValidationFailed();
-    if (errorsList.length >= 1) {
-      currentError = errorsList[0];
-    }
-    for (let i = 1; i < errorsList.length; i++) {
-      currentError = this.combineTwoErrorObjects(currentError, errorsList[i]);
-    }
-
+    const currentError = this.combineErrorObjects(errorChunks);
     this.errors = currentError.errors;
   }
 
-  private combineTwoErrorObjects(
-    error1: DataModelValidationFailed,
-    error2: DataModelValidationFailed
-  ) {
-    let finalErrors = {
-      ...error1.errors,
+  private combineErrorObjects(errorChunks: DataModelValidationFailed[]) {
+    let errorObject = new DataModelValidationFailed();
+    if (errorChunks.length >= 1) {
+      errorObject = errorChunks[0];
+    }
+    let errorsList = {
+      ...errorChunks[0].errors,
     };
-    for (const [key, errorDetail] of Object.entries(error2.errors)) {
-      if (finalErrors[key]) {
-        finalErrors = {
-          ...finalErrors,
-          [key]: {
-            rows: [...finalErrors[key].rows, ...errorDetail.rows],
-            msgs: [...finalErrors[key].msgs, ...errorDetail.msgs],
-          },
-        };
-      } else {
-        finalErrors = {
-          ...finalErrors,
-          [key]: errorDetail,
-        };
+    for (let i = 1; i < errorChunks.length; i++) {
+      for (const [key, errorDetail] of Object.entries(errorChunks[i].errors)) {
+        if (errorsList[key]) {
+          errorsList = {
+            ...errorsList,
+            [key]: {
+              rows: [...errorsList[key].rows, ...errorDetail.rows],
+              msgs: [...errorsList[key].msgs, ...errorDetail.msgs],
+            },
+          };
+        } else {
+          errorsList = {
+            ...errorsList,
+            [key]: errorDetail,
+          };
+        }
       }
     }
 
-    const finalErrorObject = new DataModelValidationFailed();
-
-    finalErrorObject.errors = finalErrors;
-    return finalErrorObject;
+    errorObject.errors = errorsList;
+    return errorObject;
   }
 }

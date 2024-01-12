@@ -17,26 +17,26 @@ export async function verifyDataModel(
   const jsonData = convertRawDataToJSON(rawData);
   const size = jsonData.length;
 
-  const combinedErrors: DataModelValidationFailed[] = [];
-  const combinedValues: EmissionDataModel[] = [];
+  const groupedErrorChunks: DataModelValidationFailed[] = [];
+  const groupedValueChunks: EmissionDataModel[] = [];
   const chunkActions: Promise<void>[] = [];
   for (let i = 0; i < Math.ceil(size / CHUNK_SIZE); i++) {
     const dataChunk = jsonData.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
     const firstRowNumber = i * CHUNK_SIZE + 1;
     chunkActions.push(
       _runValidationAsync(input, dataChunk, {
-        combinedErrors,
-        combinedValues,
+        groupedErrorChunks,
+        groupedValueChunks,
         firstRowNumber,
       })
     );
   }
 
   await Promise.all(chunkActions);
-  if (combinedErrors.length) {
-    throw new CombinedDataModelValidationError(combinedErrors);
+  if (groupedErrorChunks.length) {
+    throw new CombinedDataModelValidationError(groupedErrorChunks);
   }
-  return combinedValues;
+  return groupedValueChunks;
 }
 
 export const validateDataModelAndWarning = async (
@@ -64,8 +64,8 @@ export const validateDataModelAndWarning = async (
 };
 
 type RunValidationOptions = {
-  combinedValues: EmissionDataModel[];
-  combinedErrors: DataModelValidationFailed[];
+  groupedValueChunks: EmissionDataModel[];
+  groupedErrorChunks: DataModelValidationFailed[];
   firstRowNumber: number;
 };
 
@@ -82,7 +82,7 @@ async function _runValidationAsync(
   options: RunValidationOptions
 ) {
   const { month, year, allowUnknown = true } = input;
-  const { combinedErrors, combinedValues, firstRowNumber } = options;
+  const { groupedErrorChunks, groupedValueChunks, firstRowNumber } = options;
   const { error, value } = shareFootprintInputSchema
     .dataModel(month, year)
     .validate(data, {
@@ -90,12 +90,12 @@ async function _runValidationAsync(
       allowUnknown,
     });
 
-  if (!error?.details) combinedValues.push(...value);
+  if (!error?.details) groupedValueChunks.push(...value);
   else {
     const validationError = new DataModelValidationFailed(
       error,
       firstRowNumber
     );
-    combinedErrors.push(validationError);
+    groupedErrorChunks.push(validationError);
   }
 }
