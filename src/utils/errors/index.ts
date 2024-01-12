@@ -94,16 +94,23 @@ export class InvalidShipmentIdFormat extends InvalidUserInput {
   message = 'The shipment Id should not containt `-`, `:`, `?` or `_`';
   name = 'invalid_shipment_id_format';
 }
+
+type DataModelErrorType = {
+  rows: number[];
+  msgs: string[];
+};
 export class DataModelValidationFailed extends InvalidUserInput {
   name = 'data_model_validation_failed';
   message = 'The footprint data you specified does not meet the data model';
 
-  public readonly errors: object;
-  constructor(joiError: ValidationError) {
+  public errors: Record<string, DataModelErrorType> = {};
+  constructor(joiError?: ValidationError, private firstRowNumber = 1) {
     super();
 
-    const errors = this.formatError(joiError);
-    this.errors = errors;
+    if (joiError) {
+      const errors = this.formatError(joiError);
+      this.errors = errors;
+    }
   }
 
   private formatError(joiError: ValidationError) {
@@ -127,7 +134,7 @@ export class DataModelValidationFailed extends InvalidUserInput {
       const firstSpace = message.indexOf(' ');
       const msg = message.slice(firstSpace + 1);
 
-      currentKeyError.rows.push(+path[0] + 1);
+      currentKeyError.rows.push(+path[0] + this.firstRowNumber);
 
       if (!currentMsgSet.has(msg)) {
         currentMsgSet.add(msg);
@@ -138,5 +145,103 @@ export class DataModelValidationFailed extends InvalidUserInput {
       finalObj[key] = currentKeyError;
     }
     return finalObj;
+  }
+}
+export class CombinedDataModelValidationError extends InvalidUserInput {
+  name = 'data_model_validation_failed';
+  message = 'The footprint data you specified does not meet the data model';
+
+  public readonly errors: object;
+  constructor(errorsList: DataModelValidationFailed[]) {
+    super();
+
+    let currentError = new DataModelValidationFailed();
+    if (errorsList.length >= 1) {
+      currentError = errorsList[0];
+    }
+    for (let i = 1; i < errorsList.length; i++) {
+      currentError = this.combineTwoErrorObjects(currentError, errorsList[i]);
+    }
+
+    this.errors = currentError.errors;
+  }
+
+  private combineTwoErrorObjects(
+    error1: DataModelValidationFailed,
+    error2: DataModelValidationFailed
+  ) {
+    /*
+      error1--> {
+        errors: {
+          co2_emissions: {
+            rows: [1,2,3],
+            msgs: ['good', 'bad','ugly']
+          },
+          loading_city: {
+            rows: [1,2,3],
+            msgs: ['good', 'bad','ugly']
+          }
+        }
+      }
+
+
+       error2-> {
+        errors: {
+          co2_emissions: {
+            rows: [4,5,6,8],
+            msgs: ['good', 'bad','ugly']
+          },
+          loading_country: {
+            rows: [1,2,3],
+            msgs: ['good', 'bad','ugly']
+          }
+        }
+      }
+
+
+      result===> {
+        co2_emissions: {
+            rows: [1,2,3, 4,5,6,8],
+            msgs: ['good', 'bad','ugly', 'good', 'bad','ugly']
+          },
+           loading_city: {
+            rows: [1,2,3],
+            msgs: ['good', 'bad','ugly']
+          },
+          loading_country: {
+            rows: [1,2,3],
+            msgs: ['good', 'bad','ugly']
+          }
+      }
+
+    */
+
+    let finalErrors = {
+      ...error1.errors,
+    };
+    for (const [key, errorDetail] of Object.entries(error2.errors)) {
+      if (finalErrors[key] && errorDetail[key]) {
+        console.log('ifs statement...');
+
+        finalErrors = {
+          ...finalErrors,
+          [key]: {
+            rows: [...finalErrors[key].rows, ...errorDetail[key].rows],
+            msgs: [...finalErrors[key].msgs, ...errorDetail[key].msgs],
+          },
+        };
+      } else {
+        console.log('else statement...', finalErrors);
+        finalErrors = {
+          ...finalErrors,
+          [key]: errorDetail,
+        };
+      }
+    }
+
+    const finalErrorObject = new DataModelValidationFailed();
+
+    finalErrorObject.errors = finalErrors;
+    return finalErrorObject;
   }
 }

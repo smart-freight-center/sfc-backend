@@ -1,6 +1,9 @@
 import { shareFootprintInputSchema } from 'core/validators/share-footprint-schema';
 import { convertRawDataToJSON } from './data-converter';
-import { DataModelValidationFailed } from './errors';
+import {
+  CombinedDataModelValidationError,
+  DataModelValidationFailed,
+} from './errors';
 import { EmissionDataModel } from 'core/types';
 
 type DataModelInput = { month: number; year: number; allowUnknown?: boolean };
@@ -11,16 +14,35 @@ export async function verifyDataModel(
 ) {
   const { month, year, allowUnknown = true } = input;
   const jsonData = convertRawDataToJSON(rawData);
-  const { error, value } = shareFootprintInputSchema
-    .dataModel(month, year)
-    .validate(jsonData, {
-      abortEarly: false,
-      allowUnknown,
-    });
+  console.log('reducing data');
+  const count = jsonData.length;
+  const slices = Math.ceil(count / 9000);
+  const combinedErrors: DataModelValidationFailed[] = [];
+  const combinedValues: EmissionDataModel[] = [];
+  for (let i = 0; i < slices; i++) {
+    const data = jsonData.slice(i * 9000, (i + 1) * 9000);
+    const { error, value } = shareFootprintInputSchema
+      .dataModel(month, year)
+      .validate(data, {
+        abortEarly: false,
+        allowUnknown,
+      });
 
-  if (!error?.details) return value as EmissionDataModel[];
+    if (!error?.details) combinedValues.push(...value);
+    else {
+      const validationError = new DataModelValidationFailed(
+        error,
+        i * 9000 + 1
+      );
+      combinedErrors.push(validationError);
+    }
+  }
 
-  throw new DataModelValidationFailed(error);
+  if (combinedErrors.length) {
+    throw new CombinedDataModelValidationError(combinedErrors);
+  } else {
+    return combinedValues;
+  }
 }
 
 export const validateDataModelAndWarning = async (
