@@ -9,20 +9,16 @@ export class ValidateDataModelUsecase {
   constructor(private dataSourceService: IDataModelValidator) {}
 
   public async execute(input: Partial<ValidateDataModelInput>) {
-    console.log('started validation');
     const validatedInput = this.validateInput(input);
     const rawData = await this.dataSourceService.fetchFootprintData(
       validatedInput
     );
 
-    console.log('getting date');
     const { month, year } = validatedInput;
-    console.log('getting data');
     const { data, warning } = await validateDataModelAndWarning(
       { month, year },
       rawData
     );
-    console.log('finishing');
     return { numberOfRows: data.length, warning };
   }
 

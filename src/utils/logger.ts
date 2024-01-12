@@ -43,7 +43,7 @@ export class AppLogger {
   }
 
   public warn(msg: string, extra?: Record<string, unknown>) {
-    _winstonLogger.error(msg, {
+    _winstonLogger.warn(msg, {
       service: this.serviceName,
       ...extra,
     });

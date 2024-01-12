@@ -170,68 +170,19 @@ export class CombinedDataModelValidationError extends InvalidUserInput {
     error1: DataModelValidationFailed,
     error2: DataModelValidationFailed
   ) {
-    /*
-      error1--> {
-        errors: {
-          co2_emissions: {
-            rows: [1,2,3],
-            msgs: ['good', 'bad','ugly']
-          },
-          loading_city: {
-            rows: [1,2,3],
-            msgs: ['good', 'bad','ugly']
-          }
-        }
-      }
-
-
-       error2-> {
-        errors: {
-          co2_emissions: {
-            rows: [4,5,6,8],
-            msgs: ['good', 'bad','ugly']
-          },
-          loading_country: {
-            rows: [1,2,3],
-            msgs: ['good', 'bad','ugly']
-          }
-        }
-      }
-
-
-      result===> {
-        co2_emissions: {
-            rows: [1,2,3, 4,5,6,8],
-            msgs: ['good', 'bad','ugly', 'good', 'bad','ugly']
-          },
-           loading_city: {
-            rows: [1,2,3],
-            msgs: ['good', 'bad','ugly']
-          },
-          loading_country: {
-            rows: [1,2,3],
-            msgs: ['good', 'bad','ugly']
-          }
-      }
-
-    */
-
     let finalErrors = {
       ...error1.errors,
     };
     for (const [key, errorDetail] of Object.entries(error2.errors)) {
-      if (finalErrors[key] && errorDetail[key]) {
-        console.log('ifs statement...');
-
+      if (finalErrors[key]) {
         finalErrors = {
           ...finalErrors,
           [key]: {
-            rows: [...finalErrors[key].rows, ...errorDetail[key].rows],
-            msgs: [...finalErrors[key].msgs, ...errorDetail[key].msgs],
+            rows: [...finalErrors[key].rows, ...errorDetail.rows],
+            msgs: [...finalErrors[key].msgs, ...errorDetail.msgs],
           },
         };
       } else {
-        console.log('else statement...', finalErrors);
         finalErrors = {
           ...finalErrors,
           [key]: errorDetail,

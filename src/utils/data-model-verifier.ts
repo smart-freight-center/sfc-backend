@@ -12,15 +12,16 @@ export async function verifyDataModel(
   input: DataModelInput,
   rawData: string | object
 ) {
+  const CHUNK_SIZE = 9000;
+
   const { month, year, allowUnknown = true } = input;
   const jsonData = convertRawDataToJSON(rawData);
-  console.log('reducing data');
-  const count = jsonData.length;
-  const slices = Math.ceil(count / 9000);
+  const size = jsonData.length;
+
   const combinedErrors: DataModelValidationFailed[] = [];
   const combinedValues: EmissionDataModel[] = [];
-  for (let i = 0; i < slices; i++) {
-    const data = jsonData.slice(i * 9000, (i + 1) * 9000);
+  for (let i = 0; i < Math.ceil(size / CHUNK_SIZE); i++) {
+    const data = jsonData.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
     const { error, value } = shareFootprintInputSchema
       .dataModel(month, year)
       .validate(data, {
@@ -32,7 +33,7 @@ export async function verifyDataModel(
     else {
       const validationError = new DataModelValidationFailed(
         error,
-        i * 9000 + 1
+        i * CHUNK_SIZE + 1
       );
       combinedErrors.push(validationError);
     }
@@ -40,9 +41,8 @@ export async function verifyDataModel(
 
   if (combinedErrors.length) {
     throw new CombinedDataModelValidationError(combinedErrors);
-  } else {
-    return combinedValues;
   }
+  return combinedValues;
 }
 
 export const validateDataModelAndWarning = async (
