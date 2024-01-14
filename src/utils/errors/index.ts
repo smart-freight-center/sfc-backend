@@ -164,29 +164,29 @@ export class CombinedDataModelValidationError extends InvalidUserInput {
     if (errorChunks.length >= 1) {
       errorObject = errorChunks[0];
     }
-    let errorsList = {
+    let errorMapper = {
       ...errorChunks[0].errors,
     };
     for (let i = 1; i < errorChunks.length; i++) {
       for (const [key, errorDetail] of Object.entries(errorChunks[i].errors)) {
-        if (errorsList[key]) {
-          errorsList = {
-            ...errorsList,
+        if (errorMapper[key]) {
+          errorMapper = {
+            ...errorMapper,
             [key]: {
-              rows: [...errorsList[key].rows, ...errorDetail.rows],
-              msgs: [...errorsList[key].msgs, ...errorDetail.msgs],
+              rows: [...errorMapper[key].rows, ...errorDetail.rows],
+              msgs: [...errorMapper[key].msgs, ...errorDetail.msgs],
             },
           };
         } else {
-          errorsList = {
-            ...errorsList,
+          errorMapper = {
+            ...errorMapper,
             [key]: errorDetail,
           };
         }
       }
     }
 
-    errorObject.errors = errorsList;
+    errorObject.errors = errorMapper;
     return errorObject;
   }
 }
