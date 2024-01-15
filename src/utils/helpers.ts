@@ -12,7 +12,9 @@ import {
 } from '@think-it-labs/edc-connector-client';
 import { ObjectSchema } from 'joi';
 import { paginationSchema } from 'core/validators';
+import { AppLogger } from './logger';
 
+const logger = new AppLogger('utils/helpers');
 type PaginationQuery = {
   page: number;
   perPage: number;
@@ -56,8 +58,8 @@ export const sleep = (ms: number): Promise<void> => {
 };
 
 export const handleErrors = (context: Context, error: Error) => {
-  console.log(error, '<---errro');
   if (error instanceof EdcConnectorClientError) {
+    logger.error('Connector error occured', { error });
     context.set('Content-type', 'application/json');
     switch (error.type) {
       case EdcConnectorClientErrorType.NotFound: {
@@ -107,12 +109,18 @@ export const handleErrors = (context: Context, error: Error) => {
   }
 
   if (error instanceof CustomError) {
+    logger.warn('We caught an error', {
+      error: { name: error.name, message: error.message },
+    });
+
     body.message = error.message;
     body.code = error.name;
     context.status = error.status;
     context.body = body;
     return;
   }
+
+  logger.error('Unknown Error occured', { error });
 
   context.status = 500;
   context.body = {

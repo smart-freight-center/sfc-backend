@@ -4,7 +4,10 @@ import { DataValidationError } from 'utils/errors/base-errors';
 import { ValidateDataModelUsecase } from '../validate-data-model';
 import { mockDataSourceFetcher } from './stubs';
 import { expect } from 'chai';
-import { DataModelValidationFailed, EmptyDataSource } from 'utils/errors';
+import {
+  CombinedDataModelValidationError,
+  EmptyDataSource,
+} from 'utils/errors';
 
 const mockInCompleteFootprint = fs.readFileSync(
   path.join(__dirname, 'mock-incomplete.csv'),
@@ -162,7 +165,7 @@ describe('Validate Data Model Usecase', () => {
         };
         const { errors } = await expect(
           validateDataModel.execute(validInput)
-        ).to.be.rejectedWith(DataModelValidationFailed);
+        ).to.be.rejectedWith(CombinedDataModelValidationError);
 
         errors.should.be.eql({
           loading_date: {
@@ -299,7 +302,7 @@ describe('Validate Data Model Usecase', () => {
         };
         await expect(
           validateDataModel.execute(validInput)
-        ).to.not.be.rejectedWith(DataModelValidationFailed);
+        ).to.not.be.rejectedWith(CombinedDataModelValidationError);
         mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
           validInput
         );
@@ -322,7 +325,7 @@ describe('Validate Data Model Usecase', () => {
         };
         const { errors } = await expect(
           validateDataModel.execute(validInput)
-        ).to.be.rejectedWith(DataModelValidationFailed);
+        ).to.be.rejectedWith(CombinedDataModelValidationError);
 
         errors.should.be.eql({
           Feedstock_N: {
@@ -467,7 +470,7 @@ describe('Validate Data Model Usecase', () => {
         };
         const { errors } = await expect(
           validateDataModel.execute(validInput)
-        ).to.be.rejectedWith(DataModelValidationFailed);
+        ).to.be.rejectedWith(CombinedDataModelValidationError);
 
         errors.should.be.eql({
           unloading_date: {
@@ -513,7 +516,7 @@ describe('Validate Data Model Usecase', () => {
         };
         const { errors } = await expect(
           validateDataModel.execute(validInput)
-        ).to.be.rejectedWith(DataModelValidationFailed);
+        ).to.be.rejectedWith(CombinedDataModelValidationError);
 
         errors.should.be.eql({
           unloading_country: {
@@ -563,7 +566,7 @@ describe('Validate Data Model Usecase', () => {
         };
         const { errors } = await expect(
           validateDataModel.execute(validInput)
-        ).to.be.rejectedWith(DataModelValidationFailed);
+        ).to.be.rejectedWith(CombinedDataModelValidationError);
 
         errors.should.be.eql({
           loading_date: {
@@ -597,7 +600,7 @@ describe('Validate Data Model Usecase', () => {
         };
         await expect(
           validateDataModel.execute(validInput)
-        ).to.not.be.rejectedWith(DataModelValidationFailed);
+        ).to.not.be.rejectedWith(CombinedDataModelValidationError);
 
         mockDataSourceFetcher.fetchFootprintData.should.have.been.calledOnceWithExactly(
           validInput
@@ -622,7 +625,7 @@ describe('Validate Data Model Usecase', () => {
         };
         const { errors } = await expect(
           validateDataModel.execute(validInput)
-        ).to.be.rejectedWith(DataModelValidationFailed);
+        ).to.be.rejectedWith(CombinedDataModelValidationError);
 
         errors.should.be.eql({
           load_factor: {

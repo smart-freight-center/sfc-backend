@@ -94,16 +94,23 @@ export class InvalidShipmentIdFormat extends InvalidUserInput {
   message = 'The shipment Id should not containt `-`, `:`, `?` or `_`';
   name = 'invalid_shipment_id_format';
 }
+
+type DataModelErrorType = {
+  rows: number[];
+  msgs: string[];
+};
 export class DataModelValidationFailed extends InvalidUserInput {
   name = 'data_model_validation_failed';
   message = 'The footprint data you specified does not meet the data model';
 
-  public readonly errors: object;
-  constructor(joiError: ValidationError) {
+  public errors: Record<string, DataModelErrorType> = {};
+  constructor(joiError?: ValidationError, private firstRowNumber = 1) {
     super();
 
-    const errors = this.formatError(joiError);
-    this.errors = errors;
+    if (joiError) {
+      const errors = this.formatError(joiError);
+      this.errors = errors;
+    }
   }
 
   private formatError(joiError: ValidationError) {
@@ -127,7 +134,7 @@ export class DataModelValidationFailed extends InvalidUserInput {
       const firstSpace = message.indexOf(' ');
       const msg = message.slice(firstSpace + 1);
 
-      currentKeyError.rows.push(+path[0] + 1);
+      currentKeyError.rows.push(+path[0] + this.firstRowNumber);
 
       if (!currentMsgSet.has(msg)) {
         currentMsgSet.add(msg);
@@ -138,5 +145,48 @@ export class DataModelValidationFailed extends InvalidUserInput {
       finalObj[key] = currentKeyError;
     }
     return finalObj;
+  }
+}
+export class CombinedDataModelValidationError extends InvalidUserInput {
+  name = 'data_model_validation_failed';
+  message = 'The footprint data you specified does not meet the data model';
+
+  public readonly errors: object;
+  constructor(errorChunks: DataModelValidationFailed[]) {
+    super();
+
+    const currentError = this.combineErrorObjects(errorChunks);
+    this.errors = currentError.errors;
+  }
+
+  private combineErrorObjects(errorChunks: DataModelValidationFailed[]) {
+    let errorObject = new DataModelValidationFailed();
+    if (errorChunks.length >= 1) {
+      errorObject = errorChunks[0];
+    }
+    let errorMapper = {
+      ...errorChunks[0].errors,
+    };
+    for (let i = 1; i < errorChunks.length; i++) {
+      for (const [key, errorDetail] of Object.entries(errorChunks[i].errors)) {
+        if (errorMapper[key]) {
+          errorMapper = {
+            ...errorMapper,
+            [key]: {
+              rows: [...errorMapper[key].rows, ...errorDetail.rows],
+              msgs: [...errorMapper[key].msgs, ...errorDetail.msgs],
+            },
+          };
+        } else {
+          errorMapper = {
+            ...errorMapper,
+            [key]: errorDetail,
+          };
+        }
+      }
+    }
+
+    errorObject.errors = errorMapper;
+    return errorObject;
   }
 }
