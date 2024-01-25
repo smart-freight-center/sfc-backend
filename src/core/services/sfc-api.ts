@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { Participant } from 'core/types';
 import { ISFCAPIConnection, ISFCAPI } from 'core/usecases/interfaces';
 import {
+  InvalidSFCAPIConnectionError,
   InvalidToken,
   InvalidTokenInSFCAPI,
   ParticipantNotFound,
@@ -37,7 +38,7 @@ export class SFCAPI implements ISFCAPIConnection {
         throw new InvalidTokenInSFCAPI();
       }
 
-      throw error;
+      throw new InvalidSFCAPIConnectionError();
     }
   }
 

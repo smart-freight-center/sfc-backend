@@ -55,7 +55,7 @@ export const validateDataModelAndWarning = async (
   } catch (error) {
     if (!passedValidationWithKnownFields) {
       throw error;
-    } else if (error instanceof DataModelValidationFailed) {
+    } else if (error instanceof CombinedDataModelValidationError) {
       warning = Object.keys(error.errors);
     }
   }
