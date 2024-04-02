@@ -18,31 +18,14 @@ To install the project, follow these steps:
 yarn
 ```
 
-3. Spin up a KeyCloak server by running [KeyCloak](https://www.keycloak.org/getting-started/getting-started-docker) with the following command:
+### Run App Dependencies using Docker Compose
 
-```bash
-docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:21.0.1 start-dev
+The project is dependent on [KeyCloak](https://www.keycloak.org/getting-started/getting-started-docker) , [Redis](https://redis.io/docs/getting-started/installation/install-redis-on-mac-os/) and the EDC Connector
 
-```
+You can spin up all those dependencies by running
 
-To get a quick dive on how to setup KeyCloak take a look at [this video](https://www.youtube.com/watch?v=duawSV69LDI&t=382s&ab_channel=StianThorgersen). This project uses OpenID Connect [client_credentials](https://www.rfc-editor.org/rfc/rfc6749#section-4.4) to authenticate all users in the project.
-
-4. Use the .env.sample to create .env variables
-
-5. Run the project this will start the server on port 3000
-
-```
-yarn dev
-```
-
-### Running Redis
-
-Follow [this](https://redis.io/docs/getting-started/installation/install-redis-on-mac-os/) instruction to install redis on your MacOS
-
-Once redis is installed you can run it with:
-
-```bash
- redis-server
+```sh
+docker-compose up
 ```
 
 ### Postman Docs for V1
