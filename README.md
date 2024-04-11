@@ -1,8 +1,16 @@
-# sfc-backend
+# SFC Data Exchange API
 
-This repository contains the SFC backend app and a RESTful API using TypeScript and Koa.
+The SFC Data Exchange API is a project that aims to enable organisations in the freight industry share carbon footprint data in a decentralized and consistent way
 
 ## Features
+
+- Participant share data in a decentralized way
+- Enforces a data model that ensures data consistency
+- Share Large Data sets
+- Data Provider can revoke acecss
+- Data Consumer can view metadata of the carbon footprints he has access to
+
+## Technologies Used
 
 Uses Koa and TypeScript for improved performance and type safety
 Implements a simple RESTful API with CRUD operations for app resources
