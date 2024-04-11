@@ -2,7 +2,6 @@ import { TypedError } from '@think-it-labs/typed-error';
 import { ValidationError } from 'joi';
 import {
   DataConflict,
-  InternalServerError,
   InvalidUserInput,
   NotFound,
   NotImplemented,
@@ -19,7 +18,17 @@ export enum EdcManagerErrorType {
 
 export class EdcManagerError extends TypedError<EdcManagerErrorType> {}
 
-export class KeyCloakCouldNotGenerateToken extends ServiceUnavailable {}
+export class KeyCloakCouldNotGenerateToken extends ServiceUnavailable {
+  name = 'invalid_server_config';
+  message =
+    'You server configurations is wrong. Please contact support or report the bug';
+}
+
+export class InvalidSFCAPIConnectionError extends NotImplemented {
+  name = 'invalid_connection_config';
+  message =
+    'Your infrastructure setup for your connection is wrong. Check server config variables to fix';
+}
 
 export class InvalidTokenInSFCAPI extends NotImplemented {
   name = 'public_key_not_provided';
@@ -86,7 +95,7 @@ export class EmptyDataSource extends InvalidUserInput {
   message = 'The datasource is empty or has only the header';
 }
 
-export class NoDataInAssetDataAddress extends InternalServerError {
+export class NoDataInAssetDataAddress extends InvalidUserInput {
   name = 'no_data_in_asset_data_address';
   message = 'The data address the user specified is currently empty';
 }

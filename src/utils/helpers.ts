@@ -125,6 +125,5 @@ export const handleErrors = (context: Context, error: Error) => {
   context.status = 500;
   context.body = {
     code: 'Unknown',
-    error,
   };
 };
